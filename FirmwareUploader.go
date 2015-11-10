@@ -140,7 +140,7 @@ func FlashWrite(port *serial.SerialPort, address uint32, buffer []byte) error {
 		return err
 	}
 	if string(ack) != "OK" {
-		return &UpdaterError{err: "Error during FlashRead()"}
+		return &UpdaterError{err: "Error during FlashWrite()"}
 	}
 	return nil
 }
