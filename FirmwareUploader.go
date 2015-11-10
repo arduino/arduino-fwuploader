@@ -1,6 +1,6 @@
 /*
   FirmwareUploader.go - A firmware uploader for the WiFi101 module.
-  Copyright (c) 2015 Arduino.  All right reserved.
+  Copyright (c) 2015 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -141,6 +141,22 @@ func FlashWrite(port *serial.SerialPort, address uint32, buffer []byte) error {
 	}
 	if string(ack) != "OK" {
 		return &UpdaterError{err: "Error during FlashRead()"}
+	}
+	return nil
+}
+
+// Erase a block of flash memory
+func FlashErase(port *serial.SerialPort, address uint32, length uint32) error {
+	// "FLASH_ERASE" command
+	programmerSendCommand(port, 0x03, address, length, 0)
+
+	// wait acknowledge
+	ack := make([]byte, 2)
+	if err := serialFillBuffer(port, ack); err != nil {
+		return err
+	}
+	if string(ack) != "OK" {
+		return &UpdaterError{err: "Error during FlashErase()"}
 	}
 	return nil
 }
