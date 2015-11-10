@@ -19,16 +19,20 @@
 package main
 
 import (
+	"bytes"
+	"certificates"
+	"errors"
 	"flag"
 	"flasher"
 	"log"
-	"os"
 )
 
 var portName string
+var rootCertDir string
 
 func init() {
 	flag.StringVar(&portName, "port", "", "serial port to use for flashing")
+	flag.StringVar(&rootCertDir, "certs", "", "root certificate directory")
 }
 
 func main() {
@@ -53,17 +57,49 @@ func main() {
 		log.Fatalf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
 	}
 
-	//if err := f.Write(1024, make([]byte, payloadSize)); err != nil {
-	//	log.Fatal(err)
-	//}
-
-	for i := 0; i < 256; i++ {
-		data, err := f.Read(uint32(i*1024), 1024)
-		if err != nil {
-			log.Fatal(err.Error())
+	if rootCertDir != "" {
+		log.Printf("Converting and flashing certificates from '%v'", rootCertDir)
+		if err := flashCerts(f, int(payloadSize)); err != nil {
+			log.Fatal(err)
 		}
-		os.Stdout.Write(data)
 	}
 
 	f.Close()
+}
+
+func flashCerts(f *flasher.Flasher, payloadSize int) error {
+	CERTIFICATES_OFFSET := 0x4000
+	CERTIFICATES_LENGTH := 4096
+
+	certificatesData, err := certificates.Convert(rootCertDir)
+	if err != nil {
+		return err
+	}
+
+	if err := f.Erase(uint32(CERTIFICATES_OFFSET), uint32(CERTIFICATES_LENGTH)); err != nil {
+		return err
+	}
+
+	for i := 0; i < CERTIFICATES_LENGTH; i += payloadSize {
+		if err := f.Write(uint32(CERTIFICATES_OFFSET+i), certificatesData[i:i+payloadSize]); err != nil {
+			return err
+		}
+	}
+
+	var flashData []byte
+
+	for i := 0; i < CERTIFICATES_LENGTH; i += payloadSize {
+		data, err := f.Read(uint32(CERTIFICATES_OFFSET+i), uint32(payloadSize))
+		if err != nil {
+			return err
+		}
+
+		flashData = append(flashData, data...)
+	}
+
+	if !bytes.Equal(certificatesData, flashData) {
+		return errors.New("Flash data does not match written!")
+	}
+
+	return nil
 }
