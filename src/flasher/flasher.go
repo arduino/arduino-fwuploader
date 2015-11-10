@@ -101,7 +101,7 @@ func (flasher *Flasher) Read(address uint32, length uint32) ([]byte, error) {
 }
 
 // Write a block of flash memory
-func (flasher *Flasher) Write(port *serial.SerialPort, address uint32, buffer []byte) error {
+func (flasher *Flasher) Write(address uint32, buffer []byte) error {
 	// "FLASH_WRITE" command
 	flasher.sendCommand(0x02, address, 0, uint16(len(buffer)))
 
