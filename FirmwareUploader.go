@@ -24,6 +24,7 @@ import "time"
 import "log"
 import "encoding/binary"
 import "os"
+import "flag"
 
 type UpdaterError struct {
 	err string
@@ -161,11 +162,19 @@ func FlashErase(port *serial.SerialPort, address uint32, length uint32) error {
 	return nil
 }
 
+var portName string
+
+func init() {
+	flag.StringVar(&portName, "port", "", "serial port to use for flashing")
+}
+
 func main() {
+	flag.Parse()
+
 	mode := &serial.Mode{
 		BaudRate: 115200,
 	}
-	port, err := serial.OpenPort("/dev/ttyACM0", mode)
+	port, err := serial.OpenPort(portName, mode)
 	if err != nil {
 		log.Fatal(err)
 	}
