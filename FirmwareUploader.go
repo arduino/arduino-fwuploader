@@ -24,21 +24,28 @@ import (
 	"errors"
 	"flag"
 	"flasher"
+	"io/ioutil"
 	"log"
 )
 
 var portName string
 var rootCertDir string
+var firmwareFile string
+
+var f *flasher.Flasher
+var payloadSize uint16
 
 func init() {
 	flag.StringVar(&portName, "port", "", "serial port to use for flashing")
 	flag.StringVar(&rootCertDir, "certs", "", "root certificate directory")
+	flag.StringVar(&firmwareFile, "firmware", "", "firmware file to flash")
 }
 
 func main() {
 	flag.Parse()
 
-	f, err := flasher.Open(portName)
+	var err error
+	f, err = flasher.Open(portName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,7 +56,7 @@ func main() {
 	}
 
 	// Check maximum supported payload size
-	payloadSize, err := f.GetMaximumPayloadSize()
+	payloadSize, err = f.GetMaximumPayloadSize()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,7 +66,14 @@ func main() {
 
 	if rootCertDir != "" {
 		log.Printf("Converting and flashing certificates from '%v'", rootCertDir)
-		if err := flashCerts(f, int(payloadSize)); err != nil {
+		if err := flashCerts(); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if firmwareFile != "" {
+		log.Printf("Flashing firmware from '%v'", firmwareFile)
+		if err := flashCerts(); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -67,29 +81,56 @@ func main() {
 	f.Close()
 }
 
-func flashCerts(f *flasher.Flasher, payloadSize int) error {
+func flashCerts() error {
 	CERTIFICATES_OFFSET := 0x4000
-	CERTIFICATES_LENGTH := 4096
 
 	certificatesData, err := certificates.Convert(rootCertDir)
 	if err != nil {
 		return err
 	}
 
-	if err := f.Erase(uint32(CERTIFICATES_OFFSET), uint32(CERTIFICATES_LENGTH)); err != nil {
+	return flashChunk(CERTIFICATES_OFFSET, certificatesData)
+}
+
+func flashFirmware() error {
+	FIRMWARE_OFFSET := 0x6800
+	FIRWARE_LENGTH := 0x30800
+
+	fwData, err := ioutil.ReadFile(firmwareFile)
+	if err != nil {
 		return err
 	}
 
-	for i := 0; i < CERTIFICATES_LENGTH; i += payloadSize {
-		if err := f.Write(uint32(CERTIFICATES_OFFSET+i), certificatesData[i:i+payloadSize]); err != nil {
+	return flashChunk(FIRMWARE_OFFSET, fwData[FIRMWARE_OFFSET:(FIRMWARE_OFFSET+FIRWARE_LENGTH)])
+}
+
+func flashChunk(offset int, buffer []byte) error {
+	chunkSize := int(payloadSize)
+	bufferLength := len(buffer)
+
+	if err := f.Erase(uint32(offset), uint32(bufferLength)); err != nil {
+		return err
+	}
+
+	for i := 0; i < bufferLength; i += chunkSize {
+		start := i
+		end := i + chunkSize
+		if end > bufferLength {
+			end = bufferLength
+		}
+		if err := f.Write(uint32(offset+i), buffer[start:end]); err != nil {
 			return err
 		}
 	}
 
 	var flashData []byte
+	for i := 0; i < bufferLength; i += chunkSize {
+		readLength := chunkSize
+		if (i + chunkSize) > bufferLength {
+			readLength = bufferLength % chunkSize
+		}
 
-	for i := 0; i < CERTIFICATES_LENGTH; i += payloadSize {
-		data, err := f.Read(uint32(CERTIFICATES_OFFSET+i), uint32(payloadSize))
+		data, err := f.Read(uint32(offset+i), uint32(readLength))
 		if err != nil {
 			return err
 		}
@@ -97,7 +138,7 @@ func flashCerts(f *flasher.Flasher, payloadSize int) error {
 		flashData = append(flashData, data...)
 	}
 
-	if !bytes.Equal(certificatesData, flashData) {
+	if !bytes.Equal(buffer, flashData) {
 		return errors.New("Flash data does not match written!")
 	}
 
