@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"crypto/rsa"
 	"crypto/sha1"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
@@ -36,20 +37,33 @@ import (
 
 var START_PATTERN = []byte{0x01, 0xF1, 0x02, 0xF2, 0x03, 0xF3, 0x04, 0xF4, 0x05, 0xF5, 0x06, 0xF6, 0x07, 0xF7, 0x08, 0xF8}
 
-func Convert(directory string) ([]byte, error) {
-	cerFiles, err := filepath.Glob(path.Join(directory, "*.cer"))
-	if err != nil {
-		return nil, err
-	}
-
+func Convert(directory string, addresses []string) ([]byte, error) {
 	var entryBytes []byte
 	var numCerts int = 0
 
-	for _, cerFile := range cerFiles {
-		cerEntry, err := entryForFile(cerFile)
+	if directory != "" {
+		cerFiles, err := filepath.Glob(path.Join(directory, "*.cer"))
+		if err != nil {
+			return nil, err
+		}
+
+		for _, cerFile := range cerFiles {
+			cerEntry, err := entryForFile(cerFile)
+
+			if err != nil {
+				log.Printf("Converting '%v' failed, skipping: %v\n", cerFile, err)
+			} else {
+				entryBytes = append(entryBytes, cerEntry...)
+				numCerts++
+			}
+		}
+	}
+
+	for _, address := range addresses {
+		cerEntry, err := entryForAddress(address)
 
 		if err != nil {
-			log.Printf("Converting '%v' failed, skipping: %v\n", cerFile, err)
+			log.Printf("Converting address '%v' failed, skipping: %v\n", address, err)
 		} else {
 			entryBytes = append(entryBytes, cerEntry...)
 			numCerts++
@@ -64,16 +78,6 @@ func Convert(directory string) ([]byte, error) {
 
 	return flashData, nil
 }
-
-/* Write Root Certificate to flash. The entry is ordered as follows:
--	SHA1_DIGEST_SIZE	--> NameSHA1 of the Root certificate.
--	uint16				--> N_SIZE (Byte count for the RSA modulus N).
--	uint16				--> E_SIZE (Byte count for the RSA public exponent E).
--	START_DATE			--> Start date of the root certificate(20 bytes).
--	EXPIRATION_DATE		--> Expiration date of the root certificate(20 bytes).
--	N_SIZE				--> RSA Modulus N.
--	E_SIZE				--> RSA Public exponent.
-*/
 
 func entryForFile(file string) (b []byte, err error) {
 	cerData, err := ioutil.ReadFile(file)
@@ -92,6 +96,47 @@ func entryForFile(file string) (b []byte, err error) {
 
 	cert := certs[0]
 
+	return entryForCert(cert)
+}
+
+func entryForAddress(address string) (b []byte, err error) {
+	config := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	conn, err := tls.Dial("tcp", address, config)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := conn.Handshake(); err != nil {
+		return nil, err
+	}
+
+	peerCerts := conn.ConnectionState().PeerCertificates
+
+	if len(peerCerts) == 0 {
+		return nil, errors.New("No peer certificates")
+	}
+
+	rootCert := peerCerts[len(peerCerts)-1]
+
+	conn.Close()
+
+	return entryForCert(rootCert)
+}
+
+/* Write Root Certificate to flash. The entry is ordered as follows:
+-	SHA1_DIGEST_SIZE	--> NameSHA1 of the Root certificate.
+-	uint16				--> N_SIZE (Byte count for the RSA modulus N).
+-	uint16				--> E_SIZE (Byte count for the RSA public exponent E).
+-	START_DATE			--> Start date of the root certificate(20 bytes).
+-	EXPIRATION_DATE		--> Expiration date of the root certificate(20 bytes).
+-	N_SIZE				--> RSA Modulus N.
+-	E_SIZE				--> RSA Public exponent.
+*/
+
+func entryForCert(cert *x509.Certificate) (b []byte, err error) {
 	nameSHA1Bytes, err := calculateNameSha1(*cert)
 	if err != nil {
 		return nil, err
