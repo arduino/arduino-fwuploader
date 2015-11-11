@@ -56,19 +56,11 @@ func Convert(directory string) ([]byte, error) {
 		}
 	}
 
-	flashData := bytes.Repeat([]byte{0xff}, 4*1024)
-	flashDataOffet := 0
-
 	numCertsBytes := uint32ToBytes(numCerts)
 
-	copy(flashData[flashDataOffet:], START_PATTERN)
-	flashDataOffet += len(START_PATTERN)
-
-	copy(flashData[flashDataOffet:], numCertsBytes)
-	flashDataOffet += len(numCertsBytes)
-
-	copy(flashData[flashDataOffet:], entryBytes)
-	flashDataOffet += len(entryBytes)
+	flashData := START_PATTERN
+	flashData = append(flashData, numCertsBytes...)
+	flashData = append(flashData, entryBytes...)
 
 	return flashData, nil
 }
