@@ -108,8 +108,7 @@ func flashCerts() error {
 }
 
 func flashFirmware() error {
-	FIRMWARE_OFFSET := 0x6800
-	FIRWARE_LENGTH := 0x30800
+	FIRMWARE_OFFSET := 0x0000
 
 	log.Printf("Flashing firmware from '%v'", firmwareFile)
 
@@ -118,7 +117,7 @@ func flashFirmware() error {
 		return err
 	}
 
-	return flashChunk(FIRMWARE_OFFSET, fwData[FIRMWARE_OFFSET:(FIRMWARE_OFFSET+FIRWARE_LENGTH)])
+	return flashChunk(FIRMWARE_OFFSET, fwData)
 }
 
 func flashChunk(offset int, buffer []byte) error {
