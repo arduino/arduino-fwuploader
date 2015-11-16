@@ -26,6 +26,7 @@ import (
 	"flasher"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 type AddressFlags []string
@@ -43,6 +44,7 @@ var portName string
 var rootCertDir string
 var addresses AddressFlags
 var firmwareFile string
+var readAll string
 
 var f *flasher.Flasher
 var payloadSize uint16
@@ -52,6 +54,7 @@ func init() {
 	flag.StringVar(&rootCertDir, "certs", "", "root certificate directory")
 	flag.Var(&addresses, "address", "address (host:port) to fetch and flash root certificate for, multiple values allowed")
 	flag.StringVar(&firmwareFile, "firmware", "", "firmware file to flash")
+	flag.StringVar(&readAll, "read", "", "readfirmware")
 }
 
 func main() {
@@ -89,7 +92,24 @@ func main() {
 		}
 	}
 
+	if readAll != "" {
+		if err := readAllFlash(); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	f.Close()
+}
+
+func readAllFlash() error {
+	for i := 0; i < 256; i++ {
+		if data, err := f.Read(uint32(i*1024), 1024); err != nil {
+			log.Fatal(err)
+		} else {
+			os.Stdout.Write(data)
+		}
+	}
+	return nil
 }
 
 func flashCerts() error {
