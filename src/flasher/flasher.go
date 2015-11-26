@@ -178,7 +178,7 @@ func Open(portName string) (*Flasher, error) {
 
 	port, err := serial.OpenPort(portName, mode)
 	if err != nil {
-		return nil, err
+		return nil, &FlasherError{err: "Error opening serial port. " + err.Error()}
 	}
 
 	flasher := &Flasher{
