@@ -37,6 +37,8 @@ import (
 
 var START_PATTERN = []byte{0x01, 0xF1, 0x02, 0xF2, 0x03, 0xF3, 0x04, 0xF4, 0x05, 0xF5, 0x06, 0xF6, 0x07, 0xF7, 0x08, 0xF8}
 
+type CertEntry []byte
+
 func Convert(directory string, addresses []string) ([]byte, error) {
 	var entryBytes []byte
 	var numCerts int = 0
@@ -48,7 +50,7 @@ func Convert(directory string, addresses []string) ([]byte, error) {
 		}
 
 		for _, cerFile := range cerFiles {
-			cerEntry, err := entryForFile(cerFile)
+			cerEntry, err := EntryForFile(cerFile)
 
 			if err != nil {
 				log.Printf("Converting '%v' failed, skipping: %v\n", cerFile, err)
@@ -60,7 +62,7 @@ func Convert(directory string, addresses []string) ([]byte, error) {
 	}
 
 	for _, address := range addresses {
-		cerEntry, err := entryForAddress(address)
+		cerEntry, err := EntryForAddress(address)
 
 		if err != nil {
 			log.Printf("Converting address '%v' failed, skipping: %v\n", address, err)
@@ -79,7 +81,19 @@ func Convert(directory string, addresses []string) ([]byte, error) {
 	return flashData, nil
 }
 
-func entryForFile(file string) (b []byte, err error) {
+func ConvertCertEntries(entries []CertEntry) []byte {
+	numCertsBytes := uint32ToBytes(len(entries))
+
+	flashData := START_PATTERN
+	flashData = append(flashData, numCertsBytes...)
+	for _, entry := range entries {
+		flashData = append(flashData, entry...)
+	}
+
+	return flashData
+}
+
+func EntryForFile(file string) (b CertEntry, err error) {
 	cerData, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
@@ -99,7 +113,7 @@ func entryForFile(file string) (b []byte, err error) {
 	return entryForCert(cert)
 }
 
-func entryForAddress(address string) (b []byte, err error) {
+func EntryForAddress(address string) (b CertEntry, err error) {
 	config := &tls.Config{
 		InsecureSkipVerify: true,
 	}
@@ -136,7 +150,7 @@ func entryForAddress(address string) (b []byte, err error) {
 -	E_SIZE				--> RSA Public exponent.
 */
 
-func entryForCert(cert *x509.Certificate) (b []byte, err error) {
+func entryForCert(cert *x509.Certificate) (b CertEntry, err error) {
 	nameSHA1Bytes, err := calculateNameSha1(*cert)
 	if err != nil {
 		return nil, err
