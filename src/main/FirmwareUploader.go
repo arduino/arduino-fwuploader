@@ -66,6 +66,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f.Close()
 
 	// Synchronize with programmer
 	if err := f.Hello(); err != nil {
@@ -98,8 +99,6 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-
-	f.Close()
 }
 
 func readAllFlash() error {
