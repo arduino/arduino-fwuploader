@@ -61,19 +61,25 @@ func init() {
 func main() {
 	flag.Parse()
 
-	var err error
-	f, err = flasher.Open(portName)
+	if portName == "" {
+		log.Fatal("Please specify a serial port")
+	}
+
+	log.Println("Connecting to programmer")
+	f, err := flasher.Open(portName)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
 
 	// Synchronize with programmer
+	log.Println("Synch with programmer")
 	if err := f.Hello(); err != nil {
 		log.Fatal(err)
 	}
 
 	// Check maximum supported payload size
+	log.Println("Reading max payload size")
 	payloadSize, err = f.GetMaximumPayloadSize()
 	if err != nil {
 		log.Fatal(err)
@@ -95,6 +101,7 @@ func main() {
 	}
 
 	if readAll != "" {
+		log.Println("Reading all flash")
 		if err := readAllFlash(); err != nil {
 			log.Fatal(err)
 		}
