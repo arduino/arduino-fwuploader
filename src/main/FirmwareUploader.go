@@ -16,6 +16,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 package main
 
 import (
@@ -29,20 +30,20 @@ import (
 	"os"
 )
 
-type AddressFlags []string
+type addressFlags []string
 
-func (af *AddressFlags) String() string {
+func (af *addressFlags) String() string {
 	return ""
 }
 
-func (af *AddressFlags) Set(value string) error {
+func (af *addressFlags) Set(value string) error {
 	*af = append(*af, value)
 	return nil
 }
 
 var portName string
 var rootCertDir string
-var addresses AddressFlags
+var addresses addressFlags
 var firmwareFile string
 var readAll string
 
@@ -113,7 +114,7 @@ func readAllFlash() error {
 }
 
 func flashCerts() error {
-	CERTIFICATES_OFFSET := 0x4000
+	CertificatesOffset := 0x4000
 
 	if rootCertDir != "" {
 		log.Printf("Converting and flashing certificates from '%v'", rootCertDir)
@@ -124,11 +125,11 @@ func flashCerts() error {
 		return err
 	}
 
-	return flashChunk(CERTIFICATES_OFFSET, certificatesData)
+	return flashChunk(CertificatesOffset, certificatesData)
 }
 
 func flashFirmware() error {
-	FIRMWARE_OFFSET := 0x0000
+	FirmwareOffset := 0x0000
 
 	log.Printf("Flashing firmware from '%v'", firmwareFile)
 
@@ -137,7 +138,7 @@ func flashFirmware() error {
 		return err
 	}
 
-	return flashChunk(FIRMWARE_OFFSET, fwData)
+	return flashChunk(FirmwareOffset, fwData)
 }
 
 func flashChunk(offset int, buffer []byte) error {
