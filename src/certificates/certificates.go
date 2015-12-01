@@ -181,7 +181,9 @@ func entryForCert(cert *x509.Certificate) (b CertEntry, err error) {
 	b = append(b, notAfterBytes...)
 	b = append(b, rsaModulusNBytes...)
 	b = append(b, rsaPublicExponentBytes...)
-	b = append(b, 0xff) // padding
+	for (len(b) & 3) != 0 {
+		b = append(b, 0xff) // padding
+	}
 
 	return
 }
