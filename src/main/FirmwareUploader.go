@@ -66,9 +66,10 @@ func main() {
 	}
 
 	log.Println("Connecting to programmer")
-	f, err := flasher.Open(portName)
-	if err != nil {
+	if _f, err := flasher.Open(portName); err != nil {
 		log.Fatal(err)
+	} else {
+		f = _f
 	}
 	defer f.Close()
 
@@ -80,7 +81,7 @@ func main() {
 
 	// Check maximum supported payload size
 	log.Println("Reading max payload size")
-	payloadSize, err = f.GetMaximumPayloadSize()
+	payloadSize, err := f.GetMaximumPayloadSize()
 	if err != nil {
 		log.Fatal(err)
 	}
