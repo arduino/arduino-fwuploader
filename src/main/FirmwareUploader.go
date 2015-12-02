@@ -45,7 +45,7 @@ var portName string
 var rootCertDir string
 var addresses addressFlags
 var firmwareFile string
-var readAll string
+var readAll bool
 
 var f *flasher.Flasher
 var payloadSize uint16
@@ -55,7 +55,7 @@ func init() {
 	flag.StringVar(&rootCertDir, "certs", "", "root certificate directory")
 	flag.Var(&addresses, "address", "address (host:port) to fetch and flash root certificate for, multiple values allowed")
 	flag.StringVar(&firmwareFile, "firmware", "", "firmware file to flash")
-	flag.StringVar(&readAll, "read", "", "readfirmware")
+	flag.BoolVar(&readAll, "read", false, "read all firmware and output to stdout")
 }
 
 func main() {
@@ -101,7 +101,7 @@ func main() {
 		}
 	}
 
-	if readAll != "" {
+	if readAll {
 		log.Println("Reading all flash")
 		if err := readAllFlash(); err != nil {
 			log.Fatal(err)
