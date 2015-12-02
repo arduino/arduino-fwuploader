@@ -20,7 +20,9 @@
 package main
 
 import (
+	"bytes"
 	"certificates"
+	"errors"
 	"flasher"
 	_ "fmt"
 	"github.com/google/gxui"
@@ -29,12 +31,11 @@ import (
 	"github.com/google/gxui/math"
 	"github.com/google/gxui/samples/flags"
 	"go.bug.st/serial"
+	_ "io/ioutil"
 	"log"
 	"strconv"
 	"strings"
 	"time"
-	"bytes"
-	"errors"
 )
 
 var payloadSize uint16
@@ -309,6 +310,14 @@ func uploadCertificates(portName string, driver gxui.Driver, updateProgress func
 		updateProgress(err.Error(), -1)
 		return
 	}
+
+	// For debugging puporses
+	/*
+		if err := ioutil.WriteFile("cert_output.bin", convertedCers, 0644); err != nil {
+			updateProgress(err.Error(), -1)
+			return
+		}
+	*/
 
 	updateProgress("Upload completed!", 100)
 }
