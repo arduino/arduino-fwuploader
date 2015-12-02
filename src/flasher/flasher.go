@@ -41,7 +41,9 @@ type Flasher struct {
 // Also check if the version of the programmer protocol match the uploader
 func (flasher *Flasher) Hello() error {
 	// "HELLO" command
-	flasher.sendCommand(0x99, 0x11223344, 0x55667788, 0)
+	if err := flasher.sendCommand(0x99, 0x11223344, 0x55667788, nil); err != nil {
+		return err
+	}
 
 	// Wait a bit
 	time.Sleep(100 * time.Millisecond)
@@ -71,7 +73,9 @@ func (flasher *Flasher) Close() error {
 // Get maximum payload size for upload.
 func (flasher *Flasher) GetMaximumPayloadSize() (uint16, error) {
 	// "MAX_PAYLOAD_SIZE" command
-	flasher.sendCommand(0x50, 0, 0, 0)
+	if err := flasher.sendCommand(0x50, 0, 0, nil); err != nil {
+		return 0, err
+	}
 
 	// Receive response
 	res := make([]byte, 2)
@@ -84,7 +88,9 @@ func (flasher *Flasher) GetMaximumPayloadSize() (uint16, error) {
 // Read a block of flash memory
 func (flasher *Flasher) Read(address uint32, length uint32) ([]byte, error) {
 	// "FLASH_READ" command
-	flasher.sendCommand(0x01, address, length, 0)
+	if err := flasher.sendCommand(0x01, address, length, nil); err != nil {
+		return nil, err
+	}
 
 	// Receive response
 	result := make([]byte, length)
@@ -104,10 +110,7 @@ func (flasher *Flasher) Read(address uint32, length uint32) ([]byte, error) {
 // Write a block of flash memory
 func (flasher *Flasher) Write(address uint32, buffer []byte) error {
 	// "FLASH_WRITE" command
-	flasher.sendCommand(0x02, address, 0, uint16(len(buffer)))
-
-	// send payload
-	if _, err := flasher.port.Write(buffer); err != nil {
+	if err := flasher.sendCommand(0x02, address, 0, buffer); err != nil {
 		return err
 	}
 
@@ -125,7 +128,9 @@ func (flasher *Flasher) Write(address uint32, buffer []byte) error {
 // Erase a block of flash memory
 func (flasher *Flasher) Erase(address uint32, length uint32) error {
 	// "FLASH_ERASE" command
-	flasher.sendCommand(0x03, address, length, 0)
+	if err := flasher.sendCommand(0x03, address, length, nil); err != nil {
+		return err
+	}
 
 	// wait acknowledge
 	ack := make([]byte, 2)
@@ -155,7 +160,7 @@ func (flasher *Flasher) serialFillBuffer(buffer []byte) error {
 	return nil
 }
 
-func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, length uint16) error {
+func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, payload []byte) error {
 	if err := binary.Write(flasher.port, binary.BigEndian, command); err != nil {
 		return err
 	}
@@ -165,8 +170,19 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, le
 	if err := binary.Write(flasher.port, binary.BigEndian, val); err != nil {
 		return err
 	}
+	var length uint16
+	if payload == nil {
+		length = 0
+	} else {
+		length = uint16(len(payload))
+	}
 	if err := binary.Write(flasher.port, binary.BigEndian, length); err != nil {
 		return err
+	}
+	if payload != nil {
+		if _, err := flasher.port.Write(payload); err != nil {
+			return err
+		}
 	}
 	return nil
 }
