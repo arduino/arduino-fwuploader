@@ -19,15 +19,15 @@ WiFi 101 shield.
 
 == How to build ==
 
-go get go.bug.st/serial
-go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/winc1500-uploader.go
+ go get go.bug.st/serial
+ go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/winc1500-uploader.go
 
-go get github.com/google/gxui
-go get github.com/google/gxui/drivers/gl
-go get github.com/google/gxui/gxfont
-go get github.com/google/gxui/math
-go get github.com/google/gxui/samples/flags
-go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/gui/main/winc1500-uploader-gui.go
+ go get github.com/google/gxui
+ go get github.com/google/gxui/drivers/gl
+ go get github.com/google/gxui/gxfont
+ go get github.com/google/gxui/math
+ go get github.com/google/gxui/samples/flags
+ go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/gui/main/winc1500-uploader-gui.go
 
 == License ==
 
