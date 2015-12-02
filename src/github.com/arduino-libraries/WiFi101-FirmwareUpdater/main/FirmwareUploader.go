@@ -21,10 +21,10 @@ package main
 
 import (
 	"bytes"
-	"certificates"
 	"errors"
 	"flag"
-	"flasher"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/certificates"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/flasher"
 	"io/ioutil"
 	"log"
 	"os"

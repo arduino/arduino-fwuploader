@@ -21,10 +21,10 @@ package main
 
 import (
 	"bytes"
-	"certificates"
 	"errors"
-	"flasher"
 	_ "fmt"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/certificates"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/flasher"
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
 	_ "github.com/google/gxui/gxfont"
