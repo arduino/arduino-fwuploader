@@ -81,9 +81,11 @@ func main() {
 
 	// Check maximum supported payload size
 	log.Println("Reading max payload size")
-	payloadSize, err := f.GetMaximumPayloadSize()
+	_payloadSize, err := f.GetMaximumPayloadSize()
 	if err != nil {
 		log.Fatal(err)
+	} else {
+		payloadSize = _payloadSize
 	}
 	if payloadSize < 1024 {
 		log.Fatalf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
