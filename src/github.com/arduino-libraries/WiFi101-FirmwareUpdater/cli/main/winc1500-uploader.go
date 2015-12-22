@@ -91,14 +91,14 @@ func main() {
 		log.Fatalf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
 	}
 
-	if rootCertDir != "" || len(addresses) != 0 {
-		if err := flashCerts(); err != nil {
+	if firmwareFile != "" {
+		if err := flashFirmware(); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if firmwareFile != "" {
-		if err := flashFirmware(); err != nil {
+	if rootCertDir != "" || len(addresses) != 0 {
+		if err := flashCerts(); err != nil {
 			log.Fatal(err)
 		}
 	}
