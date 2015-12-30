@@ -1,14 +1,15 @@
-= Firmware/Certificates updater for the Arduino Wifi 101 Shield =
+= Firmware/Certificates updater for the Arduino WiFi 101 Shield =
 
 Use this tool to update the SSL root-certificates installed on the
 WiFi 101 shield.
 
 == Usage ==
 
-1. Upload the sketch "FirmwareUploader" in your board. You need to
-   install the lastes WiFi101 library (available through the librayr
-   manager of the Arduino IDE).
-   The sketch should be available as an example of the library too.
+1. Upload the ["FirmwareUpdater"](https://github.com/arduino-libraries/WiFi101/tree/master/examples/FirmwareUpdater)
+   sketch onto your board. You need to install the lastest WiFi101 library
+   (available through the library manager of the Arduino IDE). The sketch is
+   included as an example of the library, 
+   ```File -> Examples -> WiFi101 -> FirmwareUpdater```.
 2. Run "winc1500-uploader-gui".
 3. The tools is able to fetch root certificates directly from the
    websites, just write the IP or domain in the text box and click
