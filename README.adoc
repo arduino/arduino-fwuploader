@@ -5,7 +5,7 @@ WiFi 101 shield.
 
 == Usage ==
 
-1. Upload the ["FirmwareUpdater"](https://github.com/arduino-libraries/WiFi101/tree/master/examples/FirmwareUpdater)
+1. Upload the https://github.com/arduino-libraries/WiFi101/tree/master/examples/FirmwareUpdater[FirmwareUpdater]
    sketch onto your board. You need to install the lastest WiFi101 library
    (available through the library manager of the Arduino IDE). The sketch is
    included as an example of the library, 
