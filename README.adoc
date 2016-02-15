@@ -1,24 +1,66 @@
-= Firmware/Certificates updater for the Arduino WiFi 101 Shield =
+= Firmware/Certificates updater for the WiFi 101 and MKR1000 =
 
 Use this tool to update the SSL root-certificates installed on the
-WiFi 101 shield.
+Arduino/Genuino WiFi 101 shield or the Arduino/Genuino MKR1000 board.
 
 == Usage ==
+
+=== To update SSL Certificates ===
 
 1. Upload the https://github.com/arduino-libraries/WiFi101/tree/master/examples/FirmwareUpdater[FirmwareUpdater]
    sketch onto your board. You need to install the lastest WiFi101 library
    (available through the library manager of the Arduino IDE). The sketch is
-   included as an example of the library, 
-   ```File -> Examples -> WiFi101 -> FirmwareUpdater```.
+   included as an example of the library: `File -> Examples -> WiFi101 -> FirmwareUpdater`
 2. Run "winc1500-uploader-gui".
-3. The tools is able to fetch root certificates directly from the
-   websites, just write the IP or domain in the text box and click
-   on the "Fetch" button.
-4. Select the serial port of the board running the "FirmwareUploader"
-   sketch.
+3. This tool is able to fetch the SSL Root Certificates directly from the
+   target websites, just write the IP or domain in the text box and click
+   on the "Fetch" button (you can repeat this step multiple times to add
+   more certificates).
+4. Select the serial port of the board running the "FirmwareUploader" sketch.
 5. Click "Update" button.
 
-== How to build ==
+**WARNING:** the storage reserved for the certificates is very small. You can load, 
+roughly, 10 certificates but the exact number may be lower depending on the size of the
+certificates.
+
+=== To update firmware ===
+
+This is possible using the Command-Line tool:
+
+1. Upload the https://github.com/arduino-libraries/WiFi101/tree/master/examples/FirmwareUpdater[FirmwareUpdater]
+   sketch onto your board. You need to install the lastest WiFi101 library
+   (available through the library manager of the Arduino IDE). The sketch is
+   included as an example of the library: `File -> Examples -> WiFi101 -> FirmwareUpdater`
+2. Read the label on the top of your WINC1500 in order to determine the model of the WiFi module.
+   The last letter should tell if you have a Model A or Model B, for example:
+   - `ATWINC1500-MR210PA` -> is a WINC1500 Model A
+   - `ATSAMW25H18-MR510PB` -> is a WINC1500 Model B
+3. Based on your WINC1500 model you must use:
+   - `firmware/19.4.4/m2m_aio_2b0.bin` for Model A
+   - `firmware/19.4.4/m2m_aio_3a0.bin` for Model B
+4. Run the following command line
+   `./winc1500-uploader -firmware XXX -port YYY`
+   replacing `XXX` with your firmware file determined on step 3) and `YYY` with your serial port number. +
+   For example:
+   `./winc1500-uploader -firmware firmware/19.4.4/m2m_aio_2b0.bin -port /dev/ttyACM0`
+
+=== Other command line options ===
+
+The full list of command line options can be obtained with the `-h` option: `./winc1500-uploader -h` 
+
+  Usage of ./winc1500-uploader:
+    -address value
+    	  address (host:port) to fetch and flash root certificate for, multiple values allowed
+    -certs string
+    	  root certificate directory
+    -firmware string
+    	  firmware file to flash
+    -port string
+    	  serial port to use for flashing
+    -read
+    	  read all firmware and output to stdout
+
+== How to build the tools from source file ==
 
  go get go.bug.st/serial
  go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/winc1500-uploader.go
@@ -32,7 +74,7 @@ WiFi 101 shield.
 
 == License ==
 
-Copyright (c) 2015 Arduino LLC. All right reserved.
+Copyright (c) 2015-2016 Arduino LLC. All right reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -47,3 +89,4 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
