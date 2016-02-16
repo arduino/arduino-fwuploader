@@ -3,6 +3,12 @@
 Use this tool to update the SSL root-certificates installed on the
 Arduino/Genuino WiFi 101 shield or the Arduino/Genuino MKR1000 board.
 
+== Install ==
+
+You can download the Firmware/Certificates updater here:
+
+https://github.com/arduino-libraries/WiFi101-FirmwareUpdater/releases/latest
+
 == Usage ==
 
 === To update SSL Certificates ===
