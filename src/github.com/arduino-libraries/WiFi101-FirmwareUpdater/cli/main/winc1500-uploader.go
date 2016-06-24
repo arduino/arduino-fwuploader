@@ -164,10 +164,12 @@ func flashChunk(offset int, buffer []byte) error {
 		if end > bufferLength {
 			end = bufferLength
 		}
+		log.Printf("Writing %d bytes at address %d", end-start, start)
 		if err := f.Write(uint32(offset+i), buffer[start:end]); err != nil {
 			return err
 		}
 	}
+	log.Printf("Programming completed")
 
 	var flashData []byte
 	for i := 0; i < bufferLength; i += chunkSize {
