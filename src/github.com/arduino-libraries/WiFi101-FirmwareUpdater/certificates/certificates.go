@@ -19,7 +19,6 @@
 package certificates
 
 import (
-	"bytes"
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/tls"
@@ -35,7 +34,7 @@ import (
 	"time"
 )
 
-var START_PATTERN = []byte{0x01, 0xF1, 0x02, 0xF2, 0x03, 0xF3, 0x04, 0xF4, 0x05, 0xF5, 0x06, 0xF6, 0x07, 0xF7, 0x08, 0xF8}
+var START_PATTERN = []byte{0x11, 0xF1, 0x12, 0xF2, 0x13, 0xF3, 0x14, 0xF4, 0x15, 0xF5, 0x16, 0xF6, 0x17, 0xF7, 0x18, 0xF8}
 
 type CertEntry []byte
 
@@ -174,11 +173,14 @@ func entryForCert(cert *x509.Certificate) (b CertEntry, err error) {
 	rsaModulusNLenBytes := uint16ToBytes(len(rsaModulusNBytes))
 	rsaPublicExponentLenBytes := uint16ToBytes(len(rsaPublicExponentBytes))
 
+	typeBytes := []byte{0x01, 0x00, 0x00, 0x00}
+
 	b = append(b, nameSHA1Bytes...)
-	b = append(b, rsaModulusNLenBytes...)
-	b = append(b, rsaPublicExponentLenBytes...)
 	b = append(b, notBeforeBytes...)
 	b = append(b, notAfterBytes...)
+	b = append(b, typeBytes...)
+	b = append(b, rsaModulusNLenBytes...)
+	b = append(b, rsaPublicExponentLenBytes...)
 	b = append(b, rsaModulusNBytes...)
 	b = append(b, rsaPublicExponentBytes...)
 	for (len(b) & 3) != 0 {
@@ -240,13 +242,16 @@ func getPublicExponent(publicKey rsa.PublicKey) (b []byte) {
 }
 
 func convertTime(time time.Time) (b []byte, err error) {
-	asn1Bytes, err := asn1.Marshal(time)
-	if err != nil {
-		return nil, err
+	b = []byte{
+		byte(time.Year() & 0xff),
+		byte((time.Year() >> 8) & 0xff),
+		byte(time.Month()),
+		byte(time.Day()),
+		byte(time.Hour()),
+		byte(time.Minute()),
+		byte(time.Second()),
+		0xcc,
 	}
-
-	b = bytes.Repeat([]byte{0x00}, 20) // value must be zero bytes
-	copy(b, asn1Bytes[2:])             // copy but drop the first two bytes
 
 	return
 }
