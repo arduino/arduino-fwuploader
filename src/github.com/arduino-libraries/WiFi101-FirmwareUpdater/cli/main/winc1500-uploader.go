@@ -20,14 +20,14 @@
 package main
 
 import (
-	"bytes"
-	"errors"
 	"flag"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/certificates"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/flasher"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/certificates"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/flasher"
 )
 
 type addressFlags []string
@@ -159,6 +159,8 @@ func flashChunk(offset int, buffer []byte) error {
 	}
 
 	for i := 0; i < bufferLength; i += chunkSize {
+		fmt.Print(i * 100 / bufferLength)
+		fmt.Println("%")
 		start := i
 		end := i + chunkSize
 		if end > bufferLength {
@@ -169,24 +171,29 @@ func flashChunk(offset int, buffer []byte) error {
 		}
 	}
 
-	var flashData []byte
-	for i := 0; i < bufferLength; i += chunkSize {
-		readLength := chunkSize
-		if (i + chunkSize) > bufferLength {
-			readLength = bufferLength % chunkSize
+	return f.Md5sum(buffer)
+
+	/*
+		fmt.Println("read")
+
+		var flashData []byte
+		for i := 0; i < bufferLength; i += chunkSize {
+			readLength := chunkSize
+			if (i + chunkSize) > bufferLength {
+				readLength = bufferLength % chunkSize
+			}
+
+			data, err := f.Read(uint32(offset+i), uint32(readLength))
+			if err != nil {
+				return err
+			}
+
+			flashData = append(flashData, data...)
 		}
 
-		data, err := f.Read(uint32(offset+i), uint32(readLength))
-		if err != nil {
-			return err
+		if !bytes.Equal(buffer, flashData) {
+			return errors.New("Flash data does not match written!")
 		}
-
-		flashData = append(flashData, data...)
-	}
-
-	if !bytes.Equal(buffer, flashData) {
-		return errors.New("Flash data does not match written!")
-	}
-
+	*/
 	return nil
 }

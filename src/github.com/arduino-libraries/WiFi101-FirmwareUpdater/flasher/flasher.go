@@ -23,6 +23,9 @@ import (
 	"encoding/binary"
 	"go.bug.st/serial"
 	"time"
+	"crypto/md5"
+	"errors"
+	"fmt"
 )
 
 type FlasherError struct {
@@ -143,6 +146,43 @@ func (flasher *Flasher) Erase(address uint32, length uint32) error {
 	return nil
 }
 
+func (flasher *Flasher) Md5sum(data []byte) error {
+	hasher := md5.New()
+  hasher.Write(data)
+
+	// Get md5sum
+	if err := flasher.sendCommand(0x04, 0, uint32(len(data)), nil); err != nil {
+		return err
+	}
+
+	// wait acknowledge
+	ack := make([]byte, 2)
+	if err := flasher.serialFillBuffer(ack); err != nil {
+		return err
+	}
+	if string(ack) != "OK" {
+		return &FlasherError{err: "Error during FlashErase()"}
+	}
+
+	// wait md5
+	md5sum := make([]byte, 16)
+	if err := flasher.serialFillBuffer(md5sum); err != nil {
+		return err
+	}
+
+	md5sumfromdevice := hasher.Sum(nil)
+
+	i := 0
+  for (i<16) {
+		if md5sumfromdevice[i] != md5sum[i] {
+				return errors.New("MD5sum failed");
+			}
+			i++
+	}
+	fmt.Println("MD5sum ok")
+	return nil
+}
+
 // Fill buffer with data coming from serial port.
 // Blocks until the buffer is full.
 func (flasher *Flasher) serialFillBuffer(buffer []byte) error {
@@ -189,7 +229,7 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 
 func Open(portName string) (*Flasher, error) {
 	mode := &serial.Mode{
-		BaudRate: 115200,
+		BaudRate: 1000000,
 	}
 
 	port, err := serial.OpenPort(portName, mode)
