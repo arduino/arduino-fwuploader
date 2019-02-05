@@ -19,29 +19,20 @@
 package nina
 
 import (
-	"bytes"
-	"crypto/rsa"
-	"crypto/sha1"
 	"crypto/tls"
 	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/asn1"
-	"encoding/binary"
 	"errors"
 	"io/ioutil"
 	"log"
 	"path"
 	"path/filepath"
-	"time"
+	"encoding/pem"
 )
-
-var START_PATTERN = []byte{0x01, 0xF1, 0x02, 0xF2, 0x03, 0xF3, 0x04, 0xF4, 0x05, 0xF5, 0x06, 0xF6, 0x07, 0xF7, 0x08, 0xF8}
 
 type CertEntry []byte
 
 func ConvertCertificates(directory string, addresses []string) ([]byte, error) {
 	var entryBytes []byte
-	var numCerts int = 0
 
 	if directory != "" {
 		cerFiles, err := filepath.Glob(path.Join(directory, "*.cer"))
@@ -56,7 +47,6 @@ func ConvertCertificates(directory string, addresses []string) ([]byte, error) {
 				log.Printf("Converting '%v' failed, skipping: %v\n", cerFile, err)
 			} else {
 				entryBytes = append(entryBytes, cerEntry...)
-				numCerts++
 			}
 		}
 	}
@@ -68,29 +58,10 @@ func ConvertCertificates(directory string, addresses []string) ([]byte, error) {
 			log.Printf("Converting address '%v' failed, skipping: %v\n", address, err)
 		} else {
 			entryBytes = append(entryBytes, cerEntry...)
-			numCerts++
 		}
 	}
 
-	numCertsBytes := uint32ToBytes(numCerts)
-
-	flashData := START_PATTERN
-	flashData = append(flashData, numCertsBytes...)
-	flashData = append(flashData, entryBytes...)
-
-	return flashData, nil
-}
-
-func ConvertCertEntries(entries []CertEntry) []byte {
-	numCertsBytes := uint32ToBytes(len(entries))
-
-	flashData := START_PATTERN
-	flashData = append(flashData, numCertsBytes...)
-	for _, entry := range entries {
-		flashData = append(flashData, entry...)
-	}
-
-	return flashData
+	return entryBytes, nil
 }
 
 func EntryForFile(file string) (b CertEntry, err error) {
@@ -140,7 +111,7 @@ func EntryForAddress(address string) (b CertEntry, err error) {
 	return entryForCert(rootCert)
 }
 
-/* Write Root Certificate to flash. The entry is ordered as follows:
+/* Write Root Certificate to flash. Must convert certificates to PEM and append them
 -	SHA1_DIGEST_SIZE	--> NameSHA1 of the Root certificate.
 -	uint16				--> N_SIZE (Byte count for the RSA modulus N).
 -	uint16				--> E_SIZE (Byte count for the RSA public exponent E).
@@ -151,102 +122,12 @@ func EntryForAddress(address string) (b CertEntry, err error) {
 */
 
 func entryForCert(cert *x509.Certificate) (b CertEntry, err error) {
-	nameSHA1Bytes, err := calculateNameSha1(*cert)
-	if err != nil {
-		return nil, err
-	}
-
-	notBeforeBytes, err := convertTime(cert.NotBefore)
-	if err != nil {
-		return nil, err
-	}
-
-	notAfterBytes, err := convertTime(cert.NotAfter)
-	if err != nil {
-		return nil, err
-	}
-
-	rsaPublicKey := *cert.PublicKey.(*rsa.PublicKey)
-
-	rsaModulusNBytes := getModulusN(rsaPublicKey)
-	rsaPublicExponentBytes := getPublicExponent(rsaPublicKey)
-
-	rsaModulusNLenBytes := uint16ToBytes(len(rsaModulusNBytes))
-	rsaPublicExponentLenBytes := uint16ToBytes(len(rsaPublicExponentBytes))
-
-	b = append(b, nameSHA1Bytes...)
-	b = append(b, rsaModulusNLenBytes...)
-	b = append(b, rsaPublicExponentLenBytes...)
-	b = append(b, notBeforeBytes...)
-	b = append(b, notAfterBytes...)
-	b = append(b, rsaModulusNBytes...)
-	b = append(b, rsaPublicExponentBytes...)
-	for (len(b) & 3) != 0 {
-		b = append(b, 0xff) // padding
-	}
-
-	return
+	return certToPEM(cert), nil
 }
 
-func uint16ToBytes(i int) (b []byte) {
-	b = make([]byte, 2)
+// CertToPEM is a utility function returns a PEM encoded x509 Certificate
+func certToPEM(cert *x509.Certificate) []byte {
+	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
 
-	binary.LittleEndian.PutUint16(b, uint16(i))
-
-	return
-}
-
-func uint32ToBytes(i int) (b []byte) {
-	b = make([]byte, 4)
-
-	binary.LittleEndian.PutUint32(b, uint32(i))
-
-	return
-}
-
-func calculateNameSha1(cert x509.Certificate) (b []byte, err error) {
-	nameSha1 := sha1.New()
-
-	var subjectDistinguishedNameSequence pkix.RDNSequence
-
-	if _, err = asn1.Unmarshal(cert.RawSubject, &subjectDistinguishedNameSequence); err != nil {
-		return nil, err
-	}
-
-	for _, dn := range subjectDistinguishedNameSequence {
-		nameSha1.Write([]byte(dn[0].Value.(string)))
-	}
-
-	b = nameSha1.Sum(nil)
-
-	return
-}
-
-func getModulusN(publicKey rsa.PublicKey) []byte {
-	return publicKey.N.Bytes()
-}
-
-func getPublicExponent(publicKey rsa.PublicKey) (b []byte) {
-	b = make([]byte, 4)
-
-	binary.BigEndian.PutUint32(b, uint32(publicKey.E))
-
-	// strip leading zeros
-	for b[0] == 0 {
-		b = b[1:]
-	}
-
-	return
-}
-
-func convertTime(time time.Time) (b []byte, err error) {
-	asn1Bytes, err := asn1.Marshal(time)
-	if err != nil {
-		return nil, err
-	}
-
-	b = bytes.Repeat([]byte{0x00}, 20) // value must be zero bytes
-	copy(b, asn1Bytes[2:])             // copy but drop the first two bytes
-
-	return
+	return pemCert
 }

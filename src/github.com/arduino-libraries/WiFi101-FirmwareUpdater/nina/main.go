@@ -20,8 +20,6 @@
 package nina
 
 import (
-	"bytes"
-	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -42,20 +40,24 @@ func Run(ctx context.Context) {
 	}
 	defer f.Close()
 
-	dumpTempFile := ""
-
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
 	if err := f.Hello(); err != nil {
 		// if Hello() fails let's try to upload the sketch and run it again
-		log.Println("Flashing firmware uploader")
-		dumpTempFile, err = bossac.DumpAndFlash(ctx)
-		if err != nil {
-				log.Fatal(err)
-		}
-		log.Println("Retrying sync")
-		if err := f.Hello(); err != nil {
-				log.Fatal(err)
+		if ctx.FWUploaderBinary != "" {
+			log.Println("Flashing firmware uploader")
+			if ctx.BinaryToRestore == "" {
+				ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
+			} else {
+				err = bossac.Flash(ctx, ctx.FWUploaderBinary)
+			}
+			if err != nil {
+					log.Fatal(err)
+			}
+			log.Println("Retrying sync")
+			if err := f.Hello(); err != nil {
+					log.Fatal(err)
+			}
 		}
 	}
 
@@ -90,8 +92,8 @@ func Run(ctx context.Context) {
 		}
 	}
 
-	if (dumpTempFile != "") {
-			if err := bossac.Restore(ctx, dumpTempFile) ; err != nil {
+	if (ctx.BinaryToRestore != "") {
+			if err := bossac.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
 				log.Fatal(err)
 			}
 	}
@@ -109,7 +111,7 @@ func readAllFlash() error {
 }
 
 func flashCerts(ctx context.Context) error {
-	CertificatesOffset := 0x4000
+	CertificatesOffset := 0x10000
 
 	if ctx.RootCertDir != "" {
 		log.Printf("Converting and flashing certificates from '%v'", ctx.RootCertDir)
@@ -155,24 +157,5 @@ func flashChunk(offset int, buffer []byte) error {
 		}
 	}
 
-	var flashData []byte
-	for i := 0; i < bufferLength; i += chunkSize {
-		readLength := chunkSize
-		if (i + chunkSize) > bufferLength {
-			readLength = bufferLength % chunkSize
-		}
-
-		data, err := f.Read(uint32(offset+i), uint32(readLength))
-		if err != nil {
-			return err
-		}
-
-		flashData = append(flashData, data...)
-	}
-
-	if !bytes.Equal(buffer, flashData) {
-		return errors.New("Flash data does not match written!")
-	}
-
-	return nil
+	return f.Md5sum(buffer)
 }

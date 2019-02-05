@@ -14,27 +14,27 @@ import (
   "os"
 )
 
-func Restore(ctx context.Context, filename string) error {
-  err := touchSerialPortAt1200bps(ctx.PortName)
+func Flash(ctx context.Context, filename string) error {
+  port, err := reset(ctx.PortName, true)
   if err != nil {
     return err
   }
-  err = invokeBossac([]string{"-e", "-w" , filename})
+  err = invokeBossac([]string{"-e", "-p", port, "-w" , filename})
   os.RemoveAll(filepath.Dir(filename))
   return err
 }
 
-func DumpAndFlash(ctx context.Context) (string, error) {
+func DumpAndFlash(ctx context.Context, filename string) (string, error) {
   dir, err := ioutil.TempDir("wifiFlasher", "dump")
-  err = touchSerialPortAt1200bps(ctx.PortName)
+  port, err := reset(ctx.PortName, true)
   if err != nil {
     return "", err
   }
-  err = invokeBossac([]string{"-r", filepath.Join(dir, "dump.bin")})
+  err = invokeBossac([]string{"-r", "-p", port, filepath.Join(dir, "dump.bin")})
   if err != nil {
     return "", err
   }
-  err = invokeBossac([]string{"-e", "-w" , ctx.FlasherBinary})
+  err = invokeBossac([]string{"-e", "-p", port, "-w" , filename})
   return filepath.Join(dir, "dump.bin"), err
 }
 
@@ -67,4 +67,99 @@ func touchSerialPortAt1200bps(port string) error {
 	time.Sleep(200 * time.Millisecond)
 
 	return nil
+}
+
+// reset opens the port at 1200bps. It returns the new port name (which could change
+// sometimes) and an error (usually because the port listing failed)
+func reset(port string, wait bool) (string, error) {
+	log.Println("Restarting in bootloader mode")
+
+	// Get port list before reset
+	ports, err := serial.GetPortsList()
+	log.Println("Get port list before reset")
+	if err != nil {
+		return "", errors.New("Get port list before reset")
+	}
+
+	// Touch port at 1200bps
+	err = touchSerialPortAt1200bps(port)
+	if err != nil {
+		return "", errors.New("1200bps Touch")
+	}
+
+	// Wait for port to disappear and reappear
+	if wait {
+		port = waitReset(ports, port)
+	}
+
+	return port, nil
+}
+
+// waitReset is meant to be called just after a reset. It watches the ports connected
+// to the machine until a port disappears and reappears. The port name could be different
+// so it returns the name of the new port.
+func waitReset(beforeReset []string, originalPort string) string {
+	var port string
+	timeout := false
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		timeout = true
+	}()
+
+	for {
+		ports, _ := serial.GetPortsList()
+		port = differ(ports, beforeReset)
+
+		if port != "" {
+			break
+		}
+		if timeout {
+			break
+		}
+		time.Sleep(time.Millisecond * 100)
+	}
+
+	// Wait for the port to reappear
+	log.Println("Wait for the port to reappear")
+	afterReset, _ := serial.GetPortsList()
+	for {
+		ports, _ := serial.GetPortsList()
+		port = differ(ports, afterReset)
+		if port != "" {
+			time.Sleep(time.Millisecond * 500)
+			break
+		}
+		if timeout {
+			break
+		}
+		time.Sleep(time.Millisecond * 100)
+	}
+
+	// try to upload on the existing port if the touch was ineffective
+	if port == "" {
+		port = originalPort
+	}
+
+	return port
+}
+
+// differ returns the first item that differ between the two input slices
+func differ(slice1 []string, slice2 []string) string {
+	m := map[string]int{}
+
+	for _, s1Val := range slice1 {
+		m[s1Val] = 1
+	}
+	for _, s2Val := range slice2 {
+		m[s2Val] = m[s2Val] + 1
+	}
+
+	for mKey, mVal := range m {
+		if mVal == 1 {
+			return mKey
+		}
+	}
+
+	return ""
 }

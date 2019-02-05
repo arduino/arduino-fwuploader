@@ -16,7 +16,7 @@ type Context struct {
 	RootCertDir 	string
 	Addresses 		addressFlags
 	FirmwareFile 	string
-	FlasherBinary string
+	FWUploaderBinary string
 	ReadAll 			bool
-	RestoreFlashContent bool
+	BinaryToRestore string
 }

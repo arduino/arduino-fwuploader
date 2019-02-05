@@ -201,8 +201,5 @@ func OpenFlasher(portName string) (*Flasher, error) {
 		port: port,
 	}
 
-	// Wait for the complete reset of the board
-	time.Sleep(2500 * time.Millisecond)
-
 	return flasher, err
 }

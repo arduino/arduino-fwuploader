@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/nina"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/winc"
+	//"github.com/arduino-libraries/WiFi101-FirmwareUpdater/winc"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 )
 
@@ -16,8 +16,8 @@ func init() {
 	flag.Var(&ctx.Addresses, "address", "address (host:port) to fetch and flash root certificate for, multiple values allowed")
 	flag.StringVar(&ctx.FirmwareFile, "firmware", "", "firmware file to flash")
 	flag.BoolVar(&ctx.ReadAll, "read", false, "read all firmware and output to stdout")
-	flag.BoolVar(&ctx.RestoreFlashContent, "restore", false, "restores flash content after flashing")
-	flag.StringVar(&ctx.FlasherBinary, "flasher", "", "firmware file to flash")
+	flag.StringVar(&ctx.FWUploaderBinary, "flasher", "", "firmware upload binary (precompiled for the right target)")
+	flag.StringVar(&ctx.BinaryToRestore, "restore_binary", "", "firmware upload binary (precompiled for the right target)")
 }
 
 func main() {
@@ -27,6 +27,6 @@ func main() {
 		log.Fatal("Please specify a serial port")
 	}
 
-	winc.Run(ctx)
+	//winc.Run(ctx)
 	nina.Run(ctx)
 }

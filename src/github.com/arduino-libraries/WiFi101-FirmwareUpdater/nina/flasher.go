@@ -22,6 +22,7 @@ package nina
 import (
 	"encoding/binary"
 	"time"
+	"crypto/md5"
 
 	"go.bug.st/serial"
 )
@@ -188,9 +189,46 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 	return nil
 }
 
+func (flasher *Flasher) Md5sum(data []byte) error {
+	hasher := md5.New()
+  hasher.Write(data)
+
+	// Get md5sum
+	if err := flasher.sendCommand(0x04, 0, uint32(len(data)), nil); err != nil {
+		return err
+	}
+
+	// wait acknowledge
+	ack := make([]byte, 2)
+	if err := flasher.serialFillBuffer(ack); err != nil {
+		return err
+	}
+	if string(ack) != "OK" {
+		return &FlasherError{err: "Error during FlashErase()"}
+	}
+
+	// wait md5
+	md5sum := make([]byte, 16)
+	if err := flasher.serialFillBuffer(md5sum); err != nil {
+		return err
+	}
+
+	md5sumfromdevice := hasher.Sum(nil)
+
+	i := 0
+  for (i<16) {
+		if md5sumfromdevice[i] != md5sum[i] {
+				return &FlasherError{err: "MD5sum failed"}
+			}
+			i++
+	}
+	return nil
+}
+
+
 func OpenFlasher(portName string) (*Flasher, error) {
 	mode := &serial.Mode{
-		BaudRate: 115200,
+		BaudRate: 1000000,
 	}
 
 	port, err := serial.OpenPort(portName, mode)
@@ -201,9 +239,6 @@ func OpenFlasher(portName string) (*Flasher, error) {
 	flasher := &Flasher{
 		port: port,
 	}
-
-	// Wait for the complete reset of the board
-	time.Sleep(2500 * time.Millisecond)
 
 	return flasher, err
 }

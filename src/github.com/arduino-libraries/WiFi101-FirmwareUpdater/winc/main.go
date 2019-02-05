@@ -42,20 +42,24 @@ func Run(ctx context.Context) {
 	}
 	defer f.Close()
 
-	dumpTempFile := ""
-
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
 	if err := f.Hello(); err != nil {
 		// if Hello() fails let's try to upload the sketch and run it again
-		log.Println("Flashing firmware uploader")
-		dumpTempFile, err = bossac.DumpAndFlash(ctx)
-		if err != nil {
-				log.Fatal(err)
-		}
-		log.Println("Retrying sync")
-		if err := f.Hello(); err != nil {
-				log.Fatal(err)
+		if ctx.FWUploaderBinary != "" {
+			log.Println("Flashing firmware uploader")
+			if ctx.BinaryToRestore == "" {
+				ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
+			} else {
+				err = bossac.Flash(ctx, ctx.FWUploaderBinary)
+			}
+			if err != nil {
+					log.Fatal(err)
+			}
+			log.Println("Retrying sync")
+			if err := f.Hello(); err != nil {
+					log.Fatal(err)
+			}
 		}
 	}
 
@@ -90,8 +94,8 @@ func Run(ctx context.Context) {
 		}
 	}
 
-	if (dumpTempFile != "") {
-			if err := bossac.Restore(ctx, dumpTempFile) ; err != nil {
+	if (ctx.BinaryToRestore != "") {
+			if err := bossac.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
 				log.Fatal(err)
 			}
 	}
