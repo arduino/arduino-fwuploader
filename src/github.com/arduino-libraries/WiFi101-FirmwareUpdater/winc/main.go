@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package main
+package winc
 
 import (
 	"bytes"
@@ -25,17 +25,15 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/certificates"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/flasher"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 )
 
-var f *flasher.Flasher
+var f *Flasher
 var payloadSize uint16
 
-func winc_flasher() {
+func Run(ctx context.Context) {
 	log.Println("Connecting to programmer")
-	if _f, err := flasher.Open(portName); err != nil {
+	if _f, err := OpenFlasher(ctx.PortName); err != nil {
 		log.Fatal(err)
 	} else {
 		f = _f
@@ -60,19 +58,19 @@ func winc_flasher() {
 		log.Fatalf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
 	}
 
-	if firmwareFile != "" {
-		if err := flashFirmware(); err != nil {
+	if ctx.FirmwareFile != "" {
+		if err := flashFirmware(ctx); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if rootCertDir != "" || len(addresses) != 0 {
-		if err := flashCerts(); err != nil {
+	if ctx.RootCertDir != "" || len(ctx.Addresses) != 0 {
+		if err := flashCerts(ctx); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if readAll {
+	if ctx.ReadAll {
 		log.Println("Reading all flash")
 		if err := readAllFlash(); err != nil {
 			log.Fatal(err)
@@ -91,14 +89,14 @@ func readAllFlash() error {
 	return nil
 }
 
-func flashCerts() error {
+func flashCerts(ctx context.Context) error {
 	CertificatesOffset := 0x4000
 
-	if rootCertDir != "" {
-		log.Printf("Converting and flashing certificates from '%v'", rootCertDir)
+	if ctx.RootCertDir != "" {
+		log.Printf("Converting and flashing certificates from '%v'", ctx.RootCertDir)
 	}
 
-	certificatesData, err := certificates.Convert(rootCertDir, addresses)
+	certificatesData, err := ConvertCertificates(ctx.RootCertDir, ctx.Addresses)
 	if err != nil {
 		return err
 	}
@@ -106,12 +104,12 @@ func flashCerts() error {
 	return flashChunk(CertificatesOffset, certificatesData)
 }
 
-func flashFirmware() error {
+func flashFirmware(ctx context.Context) error {
 	FirmwareOffset := 0x0000
 
-	log.Printf("Flashing firmware from '%v'", firmwareFile)
+	log.Printf("Flashing firmware from '%v'", ctx.FirmwareFile)
 
-	fwData, err := ioutil.ReadFile(firmwareFile)
+	fwData, err := ioutil.ReadFile(ctx.FirmwareFile)
 	if err != nil {
 		return err
 	}

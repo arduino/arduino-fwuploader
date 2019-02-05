@@ -17,12 +17,13 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package flasher
+package nina
 
 import (
 	"encoding/binary"
-	"go.bug.st/serial"
 	"time"
+
+	"go.bug.st/serial"
 )
 
 type FlasherError struct {
@@ -187,7 +188,7 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 	return nil
 }
 
-func Open(portName string) (*Flasher, error) {
+func OpenFlasher(portName string) (*Flasher, error) {
 	mode := &serial.Mode{
 		BaudRate: 115200,
 	}

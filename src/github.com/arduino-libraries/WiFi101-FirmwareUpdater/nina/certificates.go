@@ -16,7 +16,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package certificates
+package nina
 
 import (
 	"bytes"
@@ -39,7 +39,7 @@ var START_PATTERN = []byte{0x01, 0xF1, 0x02, 0xF2, 0x03, 0xF3, 0x04, 0xF4, 0x05,
 
 type CertEntry []byte
 
-func Convert(directory string, addresses []string) ([]byte, error) {
+func ConvertCertificates(directory string, addresses []string) ([]byte, error) {
 	var entryBytes []byte
 	var numCerts int = 0
 
