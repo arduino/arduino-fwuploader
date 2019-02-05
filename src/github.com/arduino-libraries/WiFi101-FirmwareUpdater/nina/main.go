@@ -26,6 +26,8 @@ import (
 	"log"
 	"os"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
+
 )
 
 var f *Flasher
@@ -40,10 +42,21 @@ func Run(ctx context.Context) {
 	}
 	defer f.Close()
 
+	dumpTempFile := ""
+
 	// Synchronize with programmer
-	log.Println("Synch with programmer")
+	log.Println("Sync with programmer")
 	if err := f.Hello(); err != nil {
-		log.Fatal(err)
+		// if Hello() fails let's try to upload the sketch and run it again
+		log.Println("Flashing firmware uploader")
+		dumpTempFile, err = bossac.DumpAndFlash(ctx)
+		if err != nil {
+				log.Fatal(err)
+		}
+		log.Println("Retrying sync")
+		if err := f.Hello(); err != nil {
+				log.Fatal(err)
+		}
 	}
 
 	// Check maximum supported payload size
@@ -75,6 +88,12 @@ func Run(ctx context.Context) {
 		if err := readAllFlash(); err != nil {
 			log.Fatal(err)
 		}
+	}
+
+	if (dumpTempFile != "") {
+			if err := bossac.Restore(ctx, dumpTempFile) ; err != nil {
+				log.Fatal(err)
+			}
 	}
 }
 
