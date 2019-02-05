@@ -11,7 +11,6 @@ import (
   serial "go.bug.st/serial.v1"
 	//"go.bug.st/serial.v1/enumerator"
   "time"
-  "os"
 )
 
 func Flash(ctx context.Context, filename string) error {
@@ -22,7 +21,6 @@ func Flash(ctx context.Context, filename string) error {
     return err
   }
   err = invokeBossac([]string{"-e", "-R", "-p", port, "-w" , filename})
-  os.RemoveAll(filepath.Dir(filename))
 
   ports, err := serial.GetPortsList()
   port = waitReset(ports, port)
@@ -32,15 +30,17 @@ func Flash(ctx context.Context, filename string) error {
 
 func DumpAndFlash(ctx context.Context, filename string) (string, error) {
   log.Println("Flashing " + filename)
-  dir, err := ioutil.TempDir("wifiFlasher", "dump")
+  dir, err := ioutil.TempDir("", "wifiFlasher_dump")
   port, err := reset(ctx.PortName, true)
   if err != nil {
     return "", err
   }
-  err = invokeBossac([]string{"-r", "-p", port, filepath.Join(dir, "dump.bin")})
-  if err != nil {
-    return "", err
-  }
+	// This delay allows bossac to correctly read the first flash page
+	time.Sleep(2 * time.Second)
+	err = invokeBossac([]string{"-r", "-p", port, filepath.Join(dir, "dump.bin")})
+	if err != nil {
+		return "", err
+	}
   err = invokeBossac([]string{"-e",  "-R", "-p", port, "-w" , filename})
 
   ports, err := serial.GetPortsList()

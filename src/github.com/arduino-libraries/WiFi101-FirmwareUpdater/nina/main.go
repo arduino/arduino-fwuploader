@@ -21,6 +21,7 @@ package nina
 
 import (
 	"io/ioutil"
+	"path/filepath"
 	"log"
 	"fmt"
 	"os"
@@ -33,6 +34,21 @@ var f *Flasher
 var payloadSize uint16
 
 func Run(ctx context.Context) {
+
+	var err error
+
+	if ctx.FWUploaderBinary != "" {
+		log.Println("Flashing firmware uploader")
+		if ctx.BinaryToRestore == "" {
+			ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
+		} else {
+			err = bossac.Flash(ctx, ctx.FWUploaderBinary)
+		}
+		if err != nil {
+				log.Fatal(err)
+		}
+	}
+
 	log.Println("Connecting to programmer")
 	if _f, err := OpenFlasher(ctx.PortName); err != nil {
 		log.Fatal(err)
@@ -44,24 +60,7 @@ func Run(ctx context.Context) {
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
 	if err := f.Hello(); err != nil {
-		// if Hello() fails let's try to upload the sketch and run it again
-		if ctx.FWUploaderBinary != "" {
-			f.port.Close()
-			log.Println("Flashing firmware uploader")
-			if ctx.BinaryToRestore == "" {
-				ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
-			} else {
-				err = bossac.Flash(ctx, ctx.FWUploaderBinary)
-			}
-			if err != nil {
-					log.Fatal(err)
-			}
-			log.Println("Retrying sync")
-			f.port, _ = OpenSerial(ctx.PortName)
-			if err := f.Hello(); err != nil {
-					log.Fatal(err)
-			}
-		}
+		log.Fatal(err)
 	}
 
 	// Check maximum supported payload size
@@ -96,9 +95,18 @@ func Run(ctx context.Context) {
 	}
 
 	if (ctx.BinaryToRestore != "") {
-			if err := bossac.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
-				log.Fatal(err)
-			}
+		log.Println("Restoring previous sketch")
+		f.Close()
+
+		if err := bossac.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("Removing all " + filepath.Dir(ctx.BinaryToRestore))
+		os.RemoveAll(filepath.Dir(ctx.BinaryToRestore))
+
+		// just to allow cleanup via defer()
+		// f.port, _ = OpenSerial(ctx.PortName)
 	}
 }
 
