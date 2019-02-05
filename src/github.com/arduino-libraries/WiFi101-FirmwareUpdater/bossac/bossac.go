@@ -15,16 +15,23 @@ import (
 )
 
 func Flash(ctx context.Context, filename string) error {
+  log.Println("Flashing " + filename)
+
   port, err := reset(ctx.PortName, true)
   if err != nil {
     return err
   }
-  err = invokeBossac([]string{"-e", "-p", port, "-w" , filename})
+  err = invokeBossac([]string{"-e", "-R", "-p", port, "-w" , filename})
   os.RemoveAll(filepath.Dir(filename))
+
+  ports, err := serial.GetPortsList()
+  port = waitReset(ports, port)
+
   return err
 }
 
 func DumpAndFlash(ctx context.Context, filename string) (string, error) {
+  log.Println("Flashing " + filename)
   dir, err := ioutil.TempDir("wifiFlasher", "dump")
   port, err := reset(ctx.PortName, true)
   if err != nil {
@@ -34,7 +41,11 @@ func DumpAndFlash(ctx context.Context, filename string) (string, error) {
   if err != nil {
     return "", err
   }
-  err = invokeBossac([]string{"-e", "-p", port, "-w" , filename})
+  err = invokeBossac([]string{"-e",  "-R", "-p", port, "-w" , filename})
+
+  ports, err := serial.GetPortsList()
+  port = waitReset(ports, port)
+
   return filepath.Join(dir, "dump.bin"), err
 }
 
@@ -43,6 +54,7 @@ func invokeBossac(args []string) error {
   var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
+  log.Println(out.String())
 	return err
 }
 

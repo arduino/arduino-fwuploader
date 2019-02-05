@@ -22,9 +22,10 @@ package nina
 import (
 	"encoding/binary"
 	"time"
+	"log"
 	"crypto/md5"
 
-	"go.bug.st/serial"
+	serial "github.com/facchinm/go-serial"
 )
 
 type FlasherError struct {
@@ -36,7 +37,7 @@ func (e FlasherError) Error() string {
 }
 
 type Flasher struct {
-	port *serial.SerialPort
+	port serial.Port
 }
 
 // Ping the programmer to see if it is alive.
@@ -57,7 +58,9 @@ func (flasher *Flasher) Hello() error {
 		return err
 	}
 	// flush eventual leftover from the rx buffer
-	res = res[n-6 : n]
+	if n >= 6 {
+		res = res[n-6 : n]
+	}
 
 	if res[0] != 'v' {
 		return &FlasherError{err: "Programmer is not responding"}
@@ -134,6 +137,8 @@ func (flasher *Flasher) Erase(address uint32, length uint32) error {
 		return err
 	}
 
+	log.Println("Erasing previous firmware")
+
 	// wait acknowledge
 	ack := make([]byte, 2)
 	if err := flasher.serialFillBuffer(ack); err != nil {
@@ -193,6 +198,8 @@ func (flasher *Flasher) Md5sum(data []byte) error {
 	hasher := md5.New()
   hasher.Write(data)
 
+	log.Println("Checking firmware integrity")
+
 	// Get md5sum
 	if err := flasher.sendCommand(0x04, 0, uint32(len(data)), nil); err != nil {
 		return err
@@ -204,7 +211,7 @@ func (flasher *Flasher) Md5sum(data []byte) error {
 		return err
 	}
 	if string(ack) != "OK" {
-		return &FlasherError{err: "Error during FlashErase()"}
+		return &FlasherError{err: "Error during Md5sum()"}
 	}
 
 	// wait md5
@@ -222,16 +229,26 @@ func (flasher *Flasher) Md5sum(data []byte) error {
 			}
 			i++
 	}
+
+	log.Println("Integrity ok")
+
 	return nil
 }
 
-
-func OpenFlasher(portName string) (*Flasher, error) {
+func OpenSerial(portName string) (serial.Port, error) {
 	mode := &serial.Mode{
 		BaudRate: 1000000,
+		Vtimeout: 100,
+		Vmin: 0,
 	}
 
-	port, err := serial.OpenPort(portName, mode)
+	return serial.Open(portName, mode)
+}
+
+func OpenFlasher(portName string) (*Flasher, error) {
+
+	port, err := OpenSerial(portName)
+
 	if err != nil {
 		return nil, &FlasherError{err: "Error opening serial port. " + err.Error()}
 	}

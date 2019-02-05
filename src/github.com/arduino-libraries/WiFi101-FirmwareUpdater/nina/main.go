@@ -22,10 +22,11 @@ package nina
 import (
 	"io/ioutil"
 	"log"
+	"fmt"
 	"os"
+	"strconv"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
-
 )
 
 var f *Flasher
@@ -45,6 +46,7 @@ func Run(ctx context.Context) {
 	if err := f.Hello(); err != nil {
 		// if Hello() fails let's try to upload the sketch and run it again
 		if ctx.FWUploaderBinary != "" {
+			f.port.Close()
 			log.Println("Flashing firmware uploader")
 			if ctx.BinaryToRestore == "" {
 				ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
@@ -55,6 +57,7 @@ func Run(ctx context.Context) {
 					log.Fatal(err)
 			}
 			log.Println("Retrying sync")
+			f.port, _ = OpenSerial(ctx.PortName)
 			if err := f.Hello(); err != nil {
 					log.Fatal(err)
 			}
@@ -147,6 +150,7 @@ func flashChunk(offset int, buffer []byte) error {
 	}
 
 	for i := 0; i < bufferLength; i += chunkSize {
+		fmt.Printf("\rFlashing firmware: " + strconv.Itoa((i*100)/bufferLength) + "%%")
 		start := i
 		end := i + chunkSize
 		if end > bufferLength {
@@ -156,6 +160,8 @@ func flashChunk(offset int, buffer []byte) error {
 			return err
 		}
 	}
+
+	fmt.Println("")
 
 	return f.Md5sum(buffer)
 }

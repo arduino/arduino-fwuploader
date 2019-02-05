@@ -21,7 +21,7 @@ package winc
 
 import (
 	"encoding/binary"
-	"go.bug.st/serial"
+	serial "github.com/facchinm/go-serial"
 	"time"
 )
 
@@ -34,7 +34,7 @@ func (e FlasherError) Error() string {
 }
 
 type Flasher struct {
-	port *serial.SerialPort
+	port serial.Port
 }
 
 // Ping the programmer to see if it is alive.
@@ -55,7 +55,9 @@ func (flasher *Flasher) Hello() error {
 		return err
 	}
 	// flush eventual leftover from the rx buffer
-	res = res[n-6 : n]
+	if n >= 6 {
+		res = res[n-6 : n]
+	}
 
 	if res[0] != 'v' {
 		return &FlasherError{err: "Programmer is not responding"}
@@ -187,12 +189,21 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 	return nil
 }
 
-func OpenFlasher(portName string) (*Flasher, error) {
+
+
+func OpenSerial(portName string) (serial.Port, error) {
 	mode := &serial.Mode{
-		BaudRate: 115200,
+		BaudRate: 1000000,
+		Vtimeout: 50,
+		Vmin: 0,
 	}
 
-	port, err := serial.OpenPort(portName, mode)
+	return serial.Open(portName, mode)
+}
+
+func OpenFlasher(portName string) (*Flasher, error) {
+
+	port, err := OpenSerial(portName)
 	if err != nil {
 		return nil, &FlasherError{err: "Error opening serial port. " + err.Error()}
 	}
