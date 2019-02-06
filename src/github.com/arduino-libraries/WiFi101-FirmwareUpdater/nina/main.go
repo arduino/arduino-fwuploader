@@ -21,7 +21,6 @@ package nina
 
 import (
 	"io/ioutil"
-	"path/filepath"
 	"log"
 	"fmt"
 	"os"
@@ -102,9 +101,6 @@ func Run(ctx context.Context) {
 			log.Fatal(err)
 		}
 
-		log.Println("Removing all " + filepath.Dir(ctx.BinaryToRestore))
-		os.RemoveAll(filepath.Dir(ctx.BinaryToRestore))
-
 		// just to allow cleanup via defer()
 		// f.port, _ = OpenSerial(ctx.PortName)
 	}
@@ -133,8 +129,13 @@ func flashCerts(ctx context.Context) error {
 		return err
 	}
 
-	if (len(certificatesData) > 0x20000) {
+	if len(certificatesData) > 0x20000 {
 		log.Fatal("Too many certificates! Aborting")
+	}
+
+	// pad certificatesData to flash page
+	for len(certificatesData) % int(payloadSize) != 0 {
+		certificatesData = append(certificatesData, 0)
 	}
 
 	log.Println(string(certificatesData))

@@ -137,7 +137,7 @@ func (flasher *Flasher) Erase(address uint32, length uint32) error {
 		return err
 	}
 
-	log.Println("Erasing previous firmware")
+	log.Printf("Erasing %d bytes from address 0x%X\n", length, address)
 
 	// wait acknowledge
 	ack := make([]byte, 2)
