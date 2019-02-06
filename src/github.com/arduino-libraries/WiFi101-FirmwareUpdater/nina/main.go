@@ -133,7 +133,13 @@ func flashCerts(ctx context.Context) error {
 		return err
 	}
 
-	return flashChunk(CertificatesOffset, certificatesData)
+	if (len(certificatesData) > 0x20000) {
+		log.Fatal("Too many certificates! Aborting")
+	}
+
+	log.Println(string(certificatesData))
+
+	return flashChunk(CertificatesOffset, certificatesData, false)
 }
 
 func flashFirmware(ctx context.Context) error {
@@ -146,10 +152,10 @@ func flashFirmware(ctx context.Context) error {
 		return err
 	}
 
-	return flashChunk(FirmwareOffset, fwData)
+	return flashChunk(FirmwareOffset, fwData, true)
 }
 
-func flashChunk(offset int, buffer []byte) error {
+func flashChunk(offset int, buffer []byte, doChecksum bool) error {
 	chunkSize := int(payloadSize)
 	bufferLength := len(buffer)
 
@@ -158,7 +164,7 @@ func flashChunk(offset int, buffer []byte) error {
 	}
 
 	for i := 0; i < bufferLength; i += chunkSize {
-		fmt.Printf("\rFlashing firmware: " + strconv.Itoa((i*100)/bufferLength) + "%%")
+		fmt.Printf("\rFlashing: " + strconv.Itoa((i*100)/bufferLength) + "%%")
 		start := i
 		end := i + chunkSize
 		if end > bufferLength {
@@ -171,5 +177,9 @@ func flashChunk(offset int, buffer []byte) error {
 
 	fmt.Println("")
 
-	return f.Md5sum(buffer)
+	if (doChecksum) {
+		return f.Md5sum(buffer)
+	} else {
+		return nil
+	}
 }

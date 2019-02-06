@@ -35,9 +35,8 @@ func DumpAndFlash(ctx context.Context, filename string) (string, error) {
   if err != nil {
     return "", err
   }
-	// This delay allows bossac to correctly read the first flash page
-	time.Sleep(100 * time.Millisecond)
-	err = invokeBossac([]string{"-r", "-p", port, filepath.Join(dir, "dump.bin")})
+	err = invokeBossac([]string{"-u", "-r", "-p", port, filepath.Join(dir, "dump.bin")})
+	log.Println("Original sketch saved at " + filepath.Join(dir, "dump.bin"))
 	if err != nil {
 		return "", err
 	}

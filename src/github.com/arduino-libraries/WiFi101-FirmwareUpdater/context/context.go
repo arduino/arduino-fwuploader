@@ -1,9 +1,13 @@
 package context
 
+import (
+	"fmt"
+)
+
 type addressFlags []string
 
 func (af *addressFlags) String() string {
-	return ""
+	return fmt.Sprint(*af)
 }
 
 func (af *addressFlags) Set(value string) error {
@@ -19,4 +23,6 @@ type Context struct {
 	FWUploaderBinary string
 	ReadAll 			bool
 	BinaryToRestore string
+	ProgrammerPath string
+	Model string
 }
