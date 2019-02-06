@@ -23,7 +23,7 @@ func (b *Bossac) Flash(ctx context.Context, filename string) error {
   if err != nil {
     return err
   }
-  err = invokeBossac([]string{"-e", "-R", "-p", port, "-w" , filename})
+  err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w" , filename})
 
   ports, err := serial.GetPortsList()
   port = waitReset(ports, port)
@@ -38,12 +38,12 @@ func (b *Bossac)DumpAndFlash(ctx context.Context, filename string) (string, erro
   if err != nil {
     return "", err
   }
-	err = invokeBossac([]string{"-u", "-r", "-p", port, filepath.Join(dir, "dump.bin")})
+	err = invokeBossac([]string{ctx.ProgrammerPath, "-u", "-r", "-p", port, filepath.Join(dir, "dump.bin")})
 	log.Println("Original sketch saved at " + filepath.Join(dir, "dump.bin"))
 	if err != nil {
 		return "", err
 	}
-  err = invokeBossac([]string{"-e",  "-R", "-p", port, "-w" , filename})
+  err = invokeBossac([]string{ctx.ProgrammerPath, "-e",  "-R", "-p", port, "-w" , filename})
 
   ports, err := serial.GetPortsList()
   port = waitReset(ports, port)
@@ -52,7 +52,7 @@ func (b *Bossac)DumpAndFlash(ctx context.Context, filename string) (string, erro
 }
 
 func invokeBossac(args []string) error {
-  cmd := exec.Command("bossac/bossac", args...)
+  cmd := exec.Command(args[0], args[1:]...)
   var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
