@@ -26,3 +26,8 @@ type Context struct {
 	ProgrammerPath string
 	Model string
 }
+
+type Programmer interface {
+  DumpAndFlash(ctx Context, filename string) (string, error)
+	Flash(ctx Context, filename string) error
+}

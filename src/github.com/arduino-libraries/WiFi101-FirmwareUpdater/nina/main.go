@@ -24,24 +24,32 @@ import (
 	"log"
 	"fmt"
 	"os"
+	"strings"
 	"strconv"
+	"path/filepath"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
+	//"github.com/arduino-libraries/WiFi101-FirmwareUpdater/avrdude"
 )
 
 var f *Flasher
 var payloadSize uint16
+var programmer context.Programmer
 
 func Run(ctx context.Context) {
 
 	var err error
 
+	if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
+		programmer = &bossac.Bossac{}
+	}
+
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader")
 		if ctx.BinaryToRestore == "" {
-			ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
+			ctx.BinaryToRestore, err = programmer.DumpAndFlash(ctx, ctx.FWUploaderBinary)
 		} else {
-			err = bossac.Flash(ctx, ctx.FWUploaderBinary)
+			err = programmer.Flash(ctx, ctx.FWUploaderBinary)
 		}
 		if err != nil {
 				log.Fatal(err)
@@ -97,7 +105,7 @@ func Run(ctx context.Context) {
 		log.Println("Restoring previous sketch")
 		f.Close()
 
-		if err := bossac.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
+		if err := programmer.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
 			log.Fatal(err)
 		}
 

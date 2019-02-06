@@ -13,7 +13,10 @@ import (
   "time"
 )
 
-func Flash(ctx context.Context, filename string) error {
+type Bossac struct {
+}
+
+func (b *Bossac) Flash(ctx context.Context, filename string) error {
   log.Println("Flashing " + filename)
 
   port, err := reset(ctx.PortName, true)
@@ -28,7 +31,7 @@ func Flash(ctx context.Context, filename string) error {
   return err
 }
 
-func DumpAndFlash(ctx context.Context, filename string) (string, error) {
+func (b *Bossac)DumpAndFlash(ctx context.Context, filename string) (string, error) {
   log.Println("Flashing " + filename)
   dir, err := ioutil.TempDir("", "wifiFlasher_dump")
   port, err := reset(ctx.PortName, true)
