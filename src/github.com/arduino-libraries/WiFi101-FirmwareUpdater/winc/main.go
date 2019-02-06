@@ -24,16 +24,32 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"fmt"
 	"os"
+	"strconv"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
-
 )
 
 var f *Flasher
 var payloadSize uint16
 
 func Run(ctx context.Context) {
+
+	var err error
+
+	if ctx.FWUploaderBinary != "" {
+		log.Println("Flashing firmware uploader")
+		if ctx.BinaryToRestore == "" {
+			ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
+		} else {
+			err = bossac.Flash(ctx, ctx.FWUploaderBinary)
+		}
+		if err != nil {
+				log.Fatal(err)
+		}
+	}
+
 	log.Println("Connecting to programmer")
 	if _f, err := OpenFlasher(ctx.PortName); err != nil {
 		log.Fatal(err)
@@ -45,22 +61,7 @@ func Run(ctx context.Context) {
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
 	if err := f.Hello(); err != nil {
-		// if Hello() fails let's try to upload the sketch and run it again
-		if ctx.FWUploaderBinary != "" {
-			log.Println("Flashing firmware uploader")
-			if ctx.BinaryToRestore == "" {
-				ctx.BinaryToRestore, err = bossac.DumpAndFlash(ctx, ctx.FWUploaderBinary)
-			} else {
-				err = bossac.Flash(ctx, ctx.FWUploaderBinary)
-			}
-			if err != nil {
-					log.Fatal(err)
-			}
-			log.Println("Retrying sync")
-			if err := f.Hello(); err != nil {
-					log.Fatal(err)
-			}
-		}
+		log.Fatal(err)
 	}
 
 	// Check maximum supported payload size
@@ -95,9 +96,15 @@ func Run(ctx context.Context) {
 	}
 
 	if (ctx.BinaryToRestore != "") {
-			if err := bossac.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
-				log.Fatal(err)
-			}
+		log.Println("Restoring previous sketch")
+		f.Close()
+
+		if err := bossac.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
+			log.Fatal(err)
+		}
+
+		// just to allow cleanup via defer()
+		// f.port, _ = OpenSerial(ctx.PortName)
 	}
 }
 
@@ -149,6 +156,7 @@ func flashChunk(offset int, buffer []byte) error {
 	}
 
 	for i := 0; i < bufferLength; i += chunkSize {
+		fmt.Printf("\rFlashing: " + strconv.Itoa((i*100)/bufferLength) + "%%")
 		start := i
 		end := i + chunkSize
 		if end > bufferLength {

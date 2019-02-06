@@ -21,6 +21,7 @@ package winc
 
 import (
 	"encoding/binary"
+	"log"
 	serial "github.com/facchinm/go-serial"
 	"time"
 )
@@ -134,6 +135,8 @@ func (flasher *Flasher) Erase(address uint32, length uint32) error {
 		return err
 	}
 
+	log.Printf("Erasing %d bytes from address 0x%X\n", length, address)
+
 	// wait acknowledge
 	ack := make([]byte, 2)
 	if err := flasher.serialFillBuffer(ack); err != nil {
@@ -194,7 +197,7 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 func OpenSerial(portName string) (serial.Port, error) {
 	mode := &serial.Mode{
 		BaudRate: 1000000,
-		Vtimeout: 50,
+		Vtimeout: 100,
 		Vmin: 0,
 	}
 
