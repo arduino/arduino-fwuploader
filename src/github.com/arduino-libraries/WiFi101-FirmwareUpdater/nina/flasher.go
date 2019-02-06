@@ -20,10 +20,10 @@
 package nina
 
 import (
-	"encoding/binary"
-	"time"
-	"log"
 	"crypto/md5"
+	"encoding/binary"
+	"log"
+	"time"
 
 	serial "github.com/facchinm/go-serial"
 )
@@ -196,7 +196,7 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 
 func (flasher *Flasher) Md5sum(data []byte) error {
 	hasher := md5.New()
-  hasher.Write(data)
+	hasher.Write(data)
 
 	log.Println("Checking firmware integrity")
 
@@ -223,11 +223,11 @@ func (flasher *Flasher) Md5sum(data []byte) error {
 	md5sumfromdevice := hasher.Sum(nil)
 
 	i := 0
-  for (i<16) {
+	for i < 16 {
 		if md5sumfromdevice[i] != md5sum[i] {
-				return &FlasherError{err: "MD5sum failed"}
-			}
-			i++
+			return &FlasherError{err: "MD5sum failed"}
+		}
+		i++
 	}
 
 	log.Println("Integrity ok")
@@ -239,7 +239,7 @@ func OpenSerial(portName string) (serial.Port, error) {
 	mode := &serial.Mode{
 		BaudRate: 230400,
 		Vtimeout: 100,
-		Vmin: 0,
+		Vmin:     0,
 	}
 
 	return serial.Open(portName, mode)

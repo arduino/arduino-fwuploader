@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	"log"
-	"strings"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/nina"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/winc"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
+	"log"
+	"strings"
 )
 
 var ctx context.Context

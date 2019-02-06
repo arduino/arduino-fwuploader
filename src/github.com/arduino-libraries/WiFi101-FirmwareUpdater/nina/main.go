@@ -20,15 +20,15 @@
 package nina
 
 import (
+	"fmt"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"io/ioutil"
 	"log"
-	"fmt"
 	"os"
-	"strings"
-	"strconv"
 	"path/filepath"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
+	"strconv"
+	"strings"
 	//"github.com/arduino-libraries/WiFi101-FirmwareUpdater/avrdude"
 )
 
@@ -52,7 +52,7 @@ func Run(ctx context.Context) {
 			err = programmer.Flash(ctx, ctx.FWUploaderBinary)
 		}
 		if err != nil {
-				log.Fatal(err)
+			log.Fatal(err)
 		}
 	}
 
@@ -101,11 +101,11 @@ func Run(ctx context.Context) {
 		}
 	}
 
-	if (ctx.BinaryToRestore != "") {
+	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
 		f.Close()
 
-		if err := programmer.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
+		if err := programmer.Flash(ctx, ctx.BinaryToRestore); err != nil {
 			log.Fatal(err)
 		}
 
@@ -142,7 +142,7 @@ func flashCerts(ctx context.Context) error {
 	}
 
 	// pad certificatesData to flash page
-	for len(certificatesData) % int(payloadSize) != 0 {
+	for len(certificatesData)%int(payloadSize) != 0 {
 		certificatesData = append(certificatesData, 0)
 	}
 
@@ -186,7 +186,7 @@ func flashChunk(offset int, buffer []byte, doChecksum bool) error {
 
 	fmt.Println("")
 
-	if (doChecksum) {
+	if doChecksum {
 		return f.Md5sum(buffer)
 	} else {
 		return nil

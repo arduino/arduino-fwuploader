@@ -16,18 +16,18 @@ func (af *addressFlags) Set(value string) error {
 }
 
 type Context struct {
-	PortName 			string
-	RootCertDir 	string
-	Addresses 		addressFlags
-	FirmwareFile 	string
+	PortName         string
+	RootCertDir      string
+	Addresses        addressFlags
+	FirmwareFile     string
 	FWUploaderBinary string
-	ReadAll 			bool
-	BinaryToRestore string
-	ProgrammerPath string
-	Model string
+	ReadAll          bool
+	BinaryToRestore  string
+	ProgrammerPath   string
+	Model            string
 }
 
 type Programmer interface {
-  DumpAndFlash(ctx Context, filename string) (string, error)
+	DumpAndFlash(ctx Context, filename string) (string, error)
 	Flash(ctx Context, filename string) error
 }

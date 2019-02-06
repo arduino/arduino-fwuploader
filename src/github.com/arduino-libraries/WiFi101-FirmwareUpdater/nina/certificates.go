@@ -21,12 +21,12 @@ package nina
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"io/ioutil"
 	"log"
 	"path"
 	"path/filepath"
-	"encoding/pem"
 )
 
 type CertEntry []byte

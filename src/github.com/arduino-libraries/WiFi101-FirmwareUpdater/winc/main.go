@@ -22,13 +22,13 @@ package winc
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"io/ioutil"
 	"log"
-	"fmt"
 	"os"
 	"strconv"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
 )
 
 var f *Flasher
@@ -48,7 +48,7 @@ func Run(ctx context.Context) {
 			err = programmer.Flash(ctx, ctx.FWUploaderBinary)
 		}
 		if err != nil {
-				log.Fatal(err)
+			log.Fatal(err)
 		}
 	}
 
@@ -97,11 +97,11 @@ func Run(ctx context.Context) {
 		}
 	}
 
-	if (ctx.BinaryToRestore != "") {
+	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
 		f.Close()
 
-		if err := programmer.Flash(ctx, ctx.BinaryToRestore) ; err != nil {
+		if err := programmer.Flash(ctx, ctx.BinaryToRestore); err != nil {
 			log.Fatal(err)
 		}
 

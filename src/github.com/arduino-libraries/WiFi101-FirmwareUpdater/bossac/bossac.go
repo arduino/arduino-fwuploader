@@ -2,61 +2,61 @@ package bossac
 
 import (
 	"bytes"
-  "errors"
-  "path/filepath"
-  "log"
-  "os/exec"
-	"io/ioutil"
+	"errors"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
-  serial "go.bug.st/serial.v1"
+	serial "go.bug.st/serial.v1"
+	"io/ioutil"
+	"log"
+	"os/exec"
+	"path/filepath"
 	//"go.bug.st/serial.v1/enumerator"
-  "time"
+	"time"
 )
 
 type Bossac struct {
 }
 
 func (b *Bossac) Flash(ctx context.Context, filename string) error {
-  log.Println("Flashing " + filename)
+	log.Println("Flashing " + filename)
 
-  port, err := reset(ctx.PortName, true)
-  if err != nil {
-    return err
-  }
-  err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w" , filename})
+	port, err := reset(ctx.PortName, true)
+	if err != nil {
+		return err
+	}
+	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
 
-  ports, err := serial.GetPortsList()
-  port = waitReset(ports, port)
+	ports, err := serial.GetPortsList()
+	port = waitReset(ports, port)
 
-  return err
+	return err
 }
 
-func (b *Bossac)DumpAndFlash(ctx context.Context, filename string) (string, error) {
-  log.Println("Flashing " + filename)
-  dir, err := ioutil.TempDir("", "wifiFlasher_dump")
-  port, err := reset(ctx.PortName, true)
-  if err != nil {
-    return "", err
-  }
+func (b *Bossac) DumpAndFlash(ctx context.Context, filename string) (string, error) {
+	log.Println("Flashing " + filename)
+	dir, err := ioutil.TempDir("", "wifiFlasher_dump")
+	port, err := reset(ctx.PortName, true)
+	if err != nil {
+		return "", err
+	}
 	err = invokeBossac([]string{ctx.ProgrammerPath, "-u", "-r", "-p", port, filepath.Join(dir, "dump.bin")})
 	log.Println("Original sketch saved at " + filepath.Join(dir, "dump.bin"))
 	if err != nil {
 		return "", err
 	}
-  err = invokeBossac([]string{ctx.ProgrammerPath, "-e",  "-R", "-p", port, "-w" , filename})
+	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
 
-  ports, err := serial.GetPortsList()
-  port = waitReset(ports, port)
+	ports, err := serial.GetPortsList()
+	port = waitReset(ports, port)
 
-  return filepath.Join(dir, "dump.bin"), err
+	return filepath.Join(dir, "dump.bin"), err
 }
 
 func invokeBossac(args []string) error {
-  cmd := exec.Command(args[0], args[1:]...)
-  var out bytes.Buffer
+	cmd := exec.Command(args[0], args[1:]...)
+	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
-  log.Println(out.String())
+	log.Println(out.String())
 	return err
 }
 
