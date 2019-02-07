@@ -26,7 +26,7 @@ func (b *Bossac) Flash(ctx context.Context, filename string) error {
 	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
 
 	ports, err := serial.GetPortsList()
-	port = waitReset(ports, port)
+	ctx.PortName = waitReset(ports, port)
 
 	return err
 }
@@ -46,7 +46,7 @@ func (b *Bossac) DumpAndFlash(ctx context.Context, filename string) (string, err
 	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
 
 	ports, err := serial.GetPortsList()
-	port = waitReset(ports, port)
+	ctx.PortName = waitReset(ports, port)
 
 	return filepath.Join(dir, "dump.bin"), err
 }
