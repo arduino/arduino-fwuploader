@@ -238,7 +238,7 @@ func (flasher *Flasher) Md5sum(data []byte) error {
 func OpenSerial(portName string) (serial.Port, error) {
 	mode := &serial.Mode{
 		BaudRate: 230400,
-		Vtimeout: 100,
+		Vtimeout: 200,
 		Vmin:     0,
 	}
 
