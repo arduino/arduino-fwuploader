@@ -21,15 +21,16 @@ package nina
 
 import (
 	"fmt"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	//"github.com/arduino-libraries/WiFi101-FirmwareUpdater/avrdude"
+
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/avrdude"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 )
 
 var f *Flasher
@@ -42,6 +43,9 @@ func Run(ctx context.Context) {
 
 	if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
 		programmer = &bossac.Bossac{}
+	}
+	if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
+		programmer = &avrdude.Avrdude{}
 	}
 
 	if ctx.FWUploaderBinary != "" {
