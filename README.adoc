@@ -1,82 +1,53 @@
-= Firmware/Certificates updater for the WiFi 101 and MKR1000 =
+= Firmware/Certificates updater for WINC and NINA Wifi module =
 
-Use this tool to update the SSL root-certificates installed on the
-Arduino/Genuino WiFi 101 shield or the Arduino/Genuino MKR1000 board.
+Use this tool to update the firmware and/or add SSL certificates for any WINC or NINA modules
 
 == Install ==
 
 You can download the Firmware/Certificates updater here:
 
-https://github.com/arduino-libraries/WiFi101-FirmwareUpdater/releases/latest
+https://github.com/bcmi-labs/WiFi-FirmwareUpdater-cli/releases/latest
 
 == Usage ==
 
-=== To update SSL Certificates ===
+Extract the zip file and run (for example, NINA -> WiFi1010)
 
-1. Upload the https://github.com/arduino-libraries/WiFi101/tree/master/examples/FirmwareUpdater[FirmwareUpdater]
-   sketch onto your board. You need to install the lastest WiFi101 library
-   (available through the library manager of the Arduino IDE). The sketch is
-   included as an example of the library: `File -> Examples -> WiFi101 -> FirmwareUpdater`
-2. Run "winc1500-uploader-gui".
-3. This tool is able to fetch the SSL Root Certificates directly from the
-   target websites, just write the IP or domain in the text box and click
-   on the "Fetch" button (you can repeat this step multiple times to add
-   more certificates).
-4. Select the serial port of the board running the "FirmwareUploader" sketch.
-5. Click "Update" button.
+ ./$your_os/updater -flasher firmwares/NINA/FirmwareUpdater.mkrwifi1010.ino.bin -firmware firmwares/NINA/1.2.1/NINA_W102.bin -port /dev/ttyACM0  -address arduino.cc:443 -restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin -programmer {runtime.tools.bossac}/bossac
 
-**WARNING:** the storage reserved for the certificates is very small. You can load, 
-roughly, 10 certificates but the exact number may be lower depending on the size of the
-certificates.
+To flash a MKR1000:
 
-=== To update firmware ===
+ ./$your_os/updater -flasher firmwares/WINC1500/FirmwareUpdater.mkr1000.ino.bin -firmware firmwares/WINC1500/19.5.4/m2m_aio_3a0.bin -port /dev/ttyACM0  -address arduino.cc:443 -restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin -programmer {runtime.tools.bossac}/bossac
 
-This is possible using the Command-Line tool:
+=== Command line options ===
 
-1. Upload the https://github.com/arduino-libraries/WiFi101/tree/master/examples/FirmwareUpdater[FirmwareUpdater]
-   sketch onto your board. You need to install the lastest WiFi101 library
-   (available through the library manager of the Arduino IDE). The sketch is
-   included as an example of the library: `File -> Examples -> WiFi101 -> FirmwareUpdater`
-2. Read the label on the top of your WINC1500 in order to determine the model of the WiFi module.
-   The last letter should tell if you have a Model A or Model B, for example:
-   - `ATWINC1500-MR210PA` -> is a WINC1500 Model A
-   - `ATSAMW25H18-MR510PB` -> is a WINC1500 Model B
-3. Based on your WINC1500 model you must use:
-   - `firmware/19.4.4/m2m_aio_2b0.bin` for Model A
-   - `firmware/19.4.4/m2m_aio_3a0.bin` for Model B
-4. Run the following command line
-   `./winc1500-uploader -firmware XXX -port YYY`
-   replacing `XXX` with your firmware file determined on step 3) and `YYY` with your serial port number. +
-   For example:
-   `./winc1500-uploader -firmware firmware/19.4.4/m2m_aio_2b0.bin -port /dev/ttyACM0`
+The full list of command line options can be obtained with the `-h` option: `./updater -h` 
 
-=== Other command line options ===
-
-The full list of command line options can be obtained with the `-h` option: `./winc1500-uploader -h` 
-
-  Usage of ./winc1500-uploader:
-    -address value
-    	  address (host:port) to fetch and flash root certificate for, multiple values allowed
-    -certs string
-    	  root certificate directory
-    -firmware string
-    	  firmware file to flash
-    -port string
-    	  serial port to use for flashing
-    -read
-    	  read all firmware and output to stdout
+   Usage of ./distrib/linux64/updater:
+     -address value
+         address (host:port) to fetch and flash root certificate for, multiple values allowed
+     -certs string
+         root certificate directory
+     -firmware string
+         firmware file to flash
+     -flasher string
+         firmware upload binary (precompiled for the right target) -> if not provided it will expect FirmwareUpdater sketch to be already flashed on the board
+     -model string
+         module model (winc or nina)
+     -port string
+         serial port to use for flashing
+     -programmer string
+         path of programmer in use (avrdude/bossac)
+     -read
+         read all firmware and output to stdout
+     -restore_binary string
+         firmware upload binary (precompiled for the right target) -> if not provided it will try to restore the original firmware
 
 == How to build the tools from source file ==
 
- go get go.bug.st/serial
- go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/winc1500-uploader.go
-
- go get github.com/google/gxui
- go get github.com/google/gxui/drivers/gl
- go get github.com/google/gxui/gxfont
- go get github.com/google/gxui/math
- go get github.com/google/gxui/samples/flags
- go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/gui/main/winc1500-uploader-gui.go
+ go get src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
+ # important! navigate to src/github.com/facchinm/go-serial/ and checkout branch v1 !
+ # to be solved by vendoring the dependencies
+ go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
 
 == License ==
 
