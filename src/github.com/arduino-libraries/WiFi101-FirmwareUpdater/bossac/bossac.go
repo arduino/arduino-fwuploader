@@ -16,7 +16,7 @@ import (
 type Bossac struct {
 }
 
-func (b *Bossac) Flash(ctx context.Context, filename string) error {
+func (b *Bossac) Flash(ctx *context.Context, filename string) error {
 	log.Println("Flashing " + filename)
 
 	port, err := reset(ctx.PortName, true)
@@ -26,12 +26,12 @@ func (b *Bossac) Flash(ctx context.Context, filename string) error {
 	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
 
 	ports, err := serial.GetPortsList()
-	ctx.PortName = waitReset(ports, port)
+	ctx.PortName = waitPort(ports, port)
 
 	return err
 }
 
-func (b *Bossac) DumpAndFlash(ctx context.Context, filename string) (string, error) {
+func (b *Bossac) DumpAndFlash(ctx *context.Context, filename string) (string, error) {
 	log.Println("Flashing " + filename)
 	dir, err := ioutil.TempDir("", "wifiFlasher_dump")
 	port, err := reset(ctx.PortName, true)
@@ -46,7 +46,7 @@ func (b *Bossac) DumpAndFlash(ctx context.Context, filename string) (string, err
 	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
 
 	ports, err := serial.GetPortsList()
-	ctx.PortName = waitReset(ports, port)
+	ctx.PortName = waitPort(ports, port)
 
 	return filepath.Join(dir, "dump.bin"), err
 }
@@ -142,6 +142,36 @@ func waitReset(beforeReset []string, originalPort string) string {
 		port = differ(ports, afterReset)
 		if port != "" {
 			time.Sleep(time.Millisecond * 500)
+			break
+		}
+		if timeout {
+			break
+		}
+		time.Sleep(time.Millisecond * 100)
+	}
+
+	// try to upload on the existing port if the touch was ineffective
+	if port == "" {
+		port = originalPort
+	}
+
+	return port
+}
+
+func waitPort(beforeReset []string, originalPort string) string {
+	var port string
+	timeout := false
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		timeout = true
+	}()
+
+	for {
+		ports, _ := serial.GetPortsList()
+		port = differ(ports, beforeReset)
+
+		if port != "" {
 			break
 		}
 		if timeout {
