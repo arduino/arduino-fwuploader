@@ -3,7 +3,7 @@ package bossac
 import (
 	"bytes"
 	"errors"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
+	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
 	serial "go.bug.st/serial.v1"
 	"io/ioutil"
 	"log"

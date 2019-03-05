@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/nina"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/winc"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/sara"
+	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
+	"github.com/arduino-libraries/FirmwareUpdater/modules/nina"
+	"github.com/arduino-libraries/FirmwareUpdater/modules/winc"
+	"github.com/arduino-libraries/FirmwareUpdater/modules/sara"
 	"log"
 	"strings"
 )

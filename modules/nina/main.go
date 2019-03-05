@@ -28,9 +28,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/avrdude"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/bossac"
-	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
+	"github.com/arduino-libraries/FirmwareUpdater/programmers/avrdude"
+	"github.com/arduino-libraries/FirmwareUpdater/programmers/bossac"
+	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
 )
 
 var f *Flasher
