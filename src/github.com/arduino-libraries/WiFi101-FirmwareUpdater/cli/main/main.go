@@ -5,6 +5,7 @@ import (
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/context"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/nina"
 	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/winc"
+	"github.com/arduino-libraries/WiFi101-FirmwareUpdater/sara"
 	"log"
 	"strings"
 )
@@ -20,7 +21,7 @@ func init() {
 	flag.StringVar(&ctx.FWUploaderBinary, "flasher", "", "firmware upload binary (precompiled for the right target)")
 	flag.StringVar(&ctx.BinaryToRestore, "restore_binary", "", "firmware upload binary (precompiled for the right target)")
 	flag.StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
-	flag.StringVar(&ctx.Model, "model", "", "module model (winc or nina)")
+	flag.StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
 }
 
 func main() {
@@ -32,7 +33,9 @@ func main() {
 
 	if ctx.Model == "nina" || strings.Contains(ctx.FirmwareFile, "NINA") || strings.Contains(ctx.FWUploaderBinary, "NINA") {
 		nina.Run(ctx)
-	} else {
+	} else if ctx.Model == "winc" || strings.Contains(ctx.FirmwareFile, "WINC") || strings.Contains(ctx.FWUploaderBinary, "WINC"){
 		winc.Run(ctx)
+	} else {
+		sara.Run(ctx)
 	}
 }
