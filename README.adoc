@@ -6,7 +6,7 @@ Use this tool to update the firmware and/or add SSL certificates for any WINC or
 
 You can download the Firmware/Certificates updater here:
 
-https://github.com/bcmi-labs/WiFi-FirmwareUpdater-cli/releases/latest
+https://github.com/bcmi-labs/FirmwareUpdater/releases/latest
 
 == Usage ==
 
@@ -17,6 +17,10 @@ Extract the zip file and run (for example, NINA -> WiFi1010)
 To flash a MKR1000:
 
  ./$your_os/updater -flasher firmwares/WINC1500/FirmwareUpdater.mkr1000.ino.bin -firmware firmwares/WINC1500/19.5.4/m2m_aio_3a0.bin -port /dev/ttyACM0  -address arduino.cc:443 -restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin -programmer {runtime.tools.bossac}/bossac
+
+To update a MKRNB1500:
+
+ ./$your_os/updater -flasher firmwares/SARA/SerialSARAPassthrough.ino.bin -firmware firmwares/SARA/5.6A2.00-to-5.6A2.01.pkg -port /dev/ttyACM0 -restore_binary firmwares/SARA/SerialSARAPassthrough.ino.bin -programmer {runtime.tools.bossac}/bossac
 
 === Command line options ===
 
@@ -44,10 +48,9 @@ The full list of command line options can be obtained with the `-h` option: `./u
 
 == How to build the tools from source file ==
 
- go get src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
- # important! navigate to src/github.com/facchinm/go-serial/ and checkout branch v1 !
- # to be solved by vendoring the dependencies
- go build src/github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
+ go get github.com/arduino-libraries/FirmwareUpdater/cli
+
+This will create a bin folder with `cli` executable in it.
 
 == License ==
 
