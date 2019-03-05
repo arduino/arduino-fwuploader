@@ -10,15 +10,15 @@ mkdir -p distrib/windows
 
 export CGO_ENABLED=0
 
-GOOS=linux GOARCH=amd64 go build -o distrib/linux64/updater github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
-GOOS=linux GOARCH=386 GO386=387 go build -o distrib/linux32/updater github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
-GOOS=linux GOARCH=arm go build -o distrib/linuxarm/updater github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
-GOOS=linux GOARCH=arm64 go build -o distrib/linuxarm64/updater github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
-GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows/updater.exe github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
+GOOS=linux GOARCH=amd64 go build -o distrib/linux64/updater github.com/arduino-libraries/FirmwareUpdater/cli
+GOOS=linux GOARCH=386 GO386=387 go build -o distrib/linux32/updater github.com/arduino-libraries/FirmwareUpdater/cli
+GOOS=linux GOARCH=arm go build -o distrib/linuxarm/updater github.com/arduino-libraries/FirmwareUpdater/cli
+GOOS=linux GOARCH=arm64 go build -o distrib/linuxarm64/updater github.com/arduino-libraries/FirmwareUpdater/cli
+GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows/updater.exe github.com/arduino-libraries/FirmwareUpdater/cli
 
 #export CGO_ENABLED=1
 # need osxcross in path
-GOOS=darwin GOARCH=amd64 go build -o distrib/osx/updater github.com/arduino-libraries/WiFi101-FirmwareUpdater/cli/main/
+GOOS=darwin GOARCH=amd64 go build -o distrib/osx/updater github.com/arduino-libraries/FirmwareUpdater/cli
 
 cp -r firmwares distrib/
 
