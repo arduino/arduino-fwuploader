@@ -1,6 +1,6 @@
         {
           "name": "fwupdater",
-          "version": ""%%VERSION%%",
+          "version": "%%VERSION%%",
           "systems": [
             {
               "host": "i686-linux-gnu",
