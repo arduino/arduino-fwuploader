@@ -52,7 +52,7 @@ func GetCompatibleWith(name string) map[string][]firmware {
 
 	exePath, _ := os.Executable()
 	root := filepath.Dir(exePath)
-	root = filepath.Join(root, "..", "firmwares")
+	root = filepath.Join(root, "firmwares")
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		unixPath := filepath.ToSlash(path)
