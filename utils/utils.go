@@ -41,7 +41,7 @@ func GetCompatibleWith(name string) map[string][]firmware {
 	knownBoards["mkr1000"] = combo{match: "(WINC1500)*(3a0)", loader: "WINC1500/Firmware*"}
 	knownBoards["mkrwifi1010"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrwifi)*", avoid: "uno"}
 	knownBoards["mkrvidor4000"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrvidor)*", avoid: "uno"}
-	knownBoards["uno2018"] = combo{match: "(NINA)", loader: "NINA/Firmware*(unowifi)*", prefer: "uno"}
+	knownBoards["uno2018"] = combo{match: "(NINA)", loader: "NINA/Firmware*(unowifi)*", prefer: "uno", avoid: "mkr"}
 	knownBoards["mkrnb1500"] = combo{match: "SARA", loader: "SARA/SerialSARAPassthrough*"}
 
 	listAll := false
@@ -64,6 +64,9 @@ func GetCompatibleWith(name string) map[string][]firmware {
 			Path:     path,
 			Name:     fancyName,
 			IsLoader: loader.MatchString(path) && !listAll,
+		}
+		if info.IsDir() {
+			return nil
 		}
 		folder := filepath.Dir(path)
 		lowerPath, _ := filepath.Rel(root, path)
