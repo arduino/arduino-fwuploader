@@ -1,13 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
-	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
-	"github.com/arduino-libraries/FirmwareUpdater/modules/nina"
-	"github.com/arduino-libraries/FirmwareUpdater/modules/winc"
-	"github.com/arduino-libraries/FirmwareUpdater/modules/sara"
+	"fmt"
 	"log"
+	"os"
 	"strings"
+
+	"github.com/arduino-libraries/FirmwareUpdater/modules/nina"
+	"github.com/arduino-libraries/FirmwareUpdater/modules/sara"
+	"github.com/arduino-libraries/FirmwareUpdater/modules/winc"
+	"github.com/arduino-libraries/FirmwareUpdater/utils"
+	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
 )
 
 var ctx context.Context
@@ -22,10 +27,17 @@ func init() {
 	flag.StringVar(&ctx.BinaryToRestore, "restore_binary", "", "firmware upload binary (precompiled for the right target)")
 	flag.StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
 	flag.StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
+	flag.StringVar(&ctx.Compatible, "get_available_for", "", "Ask for available firmwares matching a given board")
 }
 
 func main() {
 	flag.Parse()
+
+	if ctx.Compatible != "" {
+		el, _ := json.Marshal(utils.GetCompatibleWith(ctx.Compatible))
+		fmt.Println(string(el))
+		os.Exit(0)
+	}
 
 	if ctx.PortName == "" {
 		log.Fatal("Please specify a serial port")
@@ -33,7 +45,7 @@ func main() {
 
 	if ctx.Model == "nina" || strings.Contains(ctx.FirmwareFile, "NINA") || strings.Contains(ctx.FWUploaderBinary, "NINA") {
 		nina.Run(ctx)
-	} else if ctx.Model == "winc" || strings.Contains(ctx.FirmwareFile, "WINC") || strings.Contains(ctx.FWUploaderBinary, "WINC"){
+	} else if ctx.Model == "winc" || strings.Contains(ctx.FirmwareFile, "WINC") || strings.Contains(ctx.FWUploaderBinary, "WINC") {
 		winc.Run(ctx)
 	} else {
 		sara.Run(ctx)

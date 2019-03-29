@@ -25,6 +25,7 @@ type Context struct {
 	BinaryToRestore  string
 	ProgrammerPath   string
 	Model            string
+	Compatible       string
 }
 
 type Programmer interface {
