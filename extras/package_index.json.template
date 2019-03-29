@@ -1,0 +1,49 @@
+        {
+          "name": "fwupdater",
+          "version": ""%%VERSION%%",
+          "systems": [
+            {
+              "host": "i686-linux-gnu",
+              "url": "http://downloads.arduino.cc/tools/%%FILENAME%%-%%VERSION%%-linux32.tar.bz2",
+              "archiveFileName": "%%FILENAME%%-%%VERSION%%-linux32.tar.bz2",
+              "checksum": "SHA-256:%%LINUX32_SHA%%",
+              "size": "%%LINUX32_SIZE%%"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://downloads.arduino.cc/tools/%%FILENAME%%-%%VERSION%%-linux64.tar.bz2",
+              "archiveFileName": "%%FILENAME%%-%%VERSION%%-linux64.tar.bz2",
+              "checksum": "SHA-256:%%LINUX64_SHA%%",
+              "size": "%%LINUX64_SIZE%%"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "http://downloads.arduino.cc/tools/%%FILENAME%%-%%VERSION%%-windows.zip",
+              "archiveFileName": "%%FILENAME%%-%%VERSION%%-windows.zip",
+              "checksum": "SHA-256:%%WINDOWS_SHA%%",
+              "size": "%%WINDOWS_SIZE%%"
+            },
+            {
+              "host": "i386-apple-darwin11",
+              "url": "http://downloads.arduino.cc/tools/%%FILENAME%%-%%VERSION%%-osx.tar.bz2",
+              "archiveFileName": "%%FILENAME%%-%%VERSION%%-osx.tar.bz2",
+              "checksum": "SHA-256:%%OSX_SHA%%",
+              "size": "%%OSX_SIZE%%"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://downloads.arduino.cc/tools/%%FILENAME%%-%%VERSION%%-linuxarm.tar.bz2",
+              "archiveFileName": "%%FILENAME%%-%%VERSION%%-linuxarm.tar.bz2",
+              "checksum": "SHA-256:%%LINUXARM_SHA%%",
+              "size": "%%LINUXARM_SIZE%%"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "http://downloads.arduino.cc/tools/%%FILENAME%%-%%VERSION%%-linuxarm64.tar.bz2",
+              "archiveFileName": "%%FILENAME%%-%%VERSION%%-linuxarm64.tar.bz2",
+              "checksum": "SHA-256:%%LINUXARM64_SHA%%",
+              "size": "%%LINUXARM64_SIZE%%"
+            }
+          ]
+        },
+
