@@ -10,6 +10,7 @@ import (
 type firmware struct {
 	Path     string
 	Name     string
+	extra    string
 	IsLoader bool
 }
 
@@ -72,11 +73,33 @@ func GetCompatibleWith(name string) map[string][]firmware {
 		lowerPath, _ := filepath.Rel(root, path)
 		lowerPath = strings.ToLower(lowerPath)
 		_, alreadyPopulated := files[folder]
-		if listAll || ((fw.MatchString(path) || f.IsLoader) && isPreferred(alreadyPopulated, lowerPath, knownBoards[name])) {
+		if listAll && !strings.HasPrefix(f.Name, "firmwares") {
+			files[folder] = append(files[folder], f)
+		}
+		if !listAll && (fw.MatchString(path) || f.IsLoader) && isPreferred(alreadyPopulated, lowerPath, knownBoards[name]) {
 			files[folder] = append(files[folder], f)
 		}
 		return nil
 	})
+
+	// check files and add information to fw.Name in case of name clashing
+	for k := range files {
+		for i := range files[k] {
+			for j := range files[k] {
+				if files[k][i].Name == files[k][j].Name && i != j {
+					files[k][i].extra = filepath.Base(files[k][i].Path)
+				}
+			}
+		}
+	}
+	for k := range files {
+		for i := range files[k] {
+			if files[k][i].extra != "" {
+				files[k][i].Name = files[k][i].Name + " (" + files[k][i].extra + ")"
+			}
+		}
+	}
+
 	if err != nil {
 		return files
 	}
