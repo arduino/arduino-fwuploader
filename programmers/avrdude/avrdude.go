@@ -20,7 +20,7 @@ type Avrdude struct {
 func (b *Avrdude) Flash(ctx *context.Context, filename string) error {
 	log.Println("Flashing " + filename)
 
-	err := invokeAvrdude([]string{ctx.ProgrammerPath, "-C" + filepath.Join(filepath.Dir(ctx.ProgrammerPath), "..", "etc/avrdude.conf"), "-v", "-patmega4809", "-cxplainedmini_updi", "-Pusb", "-b115200", "-e", "-D", "-Uflash:w:" + filename + ":i"})
+	err := invokeAvrdude([]string{ctx.ProgrammerPath, "-C" + filepath.Join(filepath.Dir(ctx.ProgrammerPath), "..", "etc/avrdude.conf"), "-v", "-patmega4809", "-cxplainedmini_updi", "-Pusb", "-b115200", "-e", "-D", "-Uflash:w:" + filename + ":i", "-Ufuse8:w:0x00:m"})
 
 	time.Sleep(3 * time.Second)
 	return err
@@ -34,7 +34,7 @@ func (b *Avrdude) DumpAndFlash(ctx *context.Context, filename string) (string, e
 	if err != nil {
 		return "", err
 	}
-	err = invokeAvrdude([]string{ctx.ProgrammerPath, "-C" + filepath.Join(filepath.Dir(ctx.ProgrammerPath), "..", "etc/avrdude.conf"), "-v", "-patmega4809", "-cxplainedmini_updi", "-Pusb", "-b115200", "-e", "-D", "-Uflash:w:" + filename + ":i"})
+	err = invokeAvrdude([]string{ctx.ProgrammerPath, "-C" + filepath.Join(filepath.Dir(ctx.ProgrammerPath), "..", "etc/avrdude.conf"), "-v", "-patmega4809", "-cxplainedmini_updi", "-Pusb", "-b115200", "-e", "-D", "-Uflash:w:" + filename + ":i", "-Ufuse8:w:0x00:m"})
 	time.Sleep(3 * time.Second)
 
 	return filepath.Join(dir, "dump.bin"), err
