@@ -49,7 +49,7 @@ func Run(ctx context.Context) {
 	}
 
 	if ctx.FWUploaderBinary != "" {
-		log.Println("Flashing firmware uploader")
+		log.Println("Flashing firmware uploader nina")
 		if ctx.BinaryToRestore == "" {
 			ctx.BinaryToRestore, err = programmer.DumpAndFlash(&ctx, ctx.FWUploaderBinary)
 		} else {

@@ -21,6 +21,7 @@ package winc
 
 import (
 	"encoding/binary"
+	"github.com/arduino-libraries/FirmwareUpdater/utils"
 	serial "github.com/facchinm/go-serial"
 	"log"
 	"time"
@@ -192,19 +193,9 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 	return nil
 }
 
-func OpenSerial(portName string) (serial.Port, error) {
-	mode := &serial.Mode{
-		BaudRate: 1000000,
-		Vtimeout: 100,
-		Vmin:     0,
-	}
-
-	return serial.Open(portName, mode)
-}
-
 func OpenFlasher(portName string) (*Flasher, error) {
 
-	port, err := OpenSerial(portName)
+	port, err := utils.OpenSerial(portName)
 	if err != nil {
 		return nil, &FlasherError{err: "Error opening serial port. " + err.Error()}
 	}

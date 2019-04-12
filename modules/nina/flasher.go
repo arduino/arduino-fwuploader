@@ -22,6 +22,7 @@ package nina
 import (
 	"crypto/md5"
 	"encoding/binary"
+	"github.com/arduino-libraries/FirmwareUpdater/utils"
 	"log"
 	"time"
 
@@ -235,19 +236,9 @@ func (flasher *Flasher) Md5sum(data []byte) error {
 	return nil
 }
 
-func OpenSerial(portName string) (serial.Port, error) {
-	mode := &serial.Mode{
-		BaudRate: 115200,
-		Vtimeout: 255,
-		Vmin:     0,
-	}
-
-	return serial.Open(portName, mode)
-}
-
 func OpenFlasher(portName string) (*Flasher, error) {
 
-	port, err := OpenSerial(portName)
+	port, err := utils.OpenSerial(portName)
 
 	if err != nil {
 		return nil, &FlasherError{err: "Error opening serial port. " + err.Error()}
