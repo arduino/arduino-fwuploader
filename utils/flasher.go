@@ -7,13 +7,6 @@ import (
 
 // http://www.ni.com/product-documentation/54548/en/
 var baudRates = []int{
-	//  Standard baud rates supported by some serial ports
-	921600,
-	460800,
-	256000,
-	230400,
-	153600,
-	128000,
 	// Standard baud rates supported by most serial ports
 	115200,
 	57600,
