@@ -20,10 +20,11 @@
 package sara
 
 import (
+	"github.com/arduino-libraries/FirmwareUpdater/utils"
 	serial "github.com/facchinm/go-serial"
-	"time"
-	"strings"
 	"log"
+	"strings"
+	"time"
 	//"strconv"
 )
 
@@ -44,7 +45,7 @@ func (flasher *Flasher) Hello() error {
 	f.Expect("ATE0", "OK", 100)
 	f.Expect("ATE0", "OK", 100)
 	f.Expect("ATE0", "OK", 100)
-	_, err := flasher.Expect("AT", "OK", 100);
+	_, err := flasher.Expect("AT", "OK", 100)
 	return err
 }
 
@@ -65,7 +66,7 @@ func (flasher *Flasher) ExpectMinBytes(buffer string, response string, timeout i
 
 	start := time.Now()
 
-	for ((time.Since(start) < time.Duration(timeout) * time.Millisecond && !strings.Contains(string(res), response)) || (len(res) < min_bytes)) {
+	for (time.Since(start) < time.Duration(timeout)*time.Millisecond && !strings.Contains(string(res), response)) || (len(res) < min_bytes) {
 		data := 0
 		partial := make([]byte, 65535)
 		data, err = flasher.port.Read(partial)
@@ -79,7 +80,7 @@ func (flasher *Flasher) ExpectMinBytes(buffer string, response string, timeout i
 	log.Println(string(res))
 
 	if !strings.Contains(string(res), response) {
-		return  string(res), &FlasherError{err: "Expected " + response + ", got " + string(res)}
+		return string(res), &FlasherError{err: "Expected " + response + ", got " + string(res)}
 	}
 	return string(res), nil
 }
@@ -103,7 +104,6 @@ func (flasher *Flasher) Write(address uint32, buffer []byte) error {
 	}
 	return nil
 }
-
 
 // Fill buffer with data coming from serial port.
 // Blocks until the buffer is full.
@@ -131,19 +131,9 @@ func (flasher *Flasher) sendCommand(payload []byte) error {
 	return nil
 }
 
-func OpenSerial(portName string) (serial.Port, error) {
-	mode := &serial.Mode{
-		BaudRate: 1000000,
-		Vtimeout: 100,
-		Vmin:     0,
-	}
-
-	return serial.Open(portName, mode)
-}
-
 func OpenFlasher(portName string) (*Flasher, error) {
 
-	port, err := OpenSerial(portName)
+	port, err := utils.OpenSerial(portName)
 	if err != nil {
 		return nil, &FlasherError{err: "Error opening serial port. " + err.Error()}
 	}

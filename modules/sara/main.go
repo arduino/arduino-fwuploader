@@ -39,7 +39,7 @@ func Run(ctx context.Context) {
 	programmer = &bossac.Bossac{}
 
 	if ctx.FWUploaderBinary != "" {
-		log.Println("Flashing firmware uploader")
+		log.Println("Flashing firmware uploader sara")
 		if ctx.BinaryToRestore == "" {
 			ctx.BinaryToRestore, err = programmer.DumpAndFlash(&ctx, ctx.FWUploaderBinary)
 		} else {
@@ -118,7 +118,7 @@ func flashFirmware(ctx context.Context) error {
 		return err
 	}
 
-	_, err = f.Expect("AT+UDWNFILE=\"UPDATE.BIN\"," + strconv.Itoa(len(fwData)) + ",\"FOAT\"", ">", 20000)
+	_, err = f.Expect("AT+UDWNFILE=\"UPDATE.BIN\","+strconv.Itoa(len(fwData))+",\"FOAT\"", ">", 20000)
 	if err != nil {
 		return err
 	}
@@ -144,9 +144,9 @@ func flashFirmware(ctx context.Context) error {
 
 	// wait up to 20 minutes trying to ping the module. After 20 minutes signal the error
 	start := time.Now()
-	for (time.Since(start) < time.Minute * 20) {
+	for time.Since(start) < time.Minute*20 {
 		err = f.Hello()
-		if (err == nil) {
+		if err == nil {
 			return nil
 		}
 		time.Sleep(1 * time.Second)

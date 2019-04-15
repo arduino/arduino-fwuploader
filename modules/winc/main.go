@@ -41,7 +41,7 @@ func Run(ctx context.Context) {
 	programmer = &bossac.Bossac{}
 
 	if ctx.FWUploaderBinary != "" {
-		log.Println("Flashing firmware uploader")
+		log.Println("Flashing firmware uploader winc")
 		if ctx.BinaryToRestore == "" {
 			ctx.BinaryToRestore, err = programmer.DumpAndFlash(&ctx, ctx.FWUploaderBinary)
 		} else {
