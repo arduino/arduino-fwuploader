@@ -28,6 +28,9 @@ func (b *Bossac) Flash(ctx *context.Context, filename string) error {
 	ports, err := serial.GetPortsList()
 	ctx.PortName = waitPort(ports, port)
 
+	log.Println("Port is online " + ctx.PortName)
+	time.Sleep(1 * time.Second)
+
 	return err
 }
 
