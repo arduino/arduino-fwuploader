@@ -41,6 +41,7 @@ func GetCompatibleWith(name string) map[string][]firmware {
 	knownBoards := make(map[string]combo)
 	knownBoards["mkr1000"] = combo{match: "(WINC1500)*(3a0)", loader: "WINC1500/Firmware*"}
 	knownBoards["mkrwifi1010"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrwifi)*", avoid: "uno"}
+	knownBoards["nano_33_iot"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrwifi)*", avoid: "uno"}
 	knownBoards["mkrvidor4000"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrvidor)*", avoid: "uno"}
 	knownBoards["uno2018"] = combo{match: "(NINA)", loader: "NINA/Firmware*(unowifi)*", prefer: "uno", avoid: "mkr"}
 	knownBoards["mkrnb1500"] = combo{match: "SARA", loader: "SARA/SerialSARAPassthrough*"}
