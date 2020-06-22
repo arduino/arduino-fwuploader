@@ -6,7 +6,7 @@ Use this tool to update the firmware and/or add SSL certificates for any WINC, N
 
 You can download the Firmware/Certificates updater here:
 
-https://github.com/bcmi-labs/FirmwareUpdater/releases/latest
+https://github.com/arduino/FirmwareUpdater/releases/latest
 
 == Usage ==
 
@@ -48,7 +48,7 @@ The full list of command line options can be obtained with the `-h` option: `./u
 
 == How to build the tools from source file ==
 
- go get github.com/arduino-libraries/FirmwareUpdater/cli
+ go get github.com/arduino/FirmwareUpdater/cli
 
 This will create a bin folder with `cli` executable in it.
 
