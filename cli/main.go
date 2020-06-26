@@ -8,11 +8,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino-libraries/FirmwareUpdater/modules/nina"
-	"github.com/arduino-libraries/FirmwareUpdater/modules/sara"
-	"github.com/arduino-libraries/FirmwareUpdater/modules/winc"
-	"github.com/arduino-libraries/FirmwareUpdater/utils"
-	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
+	"github.com/arduino/FirmwareUpdater/modules/nina"
+	"github.com/arduino/FirmwareUpdater/modules/sara"
+	"github.com/arduino/FirmwareUpdater/modules/winc"
+	"github.com/arduino/FirmwareUpdater/utils"
+	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
 var ctx context.Context

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=`cd src/github.com/arduino-libraries/FirmwareUpdater/cli && git describe --tags`
+VERSION=`cd src/github.com/arduino/FirmwareUpdater/cli && git describe --tags`
 FILENAME="FirmwareUpdater"
 
 rm -rf distrib
@@ -13,22 +13,22 @@ mkdir -p distrib/windows
 
 export CGO_ENABLED=0
 
-GOOS=linux GOARCH=amd64 go build -o distrib/linux64/updater github.com/arduino-libraries/FirmwareUpdater/cli
-GOOS=linux GOARCH=386 GO386=387 go build -o distrib/linux32/updater github.com/arduino-libraries/FirmwareUpdater/cli
-GOOS=linux GOARCH=arm go build -o distrib/linuxarm/updater github.com/arduino-libraries/FirmwareUpdater/cli
-GOOS=linux GOARCH=arm64 go build -o distrib/linuxarm64/updater github.com/arduino-libraries/FirmwareUpdater/cli
-GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows/updater.exe github.com/arduino-libraries/FirmwareUpdater/cli
+GOOS=linux GOARCH=amd64 go build -o distrib/linux64/updater github.com/arduino/FirmwareUpdater/cli
+GOOS=linux GOARCH=386 GO386=387 go build -o distrib/linux32/updater github.com/arduino/FirmwareUpdater/cli
+GOOS=linux GOARCH=arm go build -o distrib/linuxarm/updater github.com/arduino/FirmwareUpdater/cli
+GOOS=linux GOARCH=arm64 go build -o distrib/linuxarm64/updater github.com/arduino/FirmwareUpdater/cli
+GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows/updater.exe github.com/arduino/FirmwareUpdater/cli
 
 #export CGO_ENABLED=1
 # need osxcross in path
-GOOS=darwin GOARCH=amd64 go build -o distrib/osx/updater github.com/arduino-libraries/FirmwareUpdater/cli
+GOOS=darwin GOARCH=amd64 go build -o distrib/osx/updater github.com/arduino/FirmwareUpdater/cli
 
-cp -r $GOPATH/src/github.com/arduino-libraries/FirmwareUpdater/firmwares distrib/linux64
-cp -r $GOPATH/src/github.com/arduino-libraries/FirmwareUpdater/firmwares distrib/linux32
-cp -r $GOPATH/src/github.com/arduino-libraries/FirmwareUpdater/firmwares distrib/linuxarm
-cp -r $GOPATH/src/github.com/arduino-libraries/FirmwareUpdater/firmwares distrib/linuxarm64
-cp -r $GOPATH/src/github.com/arduino-libraries/FirmwareUpdater/firmwares distrib/windows
-cp -r $GOPATH/src/github.com/arduino-libraries/FirmwareUpdater/firmwares distrib/osx
+cp -r $GOPATH/src/github.com/arduino/FirmwareUpdater/firmwares distrib/linux64
+cp -r $GOPATH/src/github.com/arduino/FirmwareUpdater/firmwares distrib/linux32
+cp -r $GOPATH/src/github.com/arduino/FirmwareUpdater/firmwares distrib/linuxarm
+cp -r $GOPATH/src/github.com/arduino/FirmwareUpdater/firmwares distrib/linuxarm64
+cp -r $GOPATH/src/github.com/arduino/FirmwareUpdater/firmwares distrib/windows
+cp -r $GOPATH/src/github.com/arduino/FirmwareUpdater/firmwares distrib/osx
 
 cd distrib/linux64 && tar cjf ../${FILENAME}-${VERSION}-linux64.tar.bz2 * && cd -
 LINUX64_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-linux64.tar.bz2 | cut -f1 -d " "`
@@ -59,7 +59,7 @@ echo "=============================="
 echo "BOARD MANAGER SNIPPET"
 echo "=============================="
 
-cat $GOPATH/src/github.com/arduino-libraries/FirmwareUpdater/extras/package_index.json.template |
+cat $GOPATH/src/github.com/arduino/FirmwareUpdater/extras/package_index.json.template |
 sed "s/%%VERSION%%/${VERSION}/" |
 sed "s/%%FILENAME%%/${FILENAME}/" |
 sed "s/%%LINUX64_SHA%%/${LINUX64_SHA}/" |

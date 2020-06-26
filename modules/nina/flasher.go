@@ -22,7 +22,7 @@ package nina
 import (
 	"crypto/md5"
 	"encoding/binary"
-	"github.com/arduino-libraries/FirmwareUpdater/utils"
+	"github.com/arduino/FirmwareUpdater/utils"
 	"log"
 	"time"
 

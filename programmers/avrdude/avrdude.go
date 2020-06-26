@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
+	"github.com/arduino/FirmwareUpdater/utils/context"
 	serial "go.bug.st/serial.v1"
 	//"go.bug.st/serial.v1/enumerator"
 	"time"
