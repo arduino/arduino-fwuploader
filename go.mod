@@ -1,4 +1,6 @@
-module github.com/arduino-libraries/FirmwareUpdater
+module github.com/arduino/FirmwareUpdater
+
+go 1.14
 
 require (
 	github.com/creack/goselect v0.0.0-20180501195510-58854f77ee8d // indirect

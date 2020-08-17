@@ -20,7 +20,7 @@
 package sara
 
 import (
-	"github.com/arduino-libraries/FirmwareUpdater/utils"
+	"github.com/arduino/FirmwareUpdater/utils"
 	serial "github.com/facchinm/go-serial"
 	"log"
 	"strings"

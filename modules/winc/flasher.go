@@ -21,7 +21,7 @@ package winc
 
 import (
 	"encoding/binary"
-	"github.com/arduino-libraries/FirmwareUpdater/utils"
+	"github.com/arduino/FirmwareUpdater/utils"
 	serial "github.com/facchinm/go-serial"
 	"log"
 	"time"

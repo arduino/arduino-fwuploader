@@ -28,9 +28,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino-libraries/FirmwareUpdater/programmers/avrdude"
-	"github.com/arduino-libraries/FirmwareUpdater/programmers/bossac"
-	"github.com/arduino-libraries/FirmwareUpdater/utils/context"
+	"github.com/arduino/FirmwareUpdater/programmers/avrdude"
+	"github.com/arduino/FirmwareUpdater/programmers/bossac"
+	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
 var f *Flasher
