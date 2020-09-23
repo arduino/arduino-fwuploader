@@ -20,12 +20,12 @@
 package sara
 
 import (
-	"github.com/arduino/FirmwareUpdater/utils"
-	serial "github.com/facchinm/go-serial"
 	"log"
 	"strings"
 	"time"
-	//"strconv"
+
+	"github.com/arduino/FirmwareUpdater/utils"
+	"go.bug.st/serial"
 )
 
 type FlasherError struct {

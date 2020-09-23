@@ -21,10 +21,11 @@ package winc
 
 import (
 	"encoding/binary"
-	"github.com/arduino/FirmwareUpdater/utils"
-	serial "github.com/facchinm/go-serial"
 	"log"
 	"time"
+
+	"github.com/arduino/FirmwareUpdater/utils"
+	"go.bug.st/serial"
 )
 
 type FlasherError struct {

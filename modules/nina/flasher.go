@@ -22,11 +22,11 @@ package nina
 import (
 	"crypto/md5"
 	"encoding/binary"
-	"github.com/arduino/FirmwareUpdater/utils"
 	"log"
 	"time"
 
-	serial "github.com/facchinm/go-serial"
+	"github.com/arduino/FirmwareUpdater/utils"
+	"go.bug.st/serial"
 )
 
 type FlasherError struct {

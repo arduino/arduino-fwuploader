@@ -48,9 +48,11 @@ The full list of command line options can be obtained with the `-h` option: `./u
 
 == How to build the tools from source file ==
 
- go get github.com/arduino/FirmwareUpdater/cli
+From the sources root directory run:
 
-This will create a bin folder with `cli` executable in it.
+ go build -o updater
+
+This will create the `updater` executable.
 
 == License ==
 

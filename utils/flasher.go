@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"github.com/facchinm/go-serial"
 	"log"
+
+	"go.bug.st/serial"
 )
 
 // http://www.ni.com/product-documentation/54548/en/
@@ -20,8 +21,8 @@ func OpenSerial(portName string) (serial.Port, error) {
 	for _, baudRate := range baudRates {
 		mode := &serial.Mode{
 			BaudRate: baudRate,
-			Vtimeout: 255,
-			Vmin:     0,
+			// Vtimeout: 255,
+			// Vmin:     0,
 		}
 		port, err := serial.Open(portName, mode)
 		if err == nil {

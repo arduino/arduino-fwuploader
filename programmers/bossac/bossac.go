@@ -3,14 +3,14 @@ package bossac
 import (
 	"bytes"
 	"errors"
-	"github.com/arduino/FirmwareUpdater/utils/context"
-	serial "go.bug.st/serial.v1"
 	"io/ioutil"
 	"log"
 	"os/exec"
 	"path/filepath"
-	//"go.bug.st/serial.v1/enumerator"
 	"time"
+
+	"github.com/arduino/FirmwareUpdater/utils/context"
+	"go.bug.st/serial"
 )
 
 type Bossac struct {

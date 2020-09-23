@@ -7,11 +7,10 @@ import (
 	"log"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/arduino/FirmwareUpdater/utils/context"
-	serial "go.bug.st/serial.v1"
-	//"go.bug.st/serial.v1/enumerator"
-	"time"
+	"go.bug.st/serial"
 )
 
 type Avrdude struct {
