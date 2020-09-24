@@ -2,6 +2,7 @@ package utils
 
 import (
 	"log"
+	"time"
 
 	"go.bug.st/serial"
 )
@@ -21,13 +22,15 @@ func OpenSerial(portName string) (serial.Port, error) {
 	for _, baudRate := range baudRates {
 		mode := &serial.Mode{
 			BaudRate: baudRate,
-			// Vtimeout: 255,
-			// Vmin:     0,
 		}
 		port, err := serial.Open(portName, mode)
 		if err == nil {
 			log.Printf("Open the serial port with baud rate %d", baudRate)
 			return port, nil
+		}
+		if err := port.SetReadTimeout(5 * time.Second); err != nil {
+			log.Fatalf("Could not set timeout on serial port: %s", err)
+			return nil, err
 		}
 	}
 	return port, err
