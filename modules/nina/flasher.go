@@ -20,6 +20,7 @@
 package nina
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/binary"
 	"log"
@@ -169,13 +170,14 @@ func (flasher *Flasher) serialFillBuffer(buffer []byte) error {
 }
 
 func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, payload []byte) error {
-	if err := binary.Write(flasher.port, binary.BigEndian, command); err != nil {
+	buff := new(bytes.Buffer)
+	if err := binary.Write(buff, binary.BigEndian, command); err != nil {
 		return err
 	}
-	if err := binary.Write(flasher.port, binary.BigEndian, address); err != nil {
+	if err := binary.Write(buff, binary.BigEndian, address); err != nil {
 		return err
 	}
-	if err := binary.Write(flasher.port, binary.BigEndian, val); err != nil {
+	if err := binary.Write(buff, binary.BigEndian, val); err != nil {
 		return err
 	}
 	var length uint16
@@ -184,13 +186,23 @@ func (flasher *Flasher) sendCommand(command byte, address uint32, val uint32, pa
 	} else {
 		length = uint16(len(payload))
 	}
-	if err := binary.Write(flasher.port, binary.BigEndian, length); err != nil {
+	if err := binary.Write(buff, binary.BigEndian, length); err != nil {
 		return err
 	}
 	if payload != nil {
-		if _, err := flasher.port.Write(payload); err != nil {
+		buff.Write(payload)
+	}
+	data := buff.Bytes()
+	for {
+		sent, err := flasher.port.Write(data)
+		if err != nil {
 			return err
 		}
+		if sent == len(data) {
+			break
+		}
+		// fmt.Println("HEY! sent", sent, "out of", len(data))
+		data = data[sent:]
 	}
 	return nil
 }

@@ -124,8 +124,14 @@ func (flasher *Flasher) serialFillBuffer(buffer []byte) error {
 
 func (flasher *Flasher) sendCommand(payload []byte) error {
 	if payload != nil {
-		if _, err := flasher.port.Write(payload); err != nil {
-			return err
+		for {
+			if sent, err := flasher.port.Write(payload); err != nil {
+				return err
+			} else if sent < len(payload) {
+				payload = payload[sent:]
+			} else {
+				break
+			}
 		}
 	}
 	return nil
