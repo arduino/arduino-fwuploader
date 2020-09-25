@@ -17,22 +17,24 @@ var baudRates = []int{
 }
 
 func OpenSerial(portName string) (serial.Port, error) {
-	var port serial.Port
 	var err error
 	for _, baudRate := range baudRates {
 		mode := &serial.Mode{
 			BaudRate: baudRate,
 		}
 		port, err := serial.Open(portName, mode)
-		if err == nil {
-			log.Printf("Open the serial port with baud rate %d", baudRate)
-			return port, nil
+		if err != nil {
+			// try another baudrate
+			continue
 		}
-		if err := port.SetReadTimeout(5 * time.Second); err != nil {
+		log.Printf("Opened the serial port with baud rate %d", baudRate)
+
+		if err := port.SetReadTimeout(10 * time.Second); err != nil {
 			log.Fatalf("Could not set timeout on serial port: %s", err)
 			return nil, err
 		}
+		return port, nil
 	}
-	return port, err
 
+	return nil, err
 }
