@@ -2,9 +2,11 @@ module github.com/arduino/FirmwareUpdater
 
 go 1.14
 
+// branch with support for serial timeouts
+replace go.bug.st/serial => github.com/cmaglie/go-serial v0.0.0-20200923162623-b214c147e37e
+
 require (
-	github.com/creack/goselect v0.0.0-20180501195510-58854f77ee8d // indirect
-	github.com/facchinm/go-serial v0.0.0-20190206110233-459a153afba0
-	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
-	golang.org/x/sys v0.0.0-20190411185658-b44545bcd369 // indirect
+	github.com/arduino/arduino-cli v0.0.0-20200924151007-69ac12c98b2b
+	github.com/pkg/errors v0.9.1
+	go.bug.st/serial v1.1.1
 )

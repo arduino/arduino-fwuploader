@@ -23,22 +23,22 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/arduino/FirmwareUpdater/programmers/bossac"
-	"github.com/arduino/FirmwareUpdater/utils/context"
 	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/arduino/FirmwareUpdater/programmers/bossac"
+	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
 var f *Flasher
 var payloadSize uint16
-var programmer context.Programmer
 
 func Run(ctx context.Context) {
 
 	var err error
-	programmer = &bossac.Bossac{}
+	programmer := &bossac.Bossac{}
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader winc")
