@@ -33,33 +33,33 @@ cp -r firmwares distrib/windows32
 cp -r firmwares distrib/windows64
 cp -r firmwares distrib/osx
 
-cd distrib/linux64 && tar cjf ../${FILENAME}-${VERSION}-linux64.tar.bz2 * && cd -
-LINUX64_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-linux64.tar.bz2 | cut -f1 -d " "`
-LINUX64_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-linux64.tar.bz2 | cut -f5 -d " "`
+cd distrib/linux64 && tar cjf ../${FILENAME}_${VERSION}_Linux_64bit.tar.bz2 * && cd -
+LINUX64_SHA=`sha256sum distrib/${FILENAME}_${VERSION}_Linux_64bit.tar.bz2 | cut -f1 -d " "`
+LINUX64_SIZE=`ls -la distrib/${FILENAME}_${VERSION}_Linux_64bit.tar.bz2 | cut -f5 -d " "`
 
-cd distrib/linux32 && tar cjf ../${FILENAME}-${VERSION}-linux32.tar.bz2 * && cd -
-LINUX32_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-linux32.tar.bz2 | cut -f1 -d " "`
-LINUX32_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-linux32.tar.bz2 | cut -f5 -d " "`
+cd distrib/linux32 && tar cjf ../${FILENAME}_${VERSION}_Linux_32bit.tar.bz2 * && cd -
+LINUX32_SHA=`sha256sum distrib/${FILENAME}_${VERSION}_Linux_32bit.tar.bz2 | cut -f1 -d " "`
+LINUX32_SIZE=`ls -la distrib/${FILENAME}_${VERSION}_Linux_32bit.tar.bz2 | cut -f5 -d " "`
 
-cd distrib/linuxarm && tar cjf ../${FILENAME}-${VERSION}-linuxarm.tar.bz2 * && cd -
-LINUXARM_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-linuxarm.tar.bz2 | cut -f1 -d " "`
-LINUXARM_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-linuxarm.tar.bz2 | cut -f5 -d " "`
+cd distrib/linuxarm && tar cjf ../${FILENAME}_${VERSION}_Linux_ARM.tar.bz2 * && cd -
+LINUXARM_SHA=`sha256sum distrib/${FILENAME}_${VERSION}_Linux_ARM.tar.bz2 | cut -f1 -d " "`
+LINUXARM_SIZE=`ls -la distrib/${FILENAME}_${VERSION}_Linux_ARM.tar.bz2 | cut -f5 -d " "`
 
-cd distrib/linuxarm64 && tar cjf ../${FILENAME}-${VERSION}-linuxarm64.tar.bz2 * && cd -
-LINUXARM64_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-linuxarm64.tar.bz2 | cut -f1 -d " "`
-LINUXARM64_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-linuxarm64.tar.bz2 | cut -f5 -d " "`
+cd distrib/linuxarm64 && tar cjf ../${FILENAME}_${VERSION}_Linux_ARM64.tar.bz2 * && cd -
+LINUXARM64_SHA=`sha256sum distrib/${FILENAME}_${VERSION}_Linux_ARM64.tar.bz2 | cut -f1 -d " "`
+LINUXARM64_SIZE=`ls -la distrib/${FILENAME}_${VERSION}_Linux_ARM64.tar.bz2 | cut -f5 -d " "`
 
-cd distrib/osx && tar cjf ../${FILENAME}-${VERSION}-osx.tar.bz2 * && cd -
-OSX_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-osx.tar.bz2 | cut -f1 -d " "`
-OSX_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-osx.tar.bz2 | cut -f5 -d " "`
+cd distrib/osx && tar cjf ../${FILENAME}_${VERSION}_macOS_64bit.tar.bz2 * && cd -
+OSX_SHA=`sha256sum distrib/${FILENAME}_${VERSION}_macOS_64bit.tar.bz2 | cut -f1 -d " "`
+OSX_SIZE=`ls -la distrib/${FILENAME}_${VERSION}_macOS_64bit.tar.bz2 | cut -f5 -d " "`
 
-cd distrib/windows32 && zip -r ../${FILENAME}-${VERSION}-windows32.zip * && cd -
-WINDOWS32_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-windows32.zip | cut -f1 -d " "`
-WINDOWS32_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-windows32.zip | cut -f5 -d " "`
+cd distrib/windows32 && zip -r ../${FILENAME}_${VERSION}_Windows_32bit.zip * && cd -
+WINDOWS32_SHA=`sha256sum distrib/${FILENAME}_${VERSION}_Windows_32bit.zip | cut -f1 -d " "`
+WINDOWS32_SIZE=`ls -la distrib/${FILENAME}_${VERSION}_Windows_32bit.zip | cut -f5 -d " "`
 
-cd distrib/windows64 && zip -r ../${FILENAME}-${VERSION}-windows64.zip * && cd -
-WINDOWS64_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-windows64.zip | cut -f1 -d " "`
-WINDOWS64_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-windows64.zip | cut -f5 -d " "`
+cd distrib/windows64 && zip -r ../${FILENAME}_${VERSION}_Windows_64bit.zip * && cd -
+WINDOWS64_SHA=`sha256sum distrib/${FILENAME}_${VERSION}_Windows_64bit.zip | cut -f1 -d " "`
+WINDOWS64_SIZE=`ls -la distrib/${FILENAME}_${VERSION}_Windows_64bit.zip | cut -f5 -d " "`
 
 
 echo "=============================="
