@@ -9,7 +9,8 @@ mkdir -p distrib/linux32
 mkdir -p distrib/linuxarm
 mkdir -p distrib/linuxarm64
 mkdir -p distrib/osx
-mkdir -p distrib/windows
+mkdir -p distrib/windows32
+mkdir -p distrib/windows64
 
 export CGO_ENABLED=0
 
@@ -17,7 +18,8 @@ GOOS=linux GOARCH=amd64 go build -o distrib/linux64/updater
 GOOS=linux GOARCH=386 GO386=387 go build -o distrib/linux32/updater
 GOOS=linux GOARCH=arm go build -o distrib/linuxarm/updater
 GOOS=linux GOARCH=arm64 go build -o distrib/linuxarm64/updater
-GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows/updater.exe
+GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows32/updater.exe
+GOOS=windows GOARCH=amd64 go build -o distrib/windows64/updater.exe
 
 #export CGO_ENABLED=1
 # need osxcross in path
@@ -27,7 +29,8 @@ cp -r firmwares distrib/linux64
 cp -r firmwares distrib/linux32
 cp -r firmwares distrib/linuxarm
 cp -r firmwares distrib/linuxarm64
-cp -r firmwares distrib/windows
+cp -r firmwares distrib/windows32
+cp -r firmwares distrib/windows64
 cp -r firmwares distrib/osx
 
 cd distrib/linux64 && tar cjf ../${FILENAME}-${VERSION}-linux64.tar.bz2 * && cd -
@@ -50,9 +53,13 @@ cd distrib/osx && tar cjf ../${FILENAME}-${VERSION}-osx.tar.bz2 * && cd -
 OSX_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-osx.tar.bz2 | cut -f1 -d " "`
 OSX_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-osx.tar.bz2 | cut -f5 -d " "`
 
-cd distrib/windows && zip -r ../${FILENAME}-${VERSION}-windows.zip * && cd -
-WINDOWS_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-windows.zip | cut -f1 -d " "`
-WINDOWS_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-windows.zip | cut -f5 -d " "`
+cd distrib/windows32 && zip -r ../${FILENAME}-${VERSION}-windows32.zip * && cd -
+WINDOWS32_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-windows32.zip | cut -f1 -d " "`
+WINDOWS32_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-windows32.zip | cut -f5 -d " "`
+
+cd distrib/windows64 && zip -r ../${FILENAME}-${VERSION}-windows64.zip * && cd -
+WINDOWS64_SHA=`sha256sum distrib/${FILENAME}-${VERSION}-windows64.zip | cut -f1 -d " "`
+WINDOWS64_SIZE=`ls -la distrib/${FILENAME}-${VERSION}-windows64.zip | cut -f5 -d " "`
 
 
 echo "=============================="
@@ -72,8 +79,10 @@ sed "s/%%LINUXARM64_SHA%%/${LINUXARM64_SHA}/" |
 sed "s/%%LINUXARM64_SIZE%%/${LINUXARM64_SIZE}/" |
 sed "s/%%OSX_SHA%%/${OSX_SHA}/" |
 sed "s/%%OSX_SIZE%%/${OSX_SIZE}/" |
-sed "s/%%WINDOWS_SHA%%/${WINDOWS_SHA}/" |
-sed "s/%%WINDOWS_SIZE%%/${WINDOWS_SIZE}/"
+sed "s/%%WINDOWS32_SHA%%/${WINDOWS32_SHA}/" |
+sed "s/%%WINDOWS32_SIZE%%/${WINDOWS32_SIZE}/" |
+sed "s/%%WINDOWS64_SHA%%/${WINDOWS64_SHA}/" |
+sed "s/%%WINDOWS64_SIZE%%/${WINDOWS64_SIZE}/"
 
 # call the tool with something like
 # ./linux64/updater -flasher firmwares/NINA/FirmwareUpdater.mkrwifi1010.ino.bin -firmware firmwares/NINA/1.2.1/NINA_W102.bin -port /dev/ttyACM0  -address arduino.cc:443 -restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin -programmer {runtime.tools.bossac}/bossac
