@@ -249,18 +249,11 @@ func (flasher *Flasher) Md5sum(data []byte) error {
 }
 
 func OpenFlasher(portName string) (*Flasher, error) {
-
 	port, err := utils.OpenSerial(portName)
-
 	if err != nil {
 		return nil, &FlasherError{err: "Error opening serial port. " + err.Error()}
 	}
 
-	flasher := &Flasher{
-		port: port,
-	}
-
 	time.Sleep(2 * time.Second)
-
-	return flasher, err
+	return &Flasher{port: port}, err
 }

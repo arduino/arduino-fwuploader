@@ -40,10 +40,10 @@ func GetCompatibleWith(name string) map[string][]firmware {
 
 	knownBoards := make(map[string]combo)
 	knownBoards["mkr1000"] = combo{match: "(WINC1500)*(3a0)", loader: "WINC1500/Firmware*"}
-	knownBoards["mkrwifi1010"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrwifi)*", avoid: "uno"}
-	knownBoards["nano_33_iot"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrwifi)*", avoid: "uno"}
-	knownBoards["mkrvidor4000"] = combo{match: "(NINA)", loader: "NINA/Firmware*(mkrvidor)*", avoid: "uno"}
-	knownBoards["uno2018"] = combo{match: "(NINA)", loader: "NINA/Firmware*(unowifi)*", prefer: "uno", avoid: "mkr"}
+	knownBoards["mkrwifi1010"] = combo{match: "(NINA)", loader: "NINA/Firmware.*mkrwifi1010.*", avoid: "uno"}
+	knownBoards["nano_33_iot"] = combo{match: "(NINA)", loader: "NINA/Firmware.*nano_33_iot.*", avoid: "uno"}
+	knownBoards["mkrvidor4000"] = combo{match: "(NINA)", loader: "NINA/Firmware.*mkrvidor.*", avoid: "uno"}
+	knownBoards["uno2018"] = combo{match: "(NINA)", loader: "NINA/Firmware.*unowifi.*", prefer: "uno", avoid: "mkr"}
 	knownBoards["mkrnb1500"] = combo{match: "SARA", loader: "SARA/SerialSARAPassthrough*"}
 
 	listAll := false
@@ -55,25 +55,28 @@ func GetCompatibleWith(name string) map[string][]firmware {
 	exePath, _ := os.Executable()
 	root := filepath.Dir(exePath)
 	root = filepath.Join(root, "firmwares")
+	loader := regexp.MustCompile(knownBoards[name].loader)
+	fw := regexp.MustCompile(knownBoards[name].match)
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
 		unixPath := filepath.ToSlash(path)
 		parts := strings.Split(unixPath, "/")
 		fancyName := parts[len(parts)-3] + " " + parts[len(parts)-2]
-		loader := regexp.MustCompile(knownBoards[name].loader)
-		fw := regexp.MustCompile(knownBoards[name].match)
 		f := firmware{
 			Path:     path,
 			Name:     fancyName,
 			IsLoader: loader.MatchString(path) && !listAll,
 		}
-		if info.IsDir() {
-			return nil
-		}
 		folder := filepath.Dir(path)
 		lowerPath, _ := filepath.Rel(root, path)
 		lowerPath = strings.ToLower(lowerPath)
 		_, alreadyPopulated := files[folder]
+		if strings.HasPrefix(f.Name, "firmwares") && !f.IsLoader {
+			return nil
+		}
 		if listAll && !strings.HasPrefix(f.Name, "firmwares") {
 			files[folder] = append(files[folder], f)
 		}
