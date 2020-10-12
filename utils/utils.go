@@ -55,13 +55,13 @@ func GetCompatibleWith(name string) map[string][]firmware {
 	exePath, _ := os.Executable()
 	root := filepath.Dir(exePath)
 	root = filepath.Join(root, "firmwares")
+	loader := regexp.MustCompile(knownBoards[name].loader)
+	fw := regexp.MustCompile(knownBoards[name].match)
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		unixPath := filepath.ToSlash(path)
 		parts := strings.Split(unixPath, "/")
 		fancyName := parts[len(parts)-3] + " " + parts[len(parts)-2]
-		loader := regexp.MustCompile(knownBoards[name].loader)
-		fw := regexp.MustCompile(knownBoards[name].match)
 		f := firmware{
 			Path:     path,
 			Name:     fancyName,
