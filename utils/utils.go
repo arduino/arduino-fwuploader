@@ -59,6 +59,9 @@ func GetCompatibleWith(name string) map[string][]firmware {
 	fw := regexp.MustCompile(knownBoards[name].match)
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
 		unixPath := filepath.ToSlash(path)
 		parts := strings.Split(unixPath, "/")
 		fancyName := parts[len(parts)-3] + " " + parts[len(parts)-2]
@@ -66,9 +69,6 @@ func GetCompatibleWith(name string) map[string][]firmware {
 			Path:     path,
 			Name:     fancyName,
 			IsLoader: loader.MatchString(path) && !listAll,
-		}
-		if info.IsDir() {
-			return nil
 		}
 		folder := filepath.Dir(path)
 		lowerPath, _ := filepath.Rel(root, path)
