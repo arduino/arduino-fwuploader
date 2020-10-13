@@ -70,7 +70,7 @@ func GetCompatibleWith(name string, rootPath string) map[string][]firmware {
 		f := firmware{
 			Path:     path,
 			Name:     fancyName,
-			IsLoader: loader.MatchString(path) && !listAll,
+			IsLoader: loader.MatchString(unixPath) && !listAll,
 		}
 		folder := filepath.Dir(path)
 		lowerPath, _ := filepath.Rel(root, path)
