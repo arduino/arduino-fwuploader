@@ -34,7 +34,7 @@ func main() {
 	flag.Parse()
 
 	if ctx.Compatible != "" {
-		el, _ := json.Marshal(utils.GetCompatibleWith(ctx.Compatible))
+		el, _ := json.Marshal(utils.GetCompatibleWith(ctx.Compatible, ""))
 		fmt.Println(string(el))
 		os.Exit(0)
 	}

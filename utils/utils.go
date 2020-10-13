@@ -34,7 +34,7 @@ func isPreferred(existing bool, path string, board combo) bool {
 	return true
 }
 
-func GetCompatibleWith(name string) map[string][]firmware {
+func GetCompatibleWith(name string, rootPath string) map[string][]firmware {
 
 	files := make(map[string][]firmware)
 
@@ -51,8 +51,10 @@ func GetCompatibleWith(name string) map[string][]firmware {
 	if knownBoards[strings.ToLower(name)].match == "" {
 		listAll = true
 	}
-
-	exePath, _ := os.Executable()
+	exePath := rootPath
+	if exePath == "" {
+		exePath, _ = os.Executable()
+	}
 	root := filepath.Dir(exePath)
 	root = filepath.Join(root, "firmwares")
 	loader := regexp.MustCompile(knownBoards[name].loader)
@@ -68,7 +70,7 @@ func GetCompatibleWith(name string) map[string][]firmware {
 		f := firmware{
 			Path:     path,
 			Name:     fancyName,
-			IsLoader: loader.MatchString(path) && !listAll,
+			IsLoader: loader.MatchString(unixPath) && !listAll,
 		}
 		folder := filepath.Dir(path)
 		lowerPath, _ := filepath.Rel(root, path)
