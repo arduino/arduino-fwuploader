@@ -68,7 +68,7 @@ func GetCompatibleWith(name string, rootPath string) map[string][]firmware {
 		parts := strings.Split(unixPath, "/")
 		fancyName := parts[len(parts)-3] + " " + parts[len(parts)-2]
 		f := firmware{
-			Path:     path,
+			Path:     unixPath,
 			Name:     fancyName,
 			IsLoader: loader.MatchString(unixPath) && !listAll,
 		}
