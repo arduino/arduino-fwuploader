@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 VERSION=`git describe --tags`
-FILENAME="FirmwareUpdater"
+FILENAME="FirmwareUploader"
 
 rm -rf distrib
 mkdir -p distrib/linux64
@@ -14,16 +14,16 @@ mkdir -p distrib/windows64
 
 export CGO_ENABLED=0
 
-GOOS=linux GOARCH=amd64 go build -o distrib/linux64/updater
-GOOS=linux GOARCH=386 GO386=387 go build -o distrib/linux32/updater
-GOOS=linux GOARCH=arm go build -o distrib/linuxarm/updater
-GOOS=linux GOARCH=arm64 go build -o distrib/linuxarm64/updater
-GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows32/updater.exe
-GOOS=windows GOARCH=amd64 go build -o distrib/windows64/updater.exe
+GOOS=linux GOARCH=amd64 go build -o distrib/linux64/${FILENAME}
+GOOS=linux GOARCH=386 GO386=387 go build -o distrib/linux32/${FILENAME}
+GOOS=linux GOARCH=arm go build -o distrib/linuxarm/${FILENAME}
+GOOS=linux GOARCH=arm64 go build -o distrib/linuxarm64/${FILENAME}
+GOOS=windows GOARCH=386 GO386=387 go build -o distrib/windows32/${FILENAME}.exe
+GOOS=windows GOARCH=amd64 go build -o distrib/windows64/${FILENAME}.exe
 
 #export CGO_ENABLED=1
 # need osxcross in path
-GOOS=darwin GOARCH=amd64 go build -o distrib/osx/updater
+GOOS=darwin GOARCH=amd64 go build -o distrib/osx/${FILENAME}
 
 cp -r firmwares distrib/linux64
 cp -r firmwares distrib/linux32
