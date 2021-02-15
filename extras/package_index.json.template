@@ -20,15 +20,15 @@
               "host": "i686-mingw32",
               "url": "http://downloads.arduino.cc/tools/%%FILENAME%%_%%VERSION%%_Windows_32bit.zip",
               "archiveFileName": "%%FILENAME%%_%%VERSION%%_Windows_32bit.zip",
-              "checksum": "SHA-256:%%WINDOWS64_SHA%%",
-              "size": "%%WINDOWS64_SIZE%%"
+              "checksum": "SHA-256:%%WINDOWS32_SHA%%",
+              "size": "%%WINDOWS32_SIZE%%"
             },
             {
               "host": "x86_64-mingw32",
               "url": "http://downloads.arduino.cc/tools/%%FILENAME%%_%%VERSION%%_Windows_64bit.zip",
               "archiveFileName": "%%FILENAME%%_%%VERSION%%_Windows_64bit.zip",
-              "checksum": "SHA-256:%%WINDOWS32_SHA%%",
-              "size": "%%WINDOWS32_SIZE%%"
+              "checksum": "SHA-256:%%WINDOWS64_SHA%%",
+              "size": "%%WINDOWS64_SIZE%%"
             },
             {
               "host": "i386-apple-darwin11",
