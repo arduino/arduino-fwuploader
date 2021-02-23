@@ -43,9 +43,10 @@ func Run(ctx context.Context) {
 
 	if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
 		programmer = &bossac.Bossac{}
-	}
-	if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
+	} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
 		programmer = &avrdude.Avrdude{}
+	} else {
+		log.Fatal("Programmer path not specified correctly, programmer path set to: " + ctx.ProgrammerPath)
 	}
 
 	if ctx.FWUploaderBinary != "" {
