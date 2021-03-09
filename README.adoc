@@ -54,6 +54,14 @@ From the sources root directory run:
 
 This will create the `updater` executable.
 
+== Security ==
+
+If you think you found a vulnerability or other security-related bug in this project, please read our
+https://github.com/arduino/FirmwareUpdater/security/policy[security policy] and report the bug to our Security Team 🛡️
+Thank you!
+
+e-mail contact: security@arduino.cc
+
 == License ==
 
 Copyright (c) 2015-2016 Arduino LLC. All right reserved.
