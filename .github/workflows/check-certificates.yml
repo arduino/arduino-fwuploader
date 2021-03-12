@@ -1,0 +1,99 @@
+name: Check for issues with signing certificates
+
+on:
+  schedule:
+    # run every 10 hours
+    - cron: "0 */10 * * *"
+  # workflow_dispatch event allows the workflow to be triggered manually.
+  # This could be used to run an immediate check after updating certificate secrets.
+  # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+
+env:
+  # Begin notifications when there are less than this many days remaining before expiration
+  EXPIRATION_WARNING_PERIOD: 30
+
+jobs:
+  get-certificates-list:
+    # This workflow would fail in forks that don't have the certificate secrets defined
+    if: github.repository == 'arduino/FirmwareUpdater'
+    runs-on: ubuntu-latest
+    outputs:
+      certificates: ${{ steps.get-certificates.outputs.certificates }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set certificates path environment variable
+        run: |
+          # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
+          echo "FILES=\\\"$(ls -m ${{ github.workspace }} | sed 's/, /\\",\\"/')\\\"" >> $GITHUB_ENV
+
+      - name: Get files list
+        id: get-files
+        run: |
+          JSON=$(echo "[${{ join(env.FILES) }}]" | jq -c '[{"cert_file": .[]}]')
+          echo "::set-output name=certificates::{\"include\": $JSON }"
+
+  check-certificates:
+    # This workflow would fail in forks that don't have the certificate secrets defined
+    if: github.repository == 'arduino/FirmwareUpdater'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix: ${{fromJSON(needs.get-certificates-list.outputs.certificates)}}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Get days remaining before certificate expiration date
+        id: get-days-before-expiration
+        run: |
+          EXPIRATION_DATE="$(
+            (
+              openssl x509 \
+                -inform der \
+                -in ${{ matrix.cert_file }} \
+                -enddate -noout
+            ) | (
+              grep \
+                --max-count=1 \
+                --only-matching \
+                --perl-regexp \
+                'notAfter=(\K.*)'
+            )
+          )"
+
+          DAYS_BEFORE_EXPIRATION="$((($(date --utc --date="$EXPIRATION_DATE" +%s) - $(date --utc +%s)) / 60 / 60 / 24))"
+
+          # Display the expiration information in the log
+          echo "Certificate expiration date: $EXPIRATION_DATE"
+          echo "Days remaining before expiration: $DAYS_BEFORE_EXPIRATION"
+
+          echo "::set-output name=days::$DAYS_BEFORE_EXPIRATION_LIST"
+
+      - name: Check if expiration notification period has been reached
+        id: check-expiration
+        run: |
+          DAYS=${{ steps.get-days-before-expiration.outputs.days }}
+          if [[ $DAYS -lt ${{ env.EXPIRATION_WARNING_PERIOD }} ]]; then
+            echo "::error::${{ matrix.cert_file }} will expire in $DAYS days!!!"
+            exit 1
+          fi
+
+      - name: Slack notification of pending certificate expiration
+        # Don't send spurious expiration notification if verification fails
+        if: failure() && steps.check-expiration.outcome == 'failure'
+        uses: rtCamp/action-slack-notify@v2.1.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.TEAM_TOOLING_CHANNEL_SLACK_WEBHOOK }}
+          SLACK_MESSAGE: |
+            :warning::warning::warning::warning:
+            WARNING: ${{ github.repository }} ${{ matrix.cert_file }} will expire in ${{ steps.get-days-before-expiration.outputs.days }} days!!!
+            :warning::warning::warning::warning:
+          SLACK_COLOR: danger
+          MSG_MINIMAL: true
