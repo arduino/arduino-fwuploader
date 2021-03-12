@@ -1,0 +1,9 @@
+/debug
+/FirmwareUpdater*
+/.vscode/
+.idea
+coverage_*.txt
+/dist
+
+# Misc.
+.DS_Store
