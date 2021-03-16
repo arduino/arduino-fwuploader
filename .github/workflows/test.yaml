@@ -1,9 +1,9 @@
-name: test
+name: Run tests
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
@@ -11,25 +11,40 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+        arch: ["386", "arm"]
+        exclude:
+          - os: macos-latest
+            node: "386"
+          - os: macos-latest
+            node: "arm"
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-go@v1
+      - name: Disable EOL conversions
+        run: git config --global core.autocrlf false
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
         with:
           go-version: "1.15"
+
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Build native
-        run: go build -v ./...
         shell: bash
+        run: task build
+
+      - name: Cross-build
+        shell: bash
+        run: GOARCH=${{ matrix.arch }} task build
+
       - name: Run unit tests
-        run: go test -v -race ./...
-        shell: bash
-      - name: Cross-build for 386
-        if: matrix.os != 'macOS-latest'
-        run: GOARCH=386 go build -v ./...
-        shell: bash
-      - name: Cross-build for arm
-        if: matrix.os != 'macOS-latest'
-        run: GOARCH=arm go build -v ./...
-        shell: bash
+        run: task test
