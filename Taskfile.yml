@@ -1,7 +1,7 @@
 version: "3"
 
-# includes:
-#   dist: ./DistTasks.yml
+includes:
+  dist: ./DistTasks.yml
 
 tasks:
   docs:check:
