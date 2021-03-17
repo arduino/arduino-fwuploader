@@ -1,0 +1,143 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  create-release-artifacts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 0
+
+      - name: Create changelog
+        uses: arduino/create-changelog@v1
+        with:
+          tag-regex: '^[0-9]+\.[0-9]+\.[0-9]+$'
+          filter-regex: '^\[(skip|changelog)[ ,-](skip|changelog)\].*'
+          case-insensitive-regex: true
+          changelog-file-path: "dist/CHANGELOG.md"
+
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Build
+        run: task dist:all
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+
+  notarize-macos:
+    runs-on: macos-latest
+    needs: create-release-artifacts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          # to ensure compatibility with v1
+          # https://github.com/actions/download-artifact#compatibility-between-v1-and-v2
+          path: dist
+
+      - name: Import Code-Signing Certificates
+        env:
+          KEYCHAIN: "sign.keychain"
+          INSTALLER_CERT_MAC_PATH: "/tmp/ArduinoCerts2020.p12"
+        run: |
+          echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode > ${{ env.INSTALLER_CERT_MAC_PATH }}
+          security create-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+          security default-keychain -s ${{ env.KEYCHAIN }}
+          security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+          security import ${{ env.INSTALLER_CERT_MAC_PATH }} -k ${{ env.KEYCHAIN }} -f pkcs12 -A -T /usr/bin/codesign -P ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
+          security set-key-partition-list -S apple-tool:,apple: -s -k ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+
+      - name: Install gon for code signing and app notarization
+        run: |
+          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_macos.zip
+          unzip gon_macos.zip -d /usr/local/bin
+
+      - name: Sign and notarize binary
+        env:
+          AC_USERNAME: ${{ secrets.AC_USERNAME }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+        run: |
+          gon gon.config.hcl
+
+      - name: Re-package binary and update checksum
+        # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
+        run: |
+          TAG=${GITHUB_REF/refs\/tags\//}
+          tar cj firmwares \
+          LICENSE.txt \
+          -C dist/macos64/  FirmwareUpdater \
+          -f dist/FirmwareUpdater_${TAG}_macOS_64bit.tar.bz2
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: notarize-macos
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          # to ensure compatibility with v1
+          # https://github.com/actions/download-artifact#compatibility-between-v1-and-v2
+          path: dist
+
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Build
+        # This must be done after OS X notarization or the wrong checksum
+        # would be calculated since the binary is modified during notarization
+        run: task dist:generate-index-data
+
+      - name: Identify Prerelease
+        # This is a workaround while waiting for create-release action
+        # to implement auto pre-release based on tag
+        id: prerelease
+        run: |
+          wget -q -P /tmp https://github.com/fsaintjacques/semver-tool/archive/3.0.0.zip
+          unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
+          if [[ $(/tmp/semver get prerel ${GITHUB_REF/refs\/tags\//}) ]]; then echo "::set-output name=IS_PRE::true"; fi
+
+      - name: Create Github Release and upload artifacts
+        id: create_release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ github.ref }}
+          name: ${{ github.ref }}
+          bodyFile: "dist/CHANGELOG.md"
+          draft: false
+          prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
+          artifacts: dist/*
