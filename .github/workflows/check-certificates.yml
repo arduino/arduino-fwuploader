@@ -28,22 +28,22 @@ jobs:
       - name: Set certificates path environment variable
         run: |
           # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
-          echo "FILES=\\\"$(ls -m ${{ github.workspace }} | sed 's/, /\\",\\"/')\\\"" >> $GITHUB_ENV
+          echo "FILES=\\\"$(ls -m ${{ github.workspace }}/certs | xargs | sed 's/, /","/g')\\\"" >> $GITHUB_ENV
 
       - name: Get files list
         id: get-files
         run: |
-          JSON=$(echo "[${{ join(env.FILES) }}]" | jq -c '[{"cert_file": .[]}]')
-          echo "::set-output name=certificates::{\"include\": $JSON }"
+          JSON=$(echo "[\"${{ join(env.FILES) }}\"]" | jq -c '{"cert_file": .}')
+          echo "::set-output name=certificates::$JSON"
 
   check-certificates:
     # This workflow would fail in forks that don't have the certificate secrets defined
     if: github.repository == 'arduino/FirmwareUpdater'
     runs-on: ubuntu-latest
+    needs: get-certificates-list
 
     strategy:
       fail-fast: false
-
       matrix: ${{fromJSON(needs.get-certificates-list.outputs.certificates)}}
 
     steps:
