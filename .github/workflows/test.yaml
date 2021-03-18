@@ -10,13 +10,7 @@ jobs:
   native-os-build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        arch: ["386", "arm"]
-        exclude:
-          - os: macos-latest
-            node: "386"
-          - os: macos-latest
-            node: "arm"
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -42,9 +36,17 @@ jobs:
         shell: bash
         run: task build
 
-      - name: Cross-build
-        shell: bash
-        run: GOARCH=${{ matrix.arch }} task build
+      - name: Cross-build for 386
+        if: matrix.os != 'macos-latest'
+        env:
+          GOARCH: "386"
+        run: task build
+
+      - name: Cross-build for arm
+        if: matrix.os != 'macos-latest'
+        env:
+          GOARCH: "arm"
+        run: task build
 
       - name: Run unit tests
         run: task test
