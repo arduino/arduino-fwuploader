@@ -19,7 +19,7 @@ jobs:
     if: github.repository == 'arduino/FirmwareUpdater'
     runs-on: ubuntu-latest
     outputs:
-      certificates: ${{ steps.get-certificates.outputs.certificates }}
+      certificates: ${{ steps.get-files.outputs.certificates }}
 
     steps:
       - name: checkout
@@ -28,12 +28,12 @@ jobs:
       - name: Set certificates path environment variable
         run: |
           # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
-          echo "FILES=\\\"$(ls -m ${{ github.workspace }}/certs | xargs | sed 's/, /","/g')\\\"" >> $GITHUB_ENV
+          echo "FILES=\\\"$(ls -md ${{ github.workspace }}/certs/* | xargs | sed 's/, /","/g')\\\"" >> $GITHUB_ENV
 
       - name: Get files list
         id: get-files
         run: |
-          JSON=$(echo "[\"${{ join(env.FILES) }}\"]" | jq -c '{"cert_file": .}')
+          JSON=$(echo "[${{ join(env.FILES) }}]" | jq -c '{"cert_file": .}')
           echo "::set-output name=certificates::$JSON"
 
   check-certificates:
@@ -74,7 +74,7 @@ jobs:
           echo "Certificate expiration date: $EXPIRATION_DATE"
           echo "Days remaining before expiration: $DAYS_BEFORE_EXPIRATION"
 
-          echo "::set-output name=days::$DAYS_BEFORE_EXPIRATION_LIST"
+          echo "::set-output name=days::$DAYS_BEFORE_EXPIRATION"
 
       - name: Check if expiration notification period has been reached
         id: check-expiration
