@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
@@ -28,6 +28,10 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16.2"
 
       - name: Build
         run: task dist:all
@@ -83,10 +87,10 @@ jobs:
         # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         run: |
           TAG=${GITHUB_REF/refs\/tags\//}
-          tar cj firmwares \
+          tar cjf dist/FirmwareUpdater_${TAG}_macOS_64bit.tar.bz2 \
+          firmwares \
           LICENSE.txt \
-          -C dist/macos64/  FirmwareUpdater \
-          -f dist/FirmwareUpdater_${TAG}_macOS_64bit.tar.bz2
+          -C dist/macos64/ FirmwareUpdater
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -131,14 +135,10 @@ jobs:
           if [[ $(/tmp/semver get prerel ${GITHUB_REF/refs\/tags\//}) ]]; then echo "::set-output name=IS_PRE::true"; fi
 
       - name: Create Github Release and upload artifacts
-        id: create_release
         uses: ncipollo/release-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag: ${{ github.ref }}
-          name: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           bodyFile: "dist/CHANGELOG.md"
           draft: false
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
-          artifacts: dist/*
+          artifacts: dist/FirmwareUpdater*
