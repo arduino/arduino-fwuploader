@@ -141,4 +141,4 @@ jobs:
           bodyFile: "dist/CHANGELOG.md"
           draft: false
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
-          artifacts: dist/FirmwareUpdater*
+          artifacts: dist/FirmwareUpdater*,dist/package_index.json
