@@ -1,0 +1,24 @@
+name: Verifies documentation links
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 3 * * 1" # Every Monday at 03:00
+
+jobs:
+  verify-links:
+    # Don't trigger on schedule event when in a fork
+    if: github.event_name != 'schedule' || (github.event_name == 'schedule' && github.repository == 'arduino/FirmwareUpdater')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Verify links
+        run: task docs:check-links

@@ -1,0 +1,93 @@
+version: "3"
+
+includes:
+  dist: ./DistTasks.yml
+
+tasks:
+  docs:check:
+    desc: Run documentation linting
+    cmds:
+      - npx {{ .PRETTIER }} --check "**/*.md"
+
+  docs:check-links:
+    desc: Verifies there are no dead links in documentation
+    cmds:
+      - |
+        npx -p markdown-link-check -c '
+        STATUS=0
+        for file in $(find -name "*.md"); do
+          markdown-link-check -c markdown-link-check-config.json -q "$file"
+          STATUS=$(( $STATUS + $? ))
+        done
+        exit $STATUS'
+
+  docs:format:
+    desc: Automatically formats documentation
+    cmds:
+      - npx {{ .PRETTIER }} --write "**/*.md"
+
+  build:
+    desc: Build the project
+    cmds:
+      - go build -v {{.LDFLAGS}}
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -short -race -run '.*' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt ./... {{.TEST_LDFLAGS}}
+
+  check:
+    desc: Check fmt and lint
+    cmds:
+      - test -z $(go fmt ./...)
+      - go vet ./...
+      - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} ./..."
+      - task: docs:check
+      - task: config:check
+
+  config:check:
+    desc: Check linting of configuration and supporting files
+    cmds:
+      - npx {{ .PRETTIER }} --check "**/*.{yml,yaml}"
+
+  config:format:
+    desc: Automatically formats configuration and supporting files
+    cmds:
+      - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
+
+vars:
+  PROJECT_NAME: "FirmwareUpdater"
+  DIST_DIR: "dist"
+  # build vars
+  COMMIT:
+    sh: echo "$(git log -n 1 --format=%h)"
+  TIMESTAMP:
+    sh: echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  TIMESTAMP_SHORT:
+    sh: echo "{{now | date "20060102"}}"
+  TAG:
+    sh: echo "`git tag --points-at=HEAD 2> /dev/null | head -n1`"
+  VERSION: "{{ if .NIGHTLY }}nightly-{{ .TIMESTAMP_SHORT }}{{ else if .TAG }}{{ .TAG }}{{ else }}{{ .PACKAGE_NAME_PREFIX }}git-snapshot{{ end }}"
+  LDFLAGS: >
+    -ldflags
+    '
+    -X github.com/arduino/FirmwareUpdater/version.versionString={{.VERSION}}
+    -X github.com/arduino/FirmwareUpdater/version.commit={{ .COMMIT }}
+    -X github.com/arduino/FirmwareUpdater/version.date={{.TIMESTAMP}}
+    '
+  # test vars
+  GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
+  TEST_VERSION: "0.0.0-test.preview"
+  TEST_COMMIT: "deadbeef"
+  TEST_LDFLAGS: >
+    -ldflags
+    '
+    -X github.com/arduino/FirmwareUpdater/version.versionString={{.TEST_VERSION}}
+    -X github.com/arduino/FirmwareUpdater/version.commit={{.TEST_COMMIT}}
+    -X github.com/arduino/FirmwareUpdater/version.date={{.TIMESTAMP}}
+    '
+  # check-lint vars
+  GOLINTBIN:
+    sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
+  GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
+  PRETTIER: prettier@2.0.5
