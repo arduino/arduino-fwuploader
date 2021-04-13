@@ -111,9 +111,9 @@ func Run(ctx context.Context) {
 		}
 	}
 
-	if ctx.BinaryToRestore != "" {
-		f.Close()
+	f.Close()
 
+	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
 		if programmer == nil {
 			log.Fatal("ERROR: You must specify a programmer!")
@@ -121,9 +121,6 @@ func Run(ctx context.Context) {
 		if err := programmer.Flash(&ctx, ctx.BinaryToRestore); err != nil {
 			log.Fatal(err)
 		}
-
-		// just to allow cleanup via defer()
-		// f.port, _ = OpenSerial(ctx.PortName)
 	}
 }
 
