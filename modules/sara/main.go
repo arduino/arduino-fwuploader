@@ -21,31 +21,25 @@ package sara
 
 import (
 	"fmt"
-	"github.com/arduino/FirmwareUpdater/programmers/bossac"
-	"github.com/arduino/FirmwareUpdater/utils/context"
 	"io/ioutil"
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/arduino/FirmwareUpdater/programmers/bossac"
+	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
 var f *Flasher
 var payloadSize uint16
 var programmer context.Programmer
 
-func Run(ctx context.Context) {
-
-	var err error
-	programmer = &bossac.Bossac{}
+func Run(ctx *context.Context) {
+	programmer := bossac.NewBossac(ctx)
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader sara")
-		if ctx.BinaryToRestore == "" {
-			ctx.BinaryToRestore, err = programmer.DumpAndFlash(&ctx, ctx.FWUploaderBinary)
-		} else {
-			err = programmer.Flash(&ctx, ctx.FWUploaderBinary)
-		}
-		if err != nil {
+		if err := programmer.Flash(ctx.FWUploaderBinary); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -56,7 +50,6 @@ func Run(ctx context.Context) {
 	} else {
 		f = _f
 	}
-	defer f.Close()
 
 	time.Sleep(2 * time.Second)
 
@@ -68,14 +61,14 @@ func Run(ctx context.Context) {
 
 	// Check maximum supported payload size
 	log.Println("Reading actual firmware version")
-	fwVersion, err := f.GetFwVersion()
-	if err != nil {
+
+	if fwVersion, err := f.GetFwVersion(); err != nil {
 		log.Fatal(err)
 	} else {
-		payloadSize = 128
+		log.Println("Initial firmware version: " + fwVersion)
 	}
 
-	log.Println("Initial firmware version: " + fwVersion)
+	payloadSize = 128
 
 	if ctx.FirmwareFile != "" {
 		if err := flashFirmware(ctx); err != nil {
@@ -83,27 +76,24 @@ func Run(ctx context.Context) {
 		}
 	}
 
-	fwVersion, err = f.GetFwVersion()
-	if err != nil {
+	if fwVersion, err := f.GetFwVersion(); err != nil {
 		log.Fatal(err)
+	} else {
+		log.Println("After applying update firmware version: " + fwVersion)
 	}
 
-	log.Println("After applying update firmware version: " + fwVersion)
+	f.Close()
 
 	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
-		f.Close()
 
-		if err := programmer.Flash(&ctx, ctx.BinaryToRestore); err != nil {
+		if err := programmer.Flash(ctx.BinaryToRestore); err != nil {
 			log.Fatal(err)
 		}
-
-		// just to allow cleanup via defer()
-		// f.port, _ = OpenSerial(ctx.PortName)
 	}
 }
 
-func flashFirmware(ctx context.Context) error {
+func flashFirmware(ctx *context.Context) error {
 	FirmwareOffset := 0x0000
 
 	log.Printf("Flashing firmware from '%v'", ctx.FirmwareFile)

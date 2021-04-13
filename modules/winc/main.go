@@ -35,19 +35,13 @@ import (
 var f *Flasher
 var payloadSize uint16
 
-func Run(ctx context.Context) {
+func Run(ctx *context.Context) {
 
-	var err error
-	programmer := &bossac.Bossac{}
+	programmer := bossac.NewBossac(ctx)
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader winc")
-		if ctx.BinaryToRestore == "" {
-			ctx.BinaryToRestore, err = programmer.DumpAndFlash(&ctx, ctx.FWUploaderBinary)
-		} else {
-			err = programmer.Flash(&ctx, ctx.FWUploaderBinary)
-		}
-		if err != nil {
+		if err := programmer.Flash(ctx.FWUploaderBinary); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -58,7 +52,6 @@ func Run(ctx context.Context) {
 	} else {
 		f = _f
 	}
-	defer f.Close()
 
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
@@ -97,16 +90,14 @@ func Run(ctx context.Context) {
 		}
 	}
 
+	f.Close()
+
 	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
-		f.Close()
 
-		if err := programmer.Flash(&ctx, ctx.BinaryToRestore); err != nil {
+		if err := programmer.Flash(ctx.BinaryToRestore); err != nil {
 			log.Fatal(err)
 		}
-
-		// just to allow cleanup via defer()
-		// f.port, _ = OpenSerial(ctx.PortName)
 	}
 }
 
@@ -121,7 +112,7 @@ func readAllFlash() error {
 	return nil
 }
 
-func flashCerts(ctx context.Context) error {
+func flashCerts(ctx *context.Context) error {
 	CertificatesOffset := 0x4000
 
 	if ctx.RootCertDir != "" {
@@ -136,7 +127,7 @@ func flashCerts(ctx context.Context) error {
 	return flashChunk(CertificatesOffset, certificatesData)
 }
 
-func flashFirmware(ctx context.Context) error {
+func flashFirmware(ctx *context.Context) error {
 	FirmwareOffset := 0x0000
 
 	log.Printf("Flashing firmware from '%v'", ctx.FirmwareFile)

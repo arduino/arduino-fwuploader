@@ -29,6 +29,5 @@ type Context struct {
 }
 
 type Programmer interface {
-	DumpAndFlash(ctx *Context, filename string) (string, error)
-	Flash(ctx *Context, filename string) error
+	Flash(filename string) error
 }

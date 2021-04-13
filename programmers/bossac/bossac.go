@@ -10,24 +10,34 @@ import (
 	"github.com/arduino/FirmwareUpdater/utils/context"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
 type Bossac struct {
+	bossacPath *paths.Path
+	portName   string
 }
 
-func (b *Bossac) Flash(ctx *context.Context, filename string) error {
+func NewBossac(ctx *context.Context) *Bossac {
+	return &Bossac{
+		bossacPath: paths.New(ctx.ProgrammerPath),
+		portName:   ctx.PortName,
+	}
+}
+
+func (b *Bossac) Flash(filename string) error {
 	log.Println("Entering board into bootloader mode")
-	port, err := serialutils.Reset(ctx.PortName, true)
+	port, err := serialutils.Reset(b.portName, true)
 	if err != nil {
 		return err
 	}
 
 	log.Println("Flashing " + filename)
-	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
+	err = b.invoke("-e", "-R", "-p", port, "-w", filename)
 
-	ctx.PortName, err = serialutils.WaitForNewSerialPortOrDefaultTo(port)
-	log.Println("Board is back online " + ctx.PortName)
+	b.portName, err = serialutils.WaitForNewSerialPortOrDefaultTo(port)
+	log.Println("Board is back online " + b.portName)
 	time.Sleep(1 * time.Second)
 
 	return err
@@ -46,7 +56,7 @@ func (b *Bossac) DumpAndFlash(ctx *context.Context, filename string) (string, er
 	}
 
 	log.Println("Reading existing sketch from the baord, to restore it later")
-	err = invokeBossac([]string{ctx.ProgrammerPath, "-u", "-r", "-p", port, filepath.Join(dir, "dump.bin")})
+	err = b.invoke("-u", "-r", "-p", port, filepath.Join(dir, "dump.bin"))
 
 	log.Println("Original sketch saved at " + filepath.Join(dir, "dump.bin"))
 	if err != nil {
@@ -54,7 +64,7 @@ func (b *Bossac) DumpAndFlash(ctx *context.Context, filename string) (string, er
 	}
 
 	log.Println("Flashing " + filename)
-	err = invokeBossac([]string{ctx.ProgrammerPath, "-e", "-R", "-p", port, "-w", filename})
+	err = b.invoke("-e", "-R", "-p", port, "-w", filename)
 
 	ctx.PortName, err = serialutils.WaitForNewSerialPortOrDefaultTo(port)
 	log.Println("Board is back online " + ctx.PortName)
@@ -63,8 +73,8 @@ func (b *Bossac) DumpAndFlash(ctx *context.Context, filename string) (string, er
 	return filepath.Join(dir, "dump.bin"), err
 }
 
-func invokeBossac(args []string) error {
-	cmd, err := executils.NewProcess(args...)
+func (b *Bossac) invoke(args ...string) error {
+	cmd, err := executils.NewProcessFromPath(b.bossacPath, args...)
 	if err != nil {
 		return err
 	}

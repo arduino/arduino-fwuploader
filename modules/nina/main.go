@@ -33,19 +33,17 @@ import (
 	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
-var f *Flasher
+var flasher *Flasher
 var payloadSize uint16
 var programmer context.Programmer
 
-func Run(ctx context.Context) {
-
-	var err error
+func Run(ctx *context.Context) {
 
 	if ctx.ProgrammerPath != "" {
 		if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
 			programmer = &bossac.Bossac{}
 		} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
-			programmer = &avrdude.Avrdude{}
+			programmer = avrdude.NewAvrdude(ctx)
 		} else {
 			log.Fatal("Programmer path not specified correctly, programmer path set to: " + ctx.ProgrammerPath)
 		}
@@ -56,34 +54,27 @@ func Run(ctx context.Context) {
 		if programmer == nil {
 			log.Fatal("ERROR: You must specify a programmer!")
 		}
-		if ctx.BinaryToRestore == "" {
-			ctx.BinaryToRestore, err = programmer.DumpAndFlash(&ctx, ctx.FWUploaderBinary)
-		} else {
-			err = programmer.Flash(&ctx, ctx.FWUploaderBinary)
-		}
-		if err != nil {
+		if err := programmer.Flash(ctx.FWUploaderBinary); err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	log.Println("Connecting to programmer")
-	if _f, err := OpenFlasher(ctx.PortName); err != nil {
+	if f, err := OpenFlasher(ctx.PortName); err != nil {
 		log.Fatal(err)
 	} else {
-		f = _f
+		flasher = f
 	}
-	defer f.Close()
 
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
-	if err := f.Hello(); err != nil {
+	if err := flasher.Hello(); err != nil {
 		log.Fatal(err)
 	}
 
 	// Check maximum supported payload size
 	log.Println("Reading max payload size")
-	_payloadSize, err := f.GetMaximumPayloadSize()
-	if err != nil {
+	if _payloadSize, err := flasher.GetMaximumPayloadSize(); err != nil {
 		log.Fatal(err)
 	} else {
 		payloadSize = _payloadSize
@@ -111,14 +102,14 @@ func Run(ctx context.Context) {
 		}
 	}
 
-	f.Close()
+	flasher.Close()
 
 	if ctx.BinaryToRestore != "" {
-		log.Println("Restoring previous sketch")
+		log.Println("Restoring binary")
 		if programmer == nil {
 			log.Fatal("ERROR: You must specify a programmer!")
 		}
-		if err := programmer.Flash(&ctx, ctx.BinaryToRestore); err != nil {
+		if err := programmer.Flash(ctx.BinaryToRestore); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -126,7 +117,7 @@ func Run(ctx context.Context) {
 
 func readAllFlash() error {
 	for i := 0; i < 256; i++ {
-		if data, err := f.Read(uint32(i*1024), 1024); err != nil {
+		if data, err := flasher.Read(uint32(i*1024), 1024); err != nil {
 			log.Fatal(err)
 		} else {
 			os.Stdout.Write(data)
@@ -135,7 +126,7 @@ func readAllFlash() error {
 	return nil
 }
 
-func flashCerts(ctx context.Context) error {
+func flashCerts(ctx *context.Context) error {
 	CertificatesOffset := 0x10000
 
 	if ctx.RootCertDir != "" {
@@ -161,7 +152,7 @@ func flashCerts(ctx context.Context) error {
 	return flashChunk(CertificatesOffset, certificatesData, false)
 }
 
-func flashFirmware(ctx context.Context) error {
+func flashFirmware(ctx *context.Context) error {
 	FirmwareOffset := 0x0000
 
 	log.Printf("Flashing firmware from '%v'", ctx.FirmwareFile)
@@ -178,7 +169,7 @@ func flashChunk(offset int, buffer []byte, doChecksum bool) error {
 	chunkSize := int(payloadSize)
 	bufferLength := len(buffer)
 
-	if err := f.Erase(uint32(offset), uint32(bufferLength)); err != nil {
+	if err := flasher.Erase(uint32(offset), uint32(bufferLength)); err != nil {
 		return err
 	}
 
@@ -189,7 +180,7 @@ func flashChunk(offset int, buffer []byte, doChecksum bool) error {
 		if end > bufferLength {
 			end = bufferLength
 		}
-		if err := f.Write(uint32(offset+i), buffer[start:end]); err != nil {
+		if err := flasher.Write(uint32(offset+i), buffer[start:end]); err != nil {
 			return err
 		}
 	}
@@ -197,7 +188,7 @@ func flashChunk(offset int, buffer []byte, doChecksum bool) error {
 	fmt.Println("")
 
 	if doChecksum {
-		return f.Md5sum(buffer)
+		return flasher.Md5sum(buffer)
 	} else {
 		return nil
 	}

@@ -15,7 +15,7 @@ import (
 	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
-var ctx context.Context
+var ctx = &context.Context{}
 
 func init() {
 	flag.StringVar(&ctx.PortName, "port", "", "serial port to use for flashing")
