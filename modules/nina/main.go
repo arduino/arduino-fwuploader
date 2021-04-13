@@ -41,16 +41,21 @@ func Run(ctx context.Context) {
 
 	var err error
 
-	if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
-		programmer = &bossac.Bossac{}
-	} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
-		programmer = &avrdude.Avrdude{}
-	} else {
-		log.Fatal("Programmer path not specified correctly, programmer path set to: " + ctx.ProgrammerPath)
+	if ctx.ProgrammerPath != "" {
+		if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
+			programmer = &bossac.Bossac{}
+		} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
+			programmer = &avrdude.Avrdude{}
+		} else {
+			log.Fatal("Programmer path not specified correctly, programmer path set to: " + ctx.ProgrammerPath)
+		}
 	}
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader nina")
+		if programmer == nil {
+			log.Fatal("ERROR: You must specify a programmer!")
+		}
 		if ctx.BinaryToRestore == "" {
 			ctx.BinaryToRestore, err = programmer.DumpAndFlash(&ctx, ctx.FWUploaderBinary)
 		} else {
@@ -107,9 +112,12 @@ func Run(ctx context.Context) {
 	}
 
 	if ctx.BinaryToRestore != "" {
-		log.Println("Restoring previous sketch")
 		f.Close()
 
+		log.Println("Restoring previous sketch")
+		if programmer == nil {
+			log.Fatal("ERROR: You must specify a programmer!")
+		}
 		if err := programmer.Flash(&ctx, ctx.BinaryToRestore); err != nil {
 			log.Fatal(err)
 		}
