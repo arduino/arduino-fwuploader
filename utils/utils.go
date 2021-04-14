@@ -45,6 +45,7 @@ func GetCompatibleWith(name string, rootPath string) map[string][]firmware {
 	knownBoards["mkrvidor4000"] = combo{match: "(NINA)", loader: "NINA/Firmware.*mkrvidor.*", avoid: "uno"}
 	knownBoards["uno2018"] = combo{match: "(NINA)", loader: "NINA/Firmware.*unowifi.*", prefer: "uno", avoid: "mkr"}
 	knownBoards["mkrnb1500"] = combo{match: "SARA", loader: "SARA/SerialSARAPassthrough*"}
+	knownBoards["nanorp2040connect"] = combo{match: "(NINA).*(Nano_RP2040_Connect)", loader: "NINA/Firmware.*nanorp2040connect.*"}
 
 	listAll := false
 

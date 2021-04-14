@@ -30,6 +30,7 @@ import (
 
 	"github.com/arduino/FirmwareUpdater/programmers/avrdude"
 	"github.com/arduino/FirmwareUpdater/programmers/bossac"
+	"github.com/arduino/FirmwareUpdater/programmers/rp2040load"
 	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
@@ -44,6 +45,8 @@ func Run(ctx *context.Context) {
 			programmer = &bossac.Bossac{}
 		} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
 			programmer = avrdude.NewAvrdude(ctx)
+		} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "rp2040load") {
+			programmer = rp2040load.NewRP2040Load(ctx)
 		} else {
 			log.Fatal("Programmer path not specified correctly, programmer path set to: " + ctx.ProgrammerPath)
 		}
