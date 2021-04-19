@@ -57,7 +57,7 @@ func Run(ctx *context.Context) {
 		if programmer == nil {
 			log.Fatal("ERROR: You must specify a programmer!")
 		}
-		if err := programmer.Flash(ctx.FWUploaderBinary); err != nil {
+		if err := programmer.Flash(ctx.FWUploaderBinary, nil); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -112,7 +112,7 @@ func Run(ctx *context.Context) {
 		if programmer == nil {
 			log.Fatal("ERROR: You must specify a programmer!")
 		}
-		if err := programmer.Flash(ctx.BinaryToRestore); err != nil {
+		if err := programmer.Flash(ctx.BinaryToRestore, nil); err != nil {
 			log.Fatal(err)
 		}
 	}

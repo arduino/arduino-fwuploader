@@ -23,19 +23,20 @@ func NewBossac(ctx *context.Context) *Bossac {
 	}
 }
 
-func (b *Bossac) Flash(filename string) error {
+func (b *Bossac) Flash(filename string, cb *serialutils.ResetProgressCallbacks) error {
 	log.Println("Entering board into bootloader mode")
-	port, err := serialutils.Reset(b.portName, true)
+	port, err := serialutils.Reset(b.portName, true, cb)
 	if err != nil {
 		return err
 	}
 
 	log.Println("Flashing " + filename)
+	if port == "" {
+		port = b.portName
+	}
 	err = b.invoke("-e", "-R", "-p", port, "-w", filename)
 
-	b.portName, err = serialutils.WaitForNewSerialPortOrDefaultTo(port)
-	log.Println("Board is back online " + b.portName)
-	time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	return err
 }

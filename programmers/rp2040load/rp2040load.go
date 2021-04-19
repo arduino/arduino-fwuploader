@@ -3,6 +3,7 @@ package rp2040load
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/arduino/FirmwareUpdater/utils/context"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
@@ -22,9 +23,9 @@ func NewRP2040Load(ctx *context.Context) *RP2040Load {
 	}
 }
 
-func (b *RP2040Load) Flash(filename string) error {
+func (b *RP2040Load) Flash(filename string, cb *serialutils.ResetProgressCallbacks) error {
 	log.Println("Entering board into bootloader mode")
-	port, err := serialutils.Reset(b.portName, true)
+	_, err := serialutils.Reset(b.portName, true, cb)
 	if err != nil {
 		return err
 	}
@@ -34,8 +35,8 @@ func (b *RP2040Load) Flash(filename string) error {
 		log.Fatalf("Error flashing %s: %s", filename, err)
 	}
 
-	b.portName, err = serialutils.WaitForNewSerialPortOrDefaultTo(port)
-	log.Println("Board is back online " + b.portName)
+	time.Sleep(5 * time.Second)
+
 	return err
 }
 

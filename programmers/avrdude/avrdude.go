@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/arduino/FirmwareUpdater/utils/context"
+	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
 )
@@ -24,7 +25,7 @@ func NewAvrdude(ctx *context.Context) *Avrdude {
 	}
 }
 
-func (b *Avrdude) Flash(filename string) error {
+func (b *Avrdude) Flash(filename string, cb *serialutils.ResetProgressCallbacks) error {
 	log.Println("Flashing " + filename)
 	err := b.invoke(
 		fmt.Sprintf("-C%s", b.configPath),
@@ -38,7 +39,7 @@ func (b *Avrdude) Flash(filename string) error {
 		fmt.Sprintf("-Uflash:w:%s:i", filename),
 		"-Ufuse8:w:0x00:m")
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	return err
 }

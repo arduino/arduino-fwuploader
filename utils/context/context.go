@@ -2,6 +2,8 @@ package context
 
 import (
 	"fmt"
+
+	"github.com/arduino/arduino-cli/arduino/serialutils"
 )
 
 type addressFlags []string
@@ -29,5 +31,5 @@ type Context struct {
 }
 
 type Programmer interface {
-	Flash(filename string) error
+	Flash(filename string, cb *serialutils.ResetProgressCallbacks) error
 }

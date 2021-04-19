@@ -41,7 +41,7 @@ func Run(ctx *context.Context) {
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader winc")
-		if err := programmer.Flash(ctx.FWUploaderBinary); err != nil {
+		if err := programmer.Flash(ctx.FWUploaderBinary, nil); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -95,7 +95,7 @@ func Run(ctx *context.Context) {
 	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
 
-		if err := programmer.Flash(ctx.BinaryToRestore); err != nil {
+		if err := programmer.Flash(ctx.BinaryToRestore, nil); err != nil {
 			log.Fatal(err)
 		}
 	}
