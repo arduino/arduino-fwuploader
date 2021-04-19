@@ -56,7 +56,7 @@ tasks:
       - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
 
 vars:
-  PROJECT_NAME: "FirmwareUpdater"
+  PROJECT_NAME: "FirmwareUploader"
   DIST_DIR: "dist"
   # build vars
   COMMIT:

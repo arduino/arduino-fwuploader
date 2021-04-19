@@ -1,5 +1,5 @@
 /debug
-/FirmwareUpdater*
+/FirmwareUploader*
 /.vscode/
 .idea
 coverage_*.txt
