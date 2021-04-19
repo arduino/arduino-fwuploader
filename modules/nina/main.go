@@ -42,7 +42,7 @@ func Run(ctx *context.Context) {
 
 	if ctx.ProgrammerPath != "" {
 		if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
-			programmer = &bossac.Bossac{}
+			programmer = bossac.NewBossac(ctx)
 		} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "avrdude") {
 			programmer = avrdude.NewAvrdude(ctx)
 		} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "rp2040load") {
