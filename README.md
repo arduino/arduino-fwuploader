@@ -6,7 +6,7 @@ Use this tool to update the firmware and/or add SSL certificates for any WINC, N
 
 You can download the Firmware/Certificates updater here:
 
-https://github.com/arduino/FirmwareUpdater/releases/latest
+https://github.com/arduino/FirmwareUploader/releases/latest
 
 ## Usage
 
@@ -90,4 +90,4 @@ details.
 You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the
 Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-[security-policy]: https://github.com/arduino/FirmwareUpdater/security/policy
+[security-policy]: https://github.com/arduino/FirmwareUploader/security/policy

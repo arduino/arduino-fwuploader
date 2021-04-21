@@ -71,9 +71,9 @@ vars:
   LDFLAGS: >
     -ldflags
     '
-    -X github.com/arduino/FirmwareUpdater/version.versionString={{.VERSION}}
-    -X github.com/arduino/FirmwareUpdater/version.commit={{ .COMMIT }}
-    -X github.com/arduino/FirmwareUpdater/version.date={{.TIMESTAMP}}
+    -X github.com/arduino/FirmwareUploader/version.versionString={{.VERSION}}
+    -X github.com/arduino/FirmwareUploader/version.commit={{ .COMMIT }}
+    -X github.com/arduino/FirmwareUploader/version.date={{.TIMESTAMP}}
     '
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
@@ -82,9 +82,9 @@ vars:
   TEST_LDFLAGS: >
     -ldflags
     '
-    -X github.com/arduino/FirmwareUpdater/version.versionString={{.TEST_VERSION}}
-    -X github.com/arduino/FirmwareUpdater/version.commit={{.TEST_COMMIT}}
-    -X github.com/arduino/FirmwareUpdater/version.date={{.TIMESTAMP}}
+    -X github.com/arduino/FirmwareUploader/version.versionString={{.TEST_VERSION}}
+    -X github.com/arduino/FirmwareUploader/version.commit={{.TEST_COMMIT}}
+    -X github.com/arduino/FirmwareUploader/version.date={{.TIMESTAMP}}
     '
   # check-lint vars
   GOLINTBIN:

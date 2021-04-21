@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/arduino/FirmwareUpdater/utils/context"
+	"github.com/arduino/FirmwareUploader/utils/context"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/pkg/errors"

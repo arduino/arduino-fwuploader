@@ -9,7 +9,7 @@ on:
 jobs:
   verify-links:
     # Don't trigger on schedule event when in a fork
-    if: github.event_name != 'schedule' || (github.event_name == 'schedule' && github.repository == 'arduino/FirmwareUpdater')
+    if: github.event_name != 'schedule' || (github.event_name == 'schedule' && github.repository == 'arduino/FirmwareUploader')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
