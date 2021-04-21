@@ -87,10 +87,10 @@ jobs:
         # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         run: |
           TAG=${GITHUB_REF/refs\/tags\//}
-          tar cjf dist/FirmwareUpdater_${TAG}_macOS_64bit.tar.bz2 \
+          tar cjf dist/FirmwareUploader_${TAG}_macOS_64bit.tar.bz2 \
           firmwares \
           LICENSE.txt \
-          -C dist/macos64/ FirmwareUpdater
+          -C dist/macos64/ FirmwareUploader
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -141,4 +141,4 @@ jobs:
           bodyFile: "dist/CHANGELOG.md"
           draft: false
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
-          artifacts: dist/FirmwareUpdater*,dist/package_index.json
+          artifacts: dist/FirmwareUploader*,dist/package_index.json

@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/FirmwareUpdater/utils"
+	"github.com/arduino/FirmwareUploader/utils"
 	"go.bug.st/serial"
 )
 

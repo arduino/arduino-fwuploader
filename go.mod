@@ -1,4 +1,4 @@
-module github.com/arduino/FirmwareUpdater
+module github.com/arduino/FirmwareUploader
 
 go 1.14
 
