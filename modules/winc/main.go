@@ -28,8 +28,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/arduino/FirmwareUpdater/programmers/bossac"
-	"github.com/arduino/FirmwareUpdater/utils/context"
+	"github.com/arduino/FirmwareUploader/programmers/bossac"
+	"github.com/arduino/FirmwareUploader/utils/context"
 )
 
 var f *Flasher

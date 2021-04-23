@@ -21,13 +21,12 @@ package sara
 
 import (
 	"fmt"
+	"github.com/arduino/FirmwareUploader/programmers/bossac"
+	"github.com/arduino/FirmwareUploader/utils/context"
 	"io/ioutil"
 	"log"
 	"strconv"
 	"time"
-
-	"github.com/arduino/FirmwareUpdater/programmers/bossac"
-	"github.com/arduino/FirmwareUpdater/utils/context"
 )
 
 var f *Flasher
