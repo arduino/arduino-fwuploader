@@ -6,7 +6,7 @@ go 1.14
 replace go.bug.st/serial => github.com/cmaglie/go-serial v0.0.0-20200923162623-b214c147e37e
 
 require (
-	github.com/arduino/arduino-cli v0.0.0-20210419093035-6ca680d235a3
+	github.com/arduino/arduino-cli v0.0.0-20210422154105-5aa424818026
 	github.com/arduino/go-paths-helper v1.4.0
 	github.com/imjasonmiller/godice v0.1.2 // indirect
 	github.com/pkg/errors v0.9.1
