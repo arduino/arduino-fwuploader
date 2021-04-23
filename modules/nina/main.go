@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/FirmwareUploader/programmers/rp2040load"
 	"github.com/arduino/FirmwareUploader/programmers/avrdude"
 	"github.com/arduino/FirmwareUploader/programmers/bossac"
 	"github.com/arduino/FirmwareUploader/utils/context"
