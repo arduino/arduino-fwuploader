@@ -21,48 +21,50 @@ package sara
 
 import (
 	"fmt"
-	"github.com/arduino/FirmwareUploader/programmers/bossac"
-	"github.com/arduino/FirmwareUploader/utils/context"
 	"io/ioutil"
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/arduino/FirmwareUploader/programmers/bossac"
+	"github.com/arduino/FirmwareUploader/utils/context"
 )
 
-var f *Flasher
+var flasher *Flasher
 var payloadSize uint16
 var programmer context.Programmer
 
-func Run(ctx *context.Context) {
+func Run(ctx *context.Context) error {
 	programmer := bossac.NewBossac(ctx)
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader sara")
 		if err := programmer.Flash(ctx.FWUploaderBinary, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	log.Println("Connecting to programmer")
-	if _f, err := OpenFlasher(ctx.PortName); err != nil {
-		log.Fatal(err)
+	if f, err := OpenFlasher(ctx.PortName); err != nil {
+		return err
 	} else {
-		f = _f
+		flasher = f
 	}
+	defer flasher.Close()
 
 	time.Sleep(2 * time.Second)
 
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
-	if err := f.Hello(); err != nil {
-		log.Fatal(err)
+	if err := flasher.Hello(); err != nil {
+		return err
 	}
 
 	// Check maximum supported payload size
 	log.Println("Reading actual firmware version")
 
-	if fwVersion, err := f.GetFwVersion(); err != nil {
-		log.Fatal(err)
+	if fwVersion, err := flasher.GetFwVersion(); err != nil {
+		return err
 	} else {
 		log.Println("Initial firmware version: " + fwVersion)
 	}
@@ -71,25 +73,26 @@ func Run(ctx *context.Context) {
 
 	if ctx.FirmwareFile != "" {
 		if err := flashFirmware(ctx); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
-	if fwVersion, err := f.GetFwVersion(); err != nil {
-		log.Fatal(err)
+	if fwVersion, err := flasher.GetFwVersion(); err != nil {
+		return err
 	} else {
 		log.Println("After applying update firmware version: " + fwVersion)
 	}
 
-	f.Close()
+	flasher.Close()
 
 	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
 
 		if err := programmer.Flash(ctx.BinaryToRestore, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func flashFirmware(ctx *context.Context) error {
@@ -102,12 +105,12 @@ func flashFirmware(ctx *context.Context) error {
 		return err
 	}
 
-	_, err = f.Expect("AT+ULSTFILE", "+ULSTFILE:", 1000)
+	_, err = flasher.Expect("AT+ULSTFILE", "+ULSTFILE:", 1000)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.Expect("AT+UDWNFILE=\"UPDATE.BIN\","+strconv.Itoa(len(fwData))+",\"FOAT\"", ">", 20000)
+	_, err = flasher.Expect("AT+UDWNFILE=\"UPDATE.BIN\","+strconv.Itoa(len(fwData))+",\"FOAT\"", ">", 20000)
 	if err != nil {
 		return err
 	}
@@ -119,12 +122,12 @@ func flashFirmware(ctx *context.Context) error {
 
 	time.Sleep(1 * time.Second)
 
-	_, err = f.Expect("", "OK", 1000)
+	_, err = flasher.Expect("", "OK", 1000)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.Expect("AT+UFWINSTALL", "OK", 60000)
+	_, err = flasher.Expect("AT+UFWINSTALL", "OK", 60000)
 	if err != nil {
 		return err
 	}
@@ -134,7 +137,7 @@ func flashFirmware(ctx *context.Context) error {
 	// wait up to 20 minutes trying to ping the module. After 20 minutes signal the error
 	start := time.Now()
 	for time.Since(start) < time.Minute*20 {
-		err = f.Hello()
+		err = flasher.Hello()
 		if err == nil {
 			return nil
 		}
@@ -154,7 +157,7 @@ func flashChunk(offset int, buffer []byte) error {
 		if end > bufferLength {
 			end = bufferLength
 		}
-		if err := f.Write(uint32(offset+i), buffer[start:end]); err != nil {
+		if err := flasher.Write(uint32(offset+i), buffer[start:end]); err != nil {
 			return err
 		}
 		//time.Sleep(1 * time.Millisecond)

@@ -41,10 +41,9 @@ type Flasher struct {
 }
 
 func (flasher *Flasher) Hello() error {
-
-	f.Expect("ATE0", "OK", 100)
-	f.Expect("ATE0", "OK", 100)
-	f.Expect("ATE0", "OK", 100)
+	flasher.Expect("ATE0", "OK", 100)
+	flasher.Expect("ATE0", "OK", 100)
+	flasher.Expect("ATE0", "OK", 100)
 	_, err := flasher.Expect("AT", "OK", 100)
 	return err
 }

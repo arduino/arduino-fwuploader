@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/arduino/FirmwareUploader/modules/nina"
 	"github.com/arduino/FirmwareUploader/modules/sara"
@@ -28,11 +29,11 @@ func init() {
 	flag.StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
 	flag.StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
 	flag.StringVar(&ctx.Compatible, "get_available_for", "", "Ask for available firmwares matching a given board")
+	flag.IntVar(&ctx.Retries, "retries", 9, "Number of retries in case of upload failure")
 }
 
 func main() {
 	flag.Parse()
-
 	if ctx.Compatible != "" {
 		el, _ := json.Marshal(utils.GetCompatibleWith(ctx.Compatible, ""))
 		fmt.Println(string(el))
@@ -43,11 +44,31 @@ func main() {
 		log.Fatal("Please specify a serial port")
 	}
 
-	if ctx.Model == "nina" || strings.Contains(ctx.FirmwareFile, "NINA") || strings.Contains(ctx.FWUploaderBinary, "NINA") {
-		nina.Run(ctx)
-	} else if ctx.Model == "winc" || strings.Contains(ctx.FirmwareFile, "WINC") || strings.Contains(ctx.FWUploaderBinary, "WINC") {
-		winc.Run(ctx)
-	} else {
-		sara.Run(ctx)
+	retry := 0
+	for {
+		var ctxCopy context.Context
+		ctxCopy = *ctx
+		var err error
+		if ctx.Model == "nina" || strings.Contains(ctx.FirmwareFile, "NINA") || strings.Contains(ctx.FWUploaderBinary, "NINA") {
+			err = nina.Run(&ctxCopy)
+		} else if ctx.Model == "winc" || strings.Contains(ctx.FirmwareFile, "WINC") || strings.Contains(ctx.FWUploaderBinary, "WINC") {
+			err = winc.Run(&ctxCopy)
+		} else {
+			err = sara.Run(&ctxCopy)
+		}
+		if err == nil {
+			log.Println("Operation completed: success! :-)")
+			break
+		}
+		log.Println("Error: " + err.Error())
+
+		if retry >= ctx.Retries {
+			log.Fatal("Operation failed. :-(")
+		}
+
+		retry++
+		log.Println("Waiting 1 second before retrying...")
+		time.Sleep(time.Second)
+		log.Printf("Retrying upload (%d of %d)", retry, ctx.Retries)
 	}
 }

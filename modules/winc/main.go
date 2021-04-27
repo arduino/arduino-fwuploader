@@ -21,7 +21,6 @@ package winc
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -30,81 +29,84 @@ import (
 
 	"github.com/arduino/FirmwareUploader/programmers/bossac"
 	"github.com/arduino/FirmwareUploader/utils/context"
+	"github.com/pkg/errors"
 )
 
-var f *Flasher
+var flasher *Flasher
 var payloadSize uint16
 
-func Run(ctx *context.Context) {
+func Run(ctx *context.Context) error {
 
 	programmer := bossac.NewBossac(ctx)
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader winc")
 		if err := programmer.Flash(ctx.FWUploaderBinary, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	log.Println("Connecting to programmer")
-	if _f, err := OpenFlasher(ctx.PortName); err != nil {
-		log.Fatal(err)
+	if f, err := OpenFlasher(ctx.PortName); err != nil {
+		return err
 	} else {
-		f = _f
+		flasher = f
 	}
+	defer flasher.Close()
 
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
-	if err := f.Hello(); err != nil {
-		log.Fatal(err)
+	if err := flasher.Hello(); err != nil {
+		return err
 	}
 
 	// Check maximum supported payload size
 	log.Println("Reading max payload size")
-	_payloadSize, err := f.GetMaximumPayloadSize()
+	_payloadSize, err := flasher.GetMaximumPayloadSize()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	} else {
 		payloadSize = _payloadSize
 	}
 	if payloadSize < 1024 {
-		log.Fatalf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
+		return errors.Errorf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
 	}
 
 	if ctx.FirmwareFile != "" {
 		if err := flashFirmware(ctx); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	if ctx.RootCertDir != "" || len(ctx.Addresses) != 0 {
 		if err := flashCerts(ctx); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	if ctx.ReadAll {
 		log.Println("Reading all flash")
 		if err := readAllFlash(); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
-	f.Close()
+	flasher.Close()
 
 	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
 
 		if err := programmer.Flash(ctx.BinaryToRestore, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func readAllFlash() error {
 	for i := 0; i < 256; i++ {
-		if data, err := f.Read(uint32(i*1024), 1024); err != nil {
-			log.Fatal(err)
+		if data, err := flasher.Read(uint32(i*1024), 1024); err != nil {
+			return err
 		} else {
 			os.Stdout.Write(data)
 		}
@@ -144,7 +146,7 @@ func flashChunk(offset int, buffer []byte) error {
 	chunkSize := int(payloadSize)
 	bufferLength := len(buffer)
 
-	if err := f.Erase(uint32(offset), uint32(bufferLength)); err != nil {
+	if err := flasher.Erase(uint32(offset), uint32(bufferLength)); err != nil {
 		return err
 	}
 
@@ -155,7 +157,7 @@ func flashChunk(offset int, buffer []byte) error {
 		if end > bufferLength {
 			end = bufferLength
 		}
-		if err := f.Write(uint32(offset+i), buffer[start:end]); err != nil {
+		if err := flasher.Write(uint32(offset+i), buffer[start:end]); err != nil {
 			return err
 		}
 	}
@@ -167,7 +169,7 @@ func flashChunk(offset int, buffer []byte) error {
 			readLength = bufferLength % chunkSize
 		}
 
-		data, err := f.Read(uint32(offset+i), uint32(readLength))
+		data, err := flasher.Read(uint32(offset+i), uint32(readLength))
 		if err != nil {
 			return err
 		}
