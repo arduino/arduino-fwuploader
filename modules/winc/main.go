@@ -32,7 +32,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var f *Flasher
+var flasher *Flasher
 var payloadSize uint16
 
 func Run(ctx *context.Context) error {
@@ -47,22 +47,22 @@ func Run(ctx *context.Context) error {
 	}
 
 	log.Println("Connecting to programmer")
-	if _f, err := OpenFlasher(ctx.PortName); err != nil {
+	if f, err := OpenFlasher(ctx.PortName); err != nil {
 		return err
 	} else {
-		f = _f
+		flasher = f
 	}
-	defer f.Close()
+	defer flasher.Close()
 
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
-	if err := f.Hello(); err != nil {
+	if err := flasher.Hello(); err != nil {
 		return err
 	}
 
 	// Check maximum supported payload size
 	log.Println("Reading max payload size")
-	_payloadSize, err := f.GetMaximumPayloadSize()
+	_payloadSize, err := flasher.GetMaximumPayloadSize()
 	if err != nil {
 		return err
 	} else {
@@ -91,7 +91,7 @@ func Run(ctx *context.Context) error {
 		}
 	}
 
-	f.Close()
+	flasher.Close()
 
 	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring previous sketch")
@@ -105,7 +105,7 @@ func Run(ctx *context.Context) error {
 
 func readAllFlash() error {
 	for i := 0; i < 256; i++ {
-		if data, err := f.Read(uint32(i*1024), 1024); err != nil {
+		if data, err := flasher.Read(uint32(i*1024), 1024); err != nil {
 			return err
 		} else {
 			os.Stdout.Write(data)
@@ -146,7 +146,7 @@ func flashChunk(offset int, buffer []byte) error {
 	chunkSize := int(payloadSize)
 	bufferLength := len(buffer)
 
-	if err := f.Erase(uint32(offset), uint32(bufferLength)); err != nil {
+	if err := flasher.Erase(uint32(offset), uint32(bufferLength)); err != nil {
 		return err
 	}
 
@@ -157,7 +157,7 @@ func flashChunk(offset int, buffer []byte) error {
 		if end > bufferLength {
 			end = bufferLength
 		}
-		if err := f.Write(uint32(offset+i), buffer[start:end]); err != nil {
+		if err := flasher.Write(uint32(offset+i), buffer[start:end]); err != nil {
 			return err
 		}
 	}
@@ -169,7 +169,7 @@ func flashChunk(offset int, buffer []byte) error {
 			readLength = bufferLength % chunkSize
 		}
 
-		data, err := f.Read(uint32(offset+i), uint32(readLength))
+		data, err := flasher.Read(uint32(offset+i), uint32(readLength))
 		if err != nil {
 			return err
 		}
