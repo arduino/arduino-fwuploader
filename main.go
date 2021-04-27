@@ -14,6 +14,7 @@ import (
 	"github.com/arduino/FirmwareUploader/modules/winc"
 	"github.com/arduino/FirmwareUploader/utils"
 	"github.com/arduino/FirmwareUploader/utils/context"
+	"github.com/arduino/go-paths-helper"
 )
 
 var ctx = &context.Context{}
@@ -25,7 +26,7 @@ func init() {
 	flag.StringVar(&ctx.FirmwareFile, "firmware", "", "firmware file to flash")
 	flag.BoolVar(&ctx.ReadAll, "read", false, "read all firmware and output to stdout")
 	flag.StringVar(&ctx.FWUploaderBinary, "flasher", "", "firmware upload binary (precompiled for the right target)")
-	flag.StringVar(&ctx.BinaryToRestore, "restore_binary", "", "firmware upload binary (precompiled for the right target)")
+	flag.StringVar(&ctx.BinaryToRestore, "restore_binary", "", "binary to restore after the firmware upload (precompiled for the right target)")
 	flag.StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
 	flag.StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
 	flag.StringVar(&ctx.Compatible, "get_available_for", "", "Ask for available firmwares matching a given board")
@@ -42,6 +43,22 @@ func main() {
 
 	if ctx.PortName == "" {
 		log.Fatal("Please specify a serial port")
+	}
+
+	if ctx.BinaryToRestore != "" {
+		// sanity check for BinaryToRestore
+		f := paths.New(ctx.BinaryToRestore)
+		info, err := f.Stat()
+		if err != nil {
+			log.Fatalf("Error opening restore_binary: %s", err)
+		}
+		if info.IsDir() {
+			log.Fatalf("Error opening restore_binary: is a directory...")
+		}
+		if info.Size() == 0 {
+			log.Println("WARNING: restore_binary is empty! Will not restore binary after upload.")
+			ctx.BinaryToRestore = ""
+		}
 	}
 
 	retry := 0
