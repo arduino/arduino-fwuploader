@@ -29,7 +29,7 @@ func init() {
 	flag.StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
 	flag.StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
 	flag.StringVar(&ctx.Compatible, "get_available_for", "", "Ask for available firmwares matching a given board")
-	flag.IntVar(&ctx.Retries, "retries", 2, "Number of retries in case of upload failure")
+	flag.IntVar(&ctx.Retries, "retries", 9, "Number of retries in case of upload failure")
 }
 
 func main() {
