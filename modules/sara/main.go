@@ -21,48 +21,50 @@ package sara
 
 import (
 	"fmt"
-	"github.com/arduino/FirmwareUploader/programmers/bossac"
-	"github.com/arduino/FirmwareUploader/utils/context"
 	"io/ioutil"
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/arduino/FirmwareUploader/programmers/bossac"
+	"github.com/arduino/FirmwareUploader/utils/context"
 )
 
 var f *Flasher
 var payloadSize uint16
 var programmer context.Programmer
 
-func Run(ctx *context.Context) {
+func Run(ctx *context.Context) error {
 	programmer := bossac.NewBossac(ctx)
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader sara")
 		if err := programmer.Flash(ctx.FWUploaderBinary, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	log.Println("Connecting to programmer")
 	if _f, err := OpenFlasher(ctx.PortName); err != nil {
-		log.Fatal(err)
+		return err
 	} else {
 		f = _f
 	}
+	defer f.Close()
 
 	time.Sleep(2 * time.Second)
 
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
 	if err := f.Hello(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Check maximum supported payload size
 	log.Println("Reading actual firmware version")
 
 	if fwVersion, err := f.GetFwVersion(); err != nil {
-		log.Fatal(err)
+		return err
 	} else {
 		log.Println("Initial firmware version: " + fwVersion)
 	}
@@ -71,12 +73,12 @@ func Run(ctx *context.Context) {
 
 	if ctx.FirmwareFile != "" {
 		if err := flashFirmware(ctx); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	if fwVersion, err := f.GetFwVersion(); err != nil {
-		log.Fatal(err)
+		return err
 	} else {
 		log.Println("After applying update firmware version: " + fwVersion)
 	}
@@ -87,9 +89,10 @@ func Run(ctx *context.Context) {
 		log.Println("Restoring previous sketch")
 
 		if err := programmer.Flash(ctx.BinaryToRestore, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func flashFirmware(ctx *context.Context) error {

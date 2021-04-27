@@ -28,17 +28,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino/FirmwareUploader/programmers/rp2040load"
 	"github.com/arduino/FirmwareUploader/programmers/avrdude"
 	"github.com/arduino/FirmwareUploader/programmers/bossac"
+	"github.com/arduino/FirmwareUploader/programmers/rp2040load"
 	"github.com/arduino/FirmwareUploader/utils/context"
+	"github.com/pkg/errors"
 )
 
 var flasher *Flasher
 var payloadSize uint16
 var programmer context.Programmer
 
-func Run(ctx *context.Context) {
+func Run(ctx *context.Context) error {
 
 	if ctx.ProgrammerPath != "" {
 		if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {
@@ -48,60 +49,61 @@ func Run(ctx *context.Context) {
 		} else if strings.Contains(filepath.Base(ctx.ProgrammerPath), "rp2040load") {
 			programmer = rp2040load.NewRP2040Load(ctx)
 		} else {
-			log.Fatal("Programmer path not specified correctly, programmer path set to: " + ctx.ProgrammerPath)
+			return errors.New("Programmer path not specified correctly, programmer path set to: " + ctx.ProgrammerPath)
 		}
 	}
 
 	if ctx.FWUploaderBinary != "" {
 		log.Println("Flashing firmware uploader nina")
 		if programmer == nil {
-			log.Fatal("ERROR: You must specify a programmer!")
+			return errors.New("ERROR: You must specify a programmer!")
 		}
 		if err := programmer.Flash(ctx.FWUploaderBinary, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	log.Println("Connecting to programmer")
 	if f, err := OpenFlasher(ctx.PortName); err != nil {
-		log.Fatal(err)
+		return err
 	} else {
 		flasher = f
 	}
+	defer flasher.Close()
 
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
 	if err := flasher.Hello(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Check maximum supported payload size
 	log.Println("Reading max payload size")
 	if _payloadSize, err := flasher.GetMaximumPayloadSize(); err != nil {
-		log.Fatal(err)
+		return err
 	} else {
 		payloadSize = _payloadSize
 	}
 	if payloadSize < 1024 {
-		log.Fatalf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
+		return errors.Errorf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
 	}
 
 	if ctx.FirmwareFile != "" {
 		if err := flashFirmware(ctx); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	if ctx.RootCertDir != "" || len(ctx.Addresses) != 0 {
 		if err := flashCerts(ctx); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	if ctx.ReadAll {
 		log.Println("Reading all flash")
 		if err := readAllFlash(); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
@@ -110,18 +112,19 @@ func Run(ctx *context.Context) {
 	if ctx.BinaryToRestore != "" {
 		log.Println("Restoring binary")
 		if programmer == nil {
-			log.Fatal("ERROR: You must specify a programmer!")
+			errors.New("ERROR: You must specify a programmer!")
 		}
 		if err := programmer.Flash(ctx.BinaryToRestore, nil); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func readAllFlash() error {
 	for i := 0; i < 256; i++ {
 		if data, err := flasher.Read(uint32(i*1024), 1024); err != nil {
-			log.Fatal(err)
+			return err
 		} else {
 			os.Stdout.Write(data)
 		}
@@ -142,7 +145,7 @@ func flashCerts(ctx *context.Context) error {
 	}
 
 	if len(certificatesData) > 0x20000 {
-		log.Fatal("Too many certificates! Aborting")
+		errors.New("Too many certificates! Aborting")
 	}
 
 	// pad certificatesData to flash page

@@ -28,6 +28,7 @@ type Context struct {
 	ProgrammerPath   string
 	Model            string
 	Compatible       string
+	Retries          int
 }
 
 type Programmer interface {
