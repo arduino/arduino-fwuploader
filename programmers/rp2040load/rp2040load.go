@@ -9,6 +9,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 )
 
 type RP2040Load struct {
@@ -32,7 +33,7 @@ func (b *RP2040Load) Flash(filename string, cb *serialutils.ResetProgressCallbac
 
 	log.Println("Flashing " + filename)
 	if err := b.invoke("-v", "-D", filename); err != nil {
-		log.Fatalf("Error flashing %s: %s", filename, err)
+		return errors.Errorf("Error flashing %s: %s", filename, err)
 	}
 
 	time.Sleep(5 * time.Second)

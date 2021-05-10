@@ -16,19 +16,11 @@ type firmware struct {
 
 type combo struct {
 	match  string
-	prefer string
-	avoid  string
 	loader string
 }
 
-func isPreferred(existing bool, path string, board combo) bool {
+func isPreferred(path string) bool {
 	if path == "" {
-		return false
-	}
-	if board.avoid != "" && strings.Contains(path, board.avoid) {
-		return false
-	}
-	if existing && !strings.Contains(path, board.prefer) {
 		return false
 	}
 	return true
@@ -39,13 +31,13 @@ func GetCompatibleWith(name string, rootPath string) map[string][]firmware {
 	files := make(map[string][]firmware)
 
 	knownBoards := make(map[string]combo)
-	knownBoards["mkr1000"] = combo{match: "(WINC1500)*(3a0)", loader: "WINC1500/Firmware*"}
-	knownBoards["mkrwifi1010"] = combo{match: "(NINA)", loader: "NINA/Firmware.*mkrwifi1010.*", avoid: "uno"}
-	knownBoards["nano_33_iot"] = combo{match: "(NINA)", loader: "NINA/Firmware.*nano_33_iot.*", avoid: "uno"}
-	knownBoards["mkrvidor4000"] = combo{match: "(NINA)", loader: "NINA/Firmware.*mkrvidor.*", avoid: "uno"}
-	knownBoards["uno2018"] = combo{match: "(NINA)", loader: "NINA/Firmware.*unowifi.*", prefer: "uno", avoid: "mkr"}
+	knownBoards["mkr1000"] = combo{match: "(WINC1500)*(3a0)", loader: "WINC1500/FirmwareUpdater.mkr1000.ino.bin"}
+	knownBoards["mkrwifi1010"] = combo{match: "NINA_W102.bin", loader: "NINA/FirmwareUpdater.mkrwifi1010.ino.bin"}
+	knownBoards["nano_33_iot"] = combo{match: "NINA_W102.bin", loader: "NINA/FirmwareUpdater.nano_33_iot.ino.bin"}
+	knownBoards["mkrvidor4000"] = combo{match: "NINA_W102.bin", loader: "NINA/FirmwareUpdater.mkrvidor4000.ino.bin"}
+	knownBoards["uno2018"] = combo{match: "NINA_W102-Uno_WiFi_Rev2.bin", loader: "NINA/FirmwareUpdater.unowifirev2.without_bl.ino.hex"}
 	knownBoards["mkrnb1500"] = combo{match: "SARA", loader: "SARA/SerialSARAPassthrough*"}
-	//knownBoards["nanorp2040connect"] = combo{match: "(NINA).*(Nano_RP2040_Connect)", loader: "NINA/Firmware.*nanorp2040connect.*"}
+	knownBoards["nanorp2040connect"] = combo{match: "NINA_W102-Nano_RP2040_Connect", loader: "NINA/FirmwareUpdater.nanorp2040connect.ino.elf"}
 
 	listAll := false
 
@@ -74,16 +66,12 @@ func GetCompatibleWith(name string, rootPath string) map[string][]firmware {
 			IsLoader: loader.MatchString(unixPath) && !listAll,
 		}
 		folder := filepath.Dir(path)
-		lowerPath, _ := filepath.Rel(root, path)
-		lowerPath = strings.ToLower(lowerPath)
-		_, alreadyPopulated := files[folder]
 		if strings.HasPrefix(f.Name, "firmwares") && !f.IsLoader {
 			return nil
 		}
 		if listAll && !strings.HasPrefix(f.Name, "firmwares") {
 			files[folder] = append(files[folder], f)
-		}
-		if !listAll && (fw.MatchString(path) || f.IsLoader) && isPreferred(alreadyPopulated, lowerPath, knownBoards[name]) {
+		} else if !listAll && (fw.MatchString(path) || f.IsLoader) {
 			files[folder] = append(files[folder], f)
 		}
 		return nil
