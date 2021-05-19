@@ -1,6 +1,6 @@
 /*
-  FirmwareUploader.go - A firmware uploader for the WiFi101 module.
-  Copyright (c) 2015 Arduino LLC.  All right reserved.
+  FirmwareUploader
+  Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,28 +17,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package sara
+package winc
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
-	"time"
 
 	"github.com/arduino/FirmwareUploader/programmers/bossac"
 	"github.com/arduino/FirmwareUploader/utils/context"
+	"github.com/pkg/errors"
 )
 
 var flasher *Flasher
 var payloadSize uint16
-var programmer context.Programmer
 
 func Run(ctx *context.Context) error {
+
 	programmer := bossac.NewBossac(ctx)
 
 	if ctx.FWUploaderBinary != "" {
-		log.Println("Flashing firmware uploader sara")
+		log.Println("Flashing firmware uploader winc")
 		if err := programmer.Flash(ctx.FWUploaderBinary, nil); err != nil {
 			return err
 		}
@@ -52,8 +54,6 @@ func Run(ctx *context.Context) error {
 	}
 	defer flasher.Close()
 
-	time.Sleep(2 * time.Second)
-
 	// Synchronize with programmer
 	log.Println("Sync with programmer")
 	if err := flasher.Hello(); err != nil {
@@ -61,15 +61,16 @@ func Run(ctx *context.Context) error {
 	}
 
 	// Check maximum supported payload size
-	log.Println("Reading actual firmware version")
-
-	if fwVersion, err := flasher.GetFwVersion(); err != nil {
+	log.Println("Reading max payload size")
+	_payloadSize, err := flasher.GetMaximumPayloadSize()
+	if err != nil {
 		return err
 	} else {
-		log.Println("Initial firmware version: " + fwVersion)
+		payloadSize = _payloadSize
 	}
-
-	payloadSize = 128
+	if payloadSize < 1024 {
+		return errors.Errorf("Programmer reports %d as maximum payload size (1024 is needed)", payloadSize)
+	}
 
 	if ctx.FirmwareFile != "" {
 		if err := flashFirmware(ctx); err != nil {
@@ -77,10 +78,17 @@ func Run(ctx *context.Context) error {
 		}
 	}
 
-	if fwVersion, err := flasher.GetFwVersion(); err != nil {
-		return err
-	} else {
-		log.Println("After applying update firmware version: " + fwVersion)
+	if ctx.RootCertDir != "" || len(ctx.Addresses) != 0 {
+		if err := flashCerts(ctx); err != nil {
+			return err
+		}
+	}
+
+	if ctx.ReadAll {
+		log.Println("Reading all flash")
+		if err := readAllFlash(); err != nil {
+			return err
+		}
 	}
 
 	flasher.Close()
@@ -95,6 +103,32 @@ func Run(ctx *context.Context) error {
 	return nil
 }
 
+func readAllFlash() error {
+	for i := 0; i < 256; i++ {
+		if data, err := flasher.Read(uint32(i*1024), 1024); err != nil {
+			return err
+		} else {
+			os.Stdout.Write(data)
+		}
+	}
+	return nil
+}
+
+func flashCerts(ctx *context.Context) error {
+	CertificatesOffset := 0x4000
+
+	if ctx.RootCertDir != "" {
+		log.Printf("Converting and flashing certificates from '%v'", ctx.RootCertDir)
+	}
+
+	certificatesData, err := ConvertCertificates(ctx.RootCertDir, ctx.Addresses)
+	if err != nil {
+		return err
+	}
+
+	return flashChunk(CertificatesOffset, certificatesData)
+}
+
 func flashFirmware(ctx *context.Context) error {
 	FirmwareOffset := 0x0000
 
@@ -105,50 +139,16 @@ func flashFirmware(ctx *context.Context) error {
 		return err
 	}
 
-	_, err = flasher.Expect("AT+ULSTFILE", "+ULSTFILE:", 1000)
-	if err != nil {
-		return err
-	}
-
-	_, err = flasher.Expect("AT+UDWNFILE=\"UPDATE.BIN\","+strconv.Itoa(len(fwData))+",\"FOAT\"", ">", 20000)
-	if err != nil {
-		return err
-	}
-
-	err = flashChunk(FirmwareOffset, fwData)
-	if err != nil {
-		return err
-	}
-
-	time.Sleep(1 * time.Second)
-
-	_, err = flasher.Expect("", "OK", 1000)
-	if err != nil {
-		return err
-	}
-
-	_, err = flasher.Expect("AT+UFWINSTALL", "OK", 60000)
-	if err != nil {
-		return err
-	}
-
-	time.Sleep(10 * time.Second)
-
-	// wait up to 20 minutes trying to ping the module. After 20 minutes signal the error
-	start := time.Now()
-	for time.Since(start) < time.Minute*20 {
-		err = flasher.Hello()
-		if err == nil {
-			return nil
-		}
-		time.Sleep(1 * time.Second)
-	}
-	return err
+	return flashChunk(FirmwareOffset, fwData)
 }
 
 func flashChunk(offset int, buffer []byte) error {
 	chunkSize := int(payloadSize)
 	bufferLength := len(buffer)
+
+	if err := flasher.Erase(uint32(offset), uint32(bufferLength)); err != nil {
+		return err
+	}
 
 	for i := 0; i < bufferLength; i += chunkSize {
 		fmt.Printf("\rFlashing: " + strconv.Itoa((i*100)/bufferLength) + "%%")
@@ -160,7 +160,25 @@ func flashChunk(offset int, buffer []byte) error {
 		if err := flasher.Write(uint32(offset+i), buffer[start:end]); err != nil {
 			return err
 		}
-		//time.Sleep(1 * time.Millisecond)
+	}
+
+	var flashData []byte
+	for i := 0; i < bufferLength; i += chunkSize {
+		readLength := chunkSize
+		if (i + chunkSize) > bufferLength {
+			readLength = bufferLength % chunkSize
+		}
+
+		data, err := flasher.Read(uint32(offset+i), uint32(readLength))
+		if err != nil {
+			return err
+		}
+
+		flashData = append(flashData, data...)
+	}
+
+	if !bytes.Equal(buffer, flashData) {
+		return errors.New("Flash data does not match written!")
 	}
 
 	return nil

@@ -1,6 +1,6 @@
 /*
-  FirmwareUploader.go - A firmware uploader for the WiFi101 module.
-  Copyright (c) 2015 Arduino LLC.  All right reserved.
+  FirmwareUploader
+  Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -31,15 +31,16 @@ import (
 	"github.com/arduino/FirmwareUploader/programmers/avrdude"
 	"github.com/arduino/FirmwareUploader/programmers/bossac"
 	"github.com/arduino/FirmwareUploader/programmers/rp2040load"
+	"github.com/arduino/FirmwareUploader/utils"
 	"github.com/arduino/FirmwareUploader/utils/context"
 	"github.com/pkg/errors"
 )
 
 var flasher *Flasher
 var payloadSize uint16
-var programmer context.Programmer
 
 func Run(ctx *context.Context) error {
+	var programmer utils.Programmer
 
 	if ctx.ProgrammerPath != "" {
 		if strings.Contains(filepath.Base(ctx.ProgrammerPath), "bossac") {

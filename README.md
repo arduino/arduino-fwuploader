@@ -13,19 +13,19 @@ https://github.com/arduino/FirmwareUploader/releases/latest
 Extract the zip file and run (for example, NINA -> WiFi1010)
 
 ```
-./FirmwareUploader -flasher firmwares/NINA/FirmwareUpdater.mkrwifi1010.ino.bin -firmware firmwares/NINA/1.2.1/NINA_W102.bin -port /dev/ttyACM0 -address arduino.cc:443 -restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin -programmer {runtime.tools.bossac}/bossac
+./FirmwareUploader --flasher firmwares/NINA/FirmwareUpdater.mkrwifi1010.ino.bin --firmware firmwares/NINA/1.2.1/NINA_W102.bin --port /dev/ttyACM0 --address arduino.cc:443 --restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin --programmer {runtime.tools.bossac}/bossac
 ```
 
 To flash a MKR1000:
 
 ```
-./FirmwareUploader -flasher firmwares/WINC1500/FirmwareUpdater.mkr1000.ino.bin -firmware firmwares/WINC1500/19.5.4/m2m_aio_3a0.bin -port /dev/ttyACM0 -address arduino.cc:443 -restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin -programmer {runtime.tools.bossac}/bossac
+./FirmwareUploader --flasher firmwares/WINC1500/FirmwareUpdater.mkr1000.ino.bin --firmware firmwares/WINC1500/19.5.4/m2m_aio_3a0.bin --port /dev/ttyACM0 --address arduino.cc:443 --restore_binary /tmp/arduino_build_619137/WiFiSSLClient.ino.bin --programmer {runtime.tools.bossac}/bossac
 ```
 
 To update a MKRNB1500:
 
 ```
-./FirmwareUploader -flasher firmwares/SARA/SerialSARAPassthrough.ino.bin -firmware firmwares/SARA/5.6A2.00-to-5.6A2.01.pkg -port /dev/ttyACM0 -restore_binary firmwares/SARA/SerialSARAPassthrough.ino.bin -programmer {runtime.tools.bossac}/bossac
+./FirmwareUploader --flasher firmwares/SARA/SerialSARAPassthrough.ino.bin --firmware firmwares/SARA/5.6A2.00-to-5.6A2.01.pkg --port /dev/ttyACM0 --restore_binary firmwares/SARA/SerialSARAPassthrough.ino.bin --programmer {runtime.tools.bossac}/bossac
 ```
 
 ### Command line options
@@ -33,27 +33,27 @@ To update a MKRNB1500:
 The full list of command line options can be obtained with the `-h` option: `./FirmwareUploader -h`
 
 ```
-Usage of ./FirmwareUploader:
-  -address value
-      address (host:port) to fetch and flash root certificate for, multiple values allowed
-  -certs string
-      root certificate directory
-  -firmware string
-      firmware file to flash
-  -flasher string
-      firmware upload binary (precompiled for the right target)
-  -get_available_for string
-      Ask for available firmwares matching a given board
-  -model string
-      module model (winc, nina or sara)
-  -port string
-      serial port to use for flashing
-  -programmer string
-      path of programmer in use (avrdude/bossac)
-  -read
-      read all firmware and output to stdout
-  -restore_binary string
-      firmware upload binary (precompiled for the right target)
+FirmwareUploader (FirmwareUploader).
+
+Usage:
+  FirmwareUploader [flags]
+
+Examples:
+  ./FirmwareUploader <command> [flags...]
+
+Flags:
+      --address strings            address (host:port) to fetch and flash root certificate for, multiple values allowed
+      --certs string               root certificate directory
+      --firmware string            firmware file to flash
+      --flasher string             firmware upload binary (precompiled for the right target)
+      --get_available_for string   Ask for available firmwares matching a given board
+  -h, --help                       help for FirmwareUploader
+      --model string               module model (winc, nina or sara)
+      --port string                serial port to use for flashing
+      --programmer string          path of programmer in use (avrdude/bossac)
+      --read                       read all firmware and output to stdout
+      --restore_binary string      binary to restore after the firmware upload (precompiled for the right target)
+      --retries int                Number of retries in case of upload failure (default 9)
 ```
 
 ## How to build the tools from source file
