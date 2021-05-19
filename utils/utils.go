@@ -19,13 +19,6 @@ type combo struct {
 	loader string
 }
 
-func isPreferred(path string) bool {
-	if path == "" {
-		return false
-	}
-	return true
-}
-
 func GetCompatibleWith(name string, rootPath string) map[string][]firmware {
 
 	files := make(map[string][]firmware)

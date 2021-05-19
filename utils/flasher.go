@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"go.bug.st/serial"
 )
 
@@ -14,6 +15,10 @@ var baudRates = []int{
 	57600,
 	56000,
 	38400,
+}
+
+type Programmer interface {
+	Flash(filename string, cb *serialutils.ResetProgressCallbacks) error
 }
 
 func OpenSerial(portName string) (serial.Port, error) {

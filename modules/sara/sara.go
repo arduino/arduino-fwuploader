@@ -32,7 +32,6 @@ import (
 
 var flasher *Flasher
 var payloadSize uint16
-var programmer context.Programmer
 
 func Run(ctx *context.Context) error {
 	programmer := bossac.NewBossac(ctx)
