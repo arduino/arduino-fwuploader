@@ -1,6 +1,6 @@
 /*
-  certificates.go - A firmware uploader for the WiFi101 module.
-  Copyright (c) 2015 Arduino LLC.  All right reserved.
+  FirmwareUploader
+  Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 package winc
 
 import (
