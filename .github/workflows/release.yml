@@ -123,12 +123,10 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
-      # NOTICE: Generation of the index data is disabled for the time being.
-      # For more info: https://arduino.atlassian.net/browse/ATL-1301?focusedCommentId=28347
-      # - name: Build
-      #   # This must be done after OS X notarization or the wrong checksum
-      #   # would be calculated since the binary is modified during notarization
-      #   run: task dist:generate-index-data
+      - name: Build
+        # This must be done after OS X notarization or the wrong checksum
+        # would be calculated since the binary is modified during notarization
+        run: task dist:generate-index-data
 
       - name: Identify Prerelease
         # This is a workaround while waiting for create-release action
