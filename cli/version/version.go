@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/FirmwareUploader/version"
+	v "github.com/arduino/FirmwareUploader/version"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +20,8 @@ func NewCommand() *cobra.Command {
 	}
 }
 
+var VersionInfo = v.NewInfo("FirmwareUploader")
+
 func run(cmd *cobra.Command, args []string) {
-	fmt.Print(version.String())
+	fmt.Print(VersionInfo)
 }
