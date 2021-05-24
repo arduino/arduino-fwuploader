@@ -20,8 +20,6 @@ func NewCommand() *cobra.Command {
 	}
 }
 
-var VersionInfo = v.NewInfo("FirmwareUploader")
-
 func run(cmd *cobra.Command, args []string) {
-	fmt.Print(VersionInfo)
+	fmt.Print(v.VersionInfo)
 }

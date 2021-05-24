@@ -7,17 +7,18 @@ var (
 	versionString        = ""
 	commit               = ""
 	date                 = ""
+	VersionInfo          *info
 )
 
-type Info struct {
+type info struct {
 	Application   string `json:"Application"`
 	VersionString string `json:"VersionString"`
 	Commit        string `json:"Commit"`
 	Date          string `json:"Date"`
 }
 
-func NewInfo(application string) *Info {
-	return &Info{
+func newInfo(application string) *info {
+	return &info{
 		Application:   application,
 		VersionString: versionString,
 		Commit:        commit,
@@ -25,7 +26,7 @@ func NewInfo(application string) *Info {
 	}
 }
 
-func (i *Info) String() string {
+func (i *info) String() string {
 	return fmt.Sprintf("%s Version: %s Commit: %s Date: %s", i.Application, i.VersionString, i.Commit, i.Date)
 }
 
@@ -33,4 +34,5 @@ func init() {
 	if versionString == "" {
 		versionString = defaultVersionString
 	}
+	VersionInfo = newInfo("FirmwareUploader")
 }
