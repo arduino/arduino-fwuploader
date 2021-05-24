@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/FirmwareUploader/cli/version"
 	"github.com/arduino/FirmwareUploader/modules/nina"
 	"github.com/arduino/FirmwareUploader/modules/sara"
 	"github.com/arduino/FirmwareUploader/modules/winc"
@@ -48,6 +49,8 @@ func NewCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}
+
+	firmwareUploaderCli.AddCommand(version.NewCommand())
 
 	firmwareUploaderCli.Flags().StringVar(&ctx.PortName, "port", "", "serial port to use for flashing")
 	firmwareUploaderCli.Flags().StringVar(&ctx.RootCertDir, "certs", "", "root certificate directory")
