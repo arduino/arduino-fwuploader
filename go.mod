@@ -9,6 +9,7 @@ require (
 	github.com/arduino/arduino-cli v0.0.0-20210422154105-5aa424818026
 	github.com/arduino/go-paths-helper v1.4.0
 	github.com/pkg/errors v0.9.1
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.6.1
 	go.bug.st/serial v1.1.2

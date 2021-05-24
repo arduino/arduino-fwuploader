@@ -33,21 +33,28 @@ import (
 	"github.com/arduino/FirmwareUploader/modules/winc"
 	"github.com/arduino/FirmwareUploader/utils"
 	"github.com/arduino/FirmwareUploader/utils/context"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var ctx = &context.Context{}
+var (
+	ctx          = &context.Context{}
+	outputFormat string
+)
 
 func NewCommand() *cobra.Command {
 	// FirmwareUploader is the root command
 	firmwareUploaderCli := &cobra.Command{
-		Use:     "FirmwareUploader",
-		Short:   "FirmwareUploader.",
-		Long:    "FirmwareUploader (FirmwareUploader).",
-		Example: "  " + os.Args[0] + " <command> [flags...]",
-		Args:    cobra.NoArgs,
-		Run:     run,
+		Use:              "FirmwareUploader",
+		Short:            "FirmwareUploader.",
+		Long:             "FirmwareUploader (FirmwareUploader).",
+		Example:          "  " + os.Args[0] + " <command> [flags...]",
+		Args:             cobra.NoArgs,
+		Run:              run,
+		PersistentPreRun: preRun, //TODO check if required
 	}
 
 	firmwareUploaderCli.AddCommand(version.NewCommand())
@@ -63,6 +70,7 @@ func NewCommand() *cobra.Command {
 	firmwareUploaderCli.Flags().StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
 	firmwareUploaderCli.Flags().StringVar(&ctx.BoardName, "get_available_for", "", "Ask for available firmwares matching a given board")
 	firmwareUploaderCli.Flags().IntVar(&ctx.Retries, "retries", 9, "Number of retries in case of upload failure")
+	firmwareUploaderCli.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
 
 	return firmwareUploaderCli
 }
@@ -118,5 +126,40 @@ func run(cmd *cobra.Command, args []string) {
 		log.Println("Waiting 1 second before retrying...")
 		time.Sleep(time.Second)
 		log.Printf("Retrying upload (%d of %d)", retry, ctx.Retries)
+	}
+}
+
+func parseFormatString(arg string) (feedback.OutputFormat, bool) {
+	f, found := map[string]feedback.OutputFormat{
+		"json": feedback.JSON,
+		"text": feedback.Text,
+	}[arg]
+
+	return f, found
+}
+
+func preRun(cmd *cobra.Command, args []string) {
+	//
+	// Prepare the Feedback system
+	//
+
+	// normalize the format strings
+	outputFormat = strings.ToLower(outputFormat)
+	// check the right output format was passed
+	format, found := parseFormatString(outputFormat)
+	if !found {
+		feedback.Error("Invalid output format: " + outputFormat)
+		os.Exit(errorcodes.ErrBadCall)
+	}
+
+	// use the output format to configure the Feedback
+	feedback.SetFormat(format)
+
+	if outputFormat != "text" {
+		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+			logrus.Warn("Calling help on JSON format")
+			feedback.Error("Invalid Call : should show Help, but it is available only in TEXT mode.")
+			os.Exit(errorcodes.ErrBadCall)
+		})
 	}
 }
