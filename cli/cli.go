@@ -46,6 +46,7 @@ func NewCommand() *cobra.Command {
 		Short:   "FirmwareUploader.",
 		Long:    "FirmwareUploader (FirmwareUploader).",
 		Example: "  " + os.Args[0] + " <command> [flags...]",
+		Args:    cobra.NoArgs,
 		Run:     run,
 	}
 
