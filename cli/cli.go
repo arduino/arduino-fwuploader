@@ -54,7 +54,7 @@ func NewCommand() *cobra.Command {
 		Example:          "  " + os.Args[0] + " <command> [flags...]",
 		Args:             cobra.NoArgs,
 		Run:              run,
-		PersistentPreRun: preRun, //TODO check if required
+		PersistentPreRun: preRun,
 	}
 
 	firmwareUploaderCli.AddCommand(version.NewCommand())
