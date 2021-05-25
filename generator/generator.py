@@ -1,3 +1,6 @@
+import argparse
+import subprocess
+import sys
 import json
 import hashlib
 import shutil
@@ -13,6 +16,12 @@ FQBNS = {
     "mkrnb1500": "arduino:samd:mkrnb1500",
     "nanorp2040connect": "arduino:mbed_nano:nanorp2040connect",
 }
+
+
+# Runs arduino-cli, doesn't handle errors at all because am lazy
+def arduino_cli(cli_path, args=[]):
+    res = subprocess.run([cli_path, *args], capture_output=True, text=True)
+    return res.stdout
 
 
 # Generates file SHA256
@@ -55,7 +64,92 @@ def create_firmware_data(simple_fqbn, binary, module, version):
     }
 
 
-def generate_boards_json(input_data):
+def create_upload_data(fqbn, installed_cores):
+    upload_data = {}
+    # Assume we're on Linux
+    arduino15 = Path.home() / ".arduino15"
+
+    core_id = ":".join(fqbn.split(":")[:2])
+
+    # Get the core install dir
+    core = installed_cores[core_id]
+    (maintainer, arch) = core_id.split(":")
+    core_install_dir = (
+        arduino15 / "packages" / maintainer / "hardware" / arch / core["installed"]
+    )
+
+    with open(core_install_dir / "boards.txt") as f:
+        boards_txt = f.readlines()
+
+    board_upload_data = {}
+    for l in boards_txt:
+        board_id = fqbn.split(":")[2]
+        if l.startswith(f"{board_id}.upload"):
+            (k, v) = l.strip().split("=", maxsplit=1)
+            k = ".".join(k.split(".", maxsplit=1)[1:])
+            board_upload_data[k] = v
+
+    tool = board_upload_data["upload.tool"]
+
+    with open(core_install_dir / "platform.txt") as f:
+        platform_txt = f.readlines()
+
+    platform_upload_data = {}
+    for l in platform_txt:
+        if l.startswith(f"tools.{tool}"):
+            (k, v) = l.strip().split("=", maxsplit=1)
+            k = ".".join(k.split(".", maxsplit=1)[1:])
+            platform_upload_data[k] = v
+
+    # We assume the installed.json exist
+    with open(core_install_dir / "installed.json") as f:
+        installed_json_data = json.load(f)
+
+    if f"{tool}.cmd" in platform_upload_data:
+        tool_executable = platform_upload_data[f"{tool}.cmd"]
+    elif f"{tool}.cmd.path" in platform_upload_data:
+        tool_executable = platform_upload_data[f"{tool}.cmd.path"].split("/")[-1]
+
+    tools = installed_json_data["packages"][0]["platforms"][0]["toolsDependencies"]
+    for t in tools:
+        if tool_executable == "rp2040load":
+            # rp2040tools includes the rp2040load tool
+            if t["name"] == "rp2040tools":
+                packager = t["packager"]
+                name = t["name"]
+                version = t["version"]
+                upload_data["uploader"] = f"{packager}:{name}@{version}"
+            continue
+
+        if t["name"] == tool_executable:
+            packager = t["packager"]
+            name = t["name"]
+            version = t["version"]
+            upload_data["uploader"] = f"{packager}:{name}@{version}"
+            break
+
+    # We already store the tool name in a different manner
+    del board_upload_data["upload.tool"]
+    # Save also all the upload properties
+    for k, v in board_upload_data.items():
+        if v:
+            upload_data[k] = v
+
+    # Get the command used to upload and modifies it a bit
+    command = (
+        platform_upload_data[f"{tool}.upload.pattern"]
+        .replace("{path}/{cmd}", "{uploader}")
+        .replace("{cmd.path}", "{uploader}")
+        .replace("{build.path}/{build.project_name}", "{loader.sketch}")
+        .replace('\\"', "")
+    )
+
+    upload_data["uploader.command"] = command
+
+    return upload_data
+
+
+def generate_boards_json(input_data, arduino_cli_path):
     boards = {
         "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
         "arduino:samd:mkrwifi1010": {
@@ -78,6 +172,20 @@ def generate_boards_json(input_data):
         },
     }
 
+    # Gets the installed cores
+    res = arduino_cli(
+        cli_path=arduino_cli_path, args=["core", "list", "--format", "json"]
+    )
+    installed_cores = {c["id"]: c for c in json.loads(res)}
+
+    # Verify all necessary cores are installed
+    # TODO: Should we check that the latest version is installed too?
+    for fqbn in boards.keys():
+        core_id = ":".join(fqbn.split(":")[:2])
+        if core_id not in installed_cores:
+            print(f"Board {fqbn} is not installed, install its core {core_id}")
+            sys.exit(1)
+
     for pseudo_fqbn, data in input_data.items():
         fqbn = FQBNS[pseudo_fqbn]
         simple_fqbn = fqbn.replace(":", ".")
@@ -93,21 +201,44 @@ def generate_boards_json(input_data):
                 boards[fqbn]["firmware"].append(
                     create_firmware_data(simple_fqbn, binary, module, version)
                 )
+                boards[fqbn]["module"] = module
 
-    # TODO: Run arduino-cli to get board names and other things?
+        res = arduino_cli(
+            cli_path=arduino_cli_path,
+            args=["board", "search", fqbn, "--format", "json"],
+        )
+        # Gets the board name
+        for board in json.loads(res):
+            if board["fqbn"] == fqbn:
+                boards[fqbn]["name"] = board["name"]
+                break
+
+        boards[fqbn].update(create_upload_data(fqbn, installed_cores))
 
     boards_json = []
     for _, b in boards.items():
         boards_json.append(b)
 
+    return boards_json
+
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog="generator.py")
+    parser.add_argument(
+        "-a",
+        "--arduino-cli",
+        default="arduino-cli",
+        help="Path to arduino-cli executable",
+        required=True,
+    )
+    args = parser.parse_args(sys.argv[1:])
+
     # raw_boards.json has been generated using --get_available_for FirmwareUploader flag.
     # It has been edited a bit to better handle parsing.
     with open("raw_boards.json", "r") as f:
         raw_boards = json.load(f)
 
-    boards_json = generate_boards_json(raw_boards)
+    boards_json = generate_boards_json(raw_boards, args.arduino_cli)
 
     with open("boards.json", "w") as f:
         json.dump(boards_json, f, indent=2)
