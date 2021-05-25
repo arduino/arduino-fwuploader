@@ -6,7 +6,7 @@ import hashlib
 import shutil
 from pathlib import Path
 
-DOWNLOAD_URL = "https://downloads.arduino.cc"
+DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 FQBNS = {
     "mkr1000": "arduino:samd:mkr1000",
     "mkrwifi1010": "arduino:samd:mkrwifi1010",
@@ -240,10 +240,12 @@ if __name__ == "__main__":
 
     boards_json = generate_boards_json(raw_boards, args.arduino_cli)
 
-    with open("boards.json", "w") as f:
+    Path("boards").mkdir()
+
+    with open("boards/board_index.json", "w") as f:
         json.dump(boards_json, f, indent=2)
 
-# boards.json must be formatted like so:
+# board_index.json must be formatted like so:
 #
 # {
 #     "name": "MKR 1000",
