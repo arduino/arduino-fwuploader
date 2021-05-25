@@ -34,7 +34,20 @@ tasks:
   test:
     desc: Run tests
     cmds:
+      - task: test-unit
+      - task: test-integration
+
+  test-unit:
+    desc: Run unit tests
+    cmds:
       - go test -short -race -run '.*' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt ./... {{.TEST_LDFLAGS}}
+
+  test-integration:
+    desc: Run integration tests
+    cmds:
+      - task: build
+      - poetry install --no-root
+      - poetry run pytest test
 
   check:
     desc: Check fmt and lint
@@ -44,6 +57,7 @@ tasks:
       - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} ./..."
       - task: docs:check
       - task: config:check
+      - task: python:check
 
   config:check:
     desc: Check linting of configuration and supporting files
@@ -54,6 +68,22 @@ tasks:
     desc: Automatically formats configuration and supporting files
     cmds:
       - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
+
+  python:check:
+    cmds:
+      - task: python:lint
+
+  python:lint:
+    desc: Lint Python code
+    cmds:
+      - poetry install --no-root
+      - poetry run flake8
+
+  python:format:
+    desc: Automatically formats Python files
+    cmds:
+      - poetry install --no-root
+      - poetry run black .
 
 vars:
   PROJECT_NAME: "FirmwareUploader"

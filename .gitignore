@@ -4,6 +4,7 @@
 .idea
 coverage_*.txt
 /dist
+__pycache__/
 
 # Misc.
 .DS_Store
