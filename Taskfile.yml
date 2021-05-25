@@ -34,7 +34,19 @@ tasks:
   test:
     desc: Run tests
     cmds:
+      - task: test-unit
+      - task: test-integration
+
+  test-unit:
+    desc: Run unit tests
+    cmds:
       - go test -short -race -run '.*' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt ./... {{.TEST_LDFLAGS}}
+
+  test-integration:
+    desc: Run integration tests
+    cmds:
+      - poetry install --no-root
+      - poetry run pytest test
 
   check:
     desc: Check fmt and lint
