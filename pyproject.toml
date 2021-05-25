@@ -9,6 +9,7 @@ python = "^3.8"
 pytest = "6.1.2"
 invoke = "^1.5.0"
 semver = "^2.13.0"
+python-dateutil = "^2.8.1"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.9.2"

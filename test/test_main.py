@@ -17,28 +17,30 @@
 
 import json
 import semver
-
-
-def test_help(run_command):
-    result = run_command("help")
-    assert result.ok
-    assert result.stderr == ""
-    assert "Usage" in result.stdout
+import dateutil.parser
 
 
 def test_version(run_command):
-    result = run_command("version")
+    result = run_command(cmd=["version"])
     assert result.ok
-    assert "Version:" in result.stdout
-    assert "Commit:" in result.stdout
-    assert "Date:" in result.stdout
+    output_list = result.stdout.strip().split(sep=" ")
+    assert output_list[0] == "FirmwareUploader"
+    assert output_list[1] == "Version:"
+    version = output_list[2]
+    assert semver.VersionInfo.isvalid(version=version) or version == "git-snapshot" or "nightly" in version
+    assert output_list[3] == "Commit:"
+    assert isinstance(output_list[4], str)
+    assert output_list[5] == "Date:"
+    assert dateutil.parser.isoparse(output_list[6])
     assert "" == result.stderr
 
-    result = run_command("version --format json")
+    result = run_command(cmd=["version", "--format", "json"])
     assert result.ok
     parsed_out = json.loads(result.stdout)
     assert parsed_out.get("Application", False) == "FirmwareUploader"
     version = parsed_out.get("VersionString", False)
     assert semver.VersionInfo.isvalid(version=version) or "git-snapshot" in version or "nightly" in version
+    assert parsed_out.get("Commit", False) != ""
     assert isinstance(parsed_out.get("Commit", False), str)
+    assert parsed_out.get("Date") != ""
     assert isinstance(parsed_out.get("Date", False), str)

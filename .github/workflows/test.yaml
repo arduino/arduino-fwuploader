@@ -32,6 +32,10 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
+      - name: Build native
+        shell: bash
+        run: task build
+
       - name: Cross-build for 386
         if: matrix.os != 'macos-latest'
         env:
@@ -42,10 +46,6 @@ jobs:
         if: matrix.os != 'macos-latest'
         env:
           GOARCH: "arm"
-        run: task build
-
-      - name: Build native
-        shell: bash
         run: task build
 
       - name: Install Python

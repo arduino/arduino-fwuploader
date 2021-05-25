@@ -17,23 +17,32 @@
 
 import pathlib
 import platform
+import typing
 import invoke.context
 import pytest
 
 
 @pytest.fixture(scope="function")
-def run_command(pytestconfig, working_dir):
+def run_command(pytestconfig, working_dir) -> typing.Callable[..., invoke.runners.Result]:
     """Provide a wrapper around invoke's `run` API so that every test will work in the same temporary folder.
+
     Useful reference:
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Result
     """
 
     fwuploader_path = pathlib.Path(pytestconfig.rootdir).parent / "FirmwareUploader"
 
-    def _run(cmd_string, custom_working_dir=None, custom_env=None):
+    def _run(
+        cmd: list, custom_working_dir: typing.Optional[str] = None, custom_env: typing.Optional[dict] = None
+    ) -> invoke.runners.Result:
+        if cmd is None:
+            cmd = []
         if not custom_working_dir:
             custom_working_dir = working_dir
-        cli_full_line = '"{}" {}'.format(fwuploader_path, cmd_string)
+        quoted_cmd = []
+        for token in cmd:
+            quoted_cmd.append(f'"{token}"')
+        cli_full_line = '"{}" {}'.format(fwuploader_path, " ".join(quoted_cmd))
         run_context = invoke.context.Context()
         # It might happen that we need to change directories between drives on Windows,
         # in that case the "/d" flag must be used otherwise directory wouldn't change
