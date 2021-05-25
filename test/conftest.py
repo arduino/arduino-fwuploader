@@ -17,8 +17,9 @@
 
 import pathlib
 import platform
-import invoke.context 
+import invoke.context
 import pytest
+
 
 @pytest.fixture(scope="function")
 def run_command(pytestconfig, working_dir):

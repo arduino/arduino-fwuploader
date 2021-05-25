@@ -18,6 +18,7 @@
 import json
 import semver
 
+
 def test_help(run_command):
     result = run_command("help")
     assert result.ok
