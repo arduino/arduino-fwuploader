@@ -31,7 +31,7 @@ To update a MKRNB1500:
 To update a Nano RP2040 Connect:
 
 ```
-./FirmwareUploader --flasher firmwares/NINA/FirmwareUpdater.nanorp2040connect.ino.elf --firmware firmwares/NINA/1.4.5/NINA_W102-Nano_RP2040_Connect.bin --port /dev/ttyACM0 --address arduino.cc:443 --programmer --programmer {runtime.tools.rp2040tools}/rp2040load
+./FirmwareUploader --flasher firmwares/NINA/FirmwareUpdater.nanorp2040connect.ino.elf --firmware firmwares/NINA/1.4.5/NINA_W102-Nano_RP2040_Connect.bin --port /dev/ttyACM0 --address arduino.cc:443 --programmer {runtime.tools.rp2040tools}/rp2040load
 ```
 
 ### Command line options
