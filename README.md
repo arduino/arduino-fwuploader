@@ -28,6 +28,12 @@ To update a MKRNB1500:
 ./FirmwareUploader --flasher firmwares/SARA/SerialSARAPassthrough.ino.bin --firmware firmwares/SARA/5.6A2.00-to-5.6A2.01.pkg --port /dev/ttyACM0 --restore_binary firmwares/SARA/SerialSARAPassthrough.ino.bin --programmer {runtime.tools.bossac}/bossac
 ```
 
+To update a Nano RP2040 Connect:
+
+```
+./FirmwareUploader --flasher firmwares/NINA/FirmwareUpdater.nanorp2040connect.ino.elf --firmware firmwares/NINA/1.4.5/NINA_W102-Nano_RP2040_Connect.bin --port /dev/ttyACM0 --address arduino.cc:443 --programmer {runtime.tools.rp2040tools}/rp2040load
+```
+
 ### Command line options
 
 The full list of command line options can be obtained with the `-h` option: `./FirmwareUploader -h`
