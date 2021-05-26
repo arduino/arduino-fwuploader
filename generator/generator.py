@@ -70,11 +70,21 @@ def create_firmware_data(binary, module, version):
     }
 
 
+def get_uploader_id(tools, tool_executable):
+    for t in tools:
+        if t["name"] == tool_executable:
+            packager = t["packager"]
+            name = t["name"]
+            version = t["version"]
+            return f"{packager}:{name}@{version}"
+
+
 def create_upload_data(fqbn, installed_cores):
     upload_data = {}
     # Assume we're on Linux
     arduino15 = Path.home() / ".arduino15"
 
+    board_id = fqbn.split(":")[2]
     core_id = ":".join(fqbn.split(":")[:2])
 
     # Get the core install dir
@@ -88,10 +98,9 @@ def create_upload_data(fqbn, installed_cores):
         boards_txt = f.readlines()
 
     board_upload_data = {}
-    for l in boards_txt:
-        board_id = fqbn.split(":")[2]
-        if l.startswith(f"{board_id}.upload"):
-            (k, v) = split_property_and_drop_first_level(l)
+    for line in boards_txt:
+        if line.startswith(f"{board_id}.upload"):
+            (k, v) = split_property_and_drop_first_level(line)
             board_upload_data[k] = v
 
     tool = board_upload_data["upload.tool"]
@@ -100,9 +109,9 @@ def create_upload_data(fqbn, installed_cores):
         platform_txt = f.readlines()
 
     platform_upload_data = {}
-    for l in platform_txt:
-        if l.startswith(f"tools.{tool}"):
-            (k, v) = split_property_and_drop_first_level(l)
+    for line in platform_txt:
+        if line.startswith(f"tools.{tool}"):
+            (k, v) = split_property_and_drop_first_level(line)
             platform_upload_data[k] = v
 
     # We assume the installed.json exist
@@ -114,23 +123,11 @@ def create_upload_data(fqbn, installed_cores):
     elif f"{tool}.cmd.path" in platform_upload_data:
         tool_executable = platform_upload_data[f"{tool}.cmd.path"].split("/")[-1]
 
-    tools = installed_json_data["packages"][0]["platforms"][0]["toolsDependencies"]
-    for t in tools:
-        if tool_executable == "rp2040load":
-            # rp2040tools includes the rp2040load tool
-            if t["name"] == "rp2040tools":
-                packager = t["packager"]
-                name = t["name"]
-                version = t["version"]
-                upload_data["uploader"] = f"{packager}:{name}@{version}"
-            continue
+    if tool_executable == "rp2040load":
+        tool_executable = "rp2040tools"
 
-        if t["name"] == tool_executable:
-            packager = t["packager"]
-            name = t["name"]
-            version = t["version"]
-            upload_data["uploader"] = f"{packager}:{name}@{version}"
-            break
+    tools = installed_json_data["packages"][0]["platforms"][0]["toolsDependencies"]
+    upload_data["uploader"] = get_uploader_id(tools, tool_executable)
 
     # We already store the tool name in a different manner
     del board_upload_data["upload.tool"]
