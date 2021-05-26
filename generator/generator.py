@@ -30,6 +30,12 @@ def sha2(file_path):
         return hashlib.sha256(f.read()).hexdigest()
 
 
+def split_property_and_drop_first_level(s):
+    (k, v) = s.strip().split("=", maxsplit=1)
+    k = ".".join(k.split(".", maxsplit=1)[1:])
+    return (k, v)
+
+
 # Generate and copy loader Sketch binary data for specified board
 def create_loader_data(simple_fqbn, binary):
     loader_path = f"firmwares/loader/{simple_fqbn}/loader.bin"
@@ -47,7 +53,7 @@ def create_loader_data(simple_fqbn, binary):
 
 
 # Generate and copy all firmware binary data for specified board
-def create_firmware_data(simple_fqbn, binary, module, version):
+def create_firmware_data(binary, module, version):
     binary_name = binary.name
     firmware_path = f"firmwares/{module}/{version}/{binary_name}"
     firmware = Path(__file__).parent / firmware_path
@@ -85,8 +91,7 @@ def create_upload_data(fqbn, installed_cores):
     for l in boards_txt:
         board_id = fqbn.split(":")[2]
         if l.startswith(f"{board_id}.upload"):
-            (k, v) = l.strip().split("=", maxsplit=1)
-            k = ".".join(k.split(".", maxsplit=1)[1:])
+            (k, v) = split_property_and_drop_first_level(l)
             board_upload_data[k] = v
 
     tool = board_upload_data["upload.tool"]
@@ -97,8 +102,7 @@ def create_upload_data(fqbn, installed_cores):
     platform_upload_data = {}
     for l in platform_txt:
         if l.startswith(f"tools.{tool}"):
-            (k, v) = l.strip().split("=", maxsplit=1)
-            k = ".".join(k.split(".", maxsplit=1)[1:])
+            (k, v) = split_property_and_drop_first_level(l)
             platform_upload_data[k] = v
 
     # We assume the installed.json exist
@@ -199,7 +203,7 @@ def generate_boards_json(input_data, arduino_cli_path):
             else:
                 module, version = item["version"].split("/")
                 boards[fqbn]["firmware"].append(
-                    create_firmware_data(simple_fqbn, binary, module, version)
+                    create_firmware_data(binary, module, version)
                 )
                 boards[fqbn]["module"] = module
 
