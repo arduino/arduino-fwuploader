@@ -28,6 +28,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/FirmwareUploader/cli/version"
 	"github.com/arduino/FirmwareUploader/indexes"
 	"github.com/arduino/FirmwareUploader/modules/nina"
@@ -211,7 +212,9 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetLevel(lvl)
 	}
 
-	indexes.DownloadIndex()
+	for _, u := range globals.DefaultIndexURL {
+		indexes.DownloadIndex(u)
+	}
 
 	//
 	// Prepare the Feedback system

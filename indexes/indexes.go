@@ -26,7 +26,6 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -34,91 +33,89 @@ import (
 	"go.bug.st/downloader/v2"
 )
 
-func DownloadIndex() error {
-	indexpath := paths.New("/tmp/fwuploader") // TODO: place to download the indexes
+// DownloadIndex will download the index in the os temp directory
+func DownloadIndex(indexURL string) error {
+	// TODO: handle if path is already present
+	indexpath := paths.New(paths.TempDir().String(), "fwuploader")
 
-	urls := globals.DefaultIndexURL
-	for _, u := range urls {
+	URL, err := utils.URLParse(indexURL)
+	if err != nil {
+		return fmt.Errorf("unable to parse URL %s: %s", indexURL, err)
+	}
 
-		URL, err := utils.URLParse(u)
-		if err != nil {
-			return fmt.Errorf("unable to parse URL %s: %s", u, err)
-		}
+	// Download index
+	var tmp *paths.Path // TODO rename tmp to something meaningful
+	if tmpFile, err := ioutil.TempFile("", ""); err != nil {
+		return fmt.Errorf("creating temp file for index download: %s", err)
+	} else if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("creating temp file for index download: %s", err)
+	} else {
+		tmp = paths.New(tmpFile.Name())
+	}
+	defer tmp.Remove()
+	d, err := downloader.Download(tmp.String(), URL.String())
+	if err != nil {
+		return fmt.Errorf("downloading index %s: %s", indexURL, err)
+	}
+	indexPath := indexpath.Join(path.Base(URL.Path))
+	Download(d)
+	if d.Error() != nil {
+		return fmt.Errorf("downloading index %s: %s", URL, d.Error())
+	}
 
-		// Download index
-		var tmp *paths.Path // TODO rename tmp to something meaningful
-		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
-			return fmt.Errorf("creating temp file for index download: %s", err)
-		} else if err := tmpFile.Close(); err != nil {
-			return fmt.Errorf("creating temp file for index download: %s", err)
-		} else {
-			tmp = paths.New(tmpFile.Name())
-		}
-		defer tmp.Remove() // not needed ?
-		d, err := downloader.Download(tmp.String(), URL.String())
-		if err != nil {
-			return fmt.Errorf("downloading index %s: %s", u, err)
-		}
-		indexPath := indexpath.Join(path.Base(URL.Path))
-		Download(d)
-		if d.Error() != nil {
-			return fmt.Errorf("downloading index %s: %s", URL, d.Error())
-		}
+	// Check for signature
+	var tmpSig *paths.Path
+	var indexSigPath *paths.Path
 
-		// Check for signature
-		var tmpSig *paths.Path
-		var indexSigPath *paths.Path
+	URLSig, err := url.Parse(URL.String())
+	if err != nil {
+		return fmt.Errorf("parsing url for index signature check: %s", err)
+	}
+	URLSig.Path += ".sig"
 
-		URLSig, err := url.Parse(URL.String())
-		if err != nil {
-			return fmt.Errorf("parsing url for index signature check: %s", err)
-		}
-		URLSig.Path += ".sig"
+	if t, err := ioutil.TempFile("", ""); err != nil {
+		return fmt.Errorf("creating temp file for index signature download: %s", err)
+	} else if err := t.Close(); err != nil {
+		return fmt.Errorf("creating temp file for index signature download: %s", err)
+	} else {
+		tmpSig = paths.New(t.Name())
+	}
+	defer tmpSig.Remove()
+	d, err = downloader.Download(tmpSig.String(), URLSig.String())
+	if err != nil {
+		return fmt.Errorf("downloading index signature %s: %s", URLSig, err)
+	}
 
-		if t, err := ioutil.TempFile("", ""); err != nil {
-			return fmt.Errorf("creating temp file for index signature download: %s", err)
-		} else if err := t.Close(); err != nil {
-			return fmt.Errorf("creating temp file for index signature download: %s", err)
-		} else {
-			tmpSig = paths.New(t.Name())
-		}
-		// defer tmpSig.Remove() // not needed ?
+	indexSigPath = indexpath.Join(path.Base(URLSig.Path))
+	Download(d)
+	if d.Error() != nil {
+		return fmt.Errorf("downloading index signature %s: %s", URL, d.Error())
+	}
 
-		d, err = downloader.Download(tmpSig.String(), URLSig.String())
-		if err != nil {
-			return fmt.Errorf("downloading index signature %s: %s", URLSig, err)
-		}
+	valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig)
+	if err != nil {
+		return fmt.Errorf("signature verification error: %s", err)
+	}
+	if !valid {
+		return fmt.Errorf("index has an invalid signature")
+	}
+	// TODO: required??
+	if _, err := packageindex.LoadIndex(tmp); err != nil {
+		return fmt.Errorf("invalid package index in %s: %s", URL, err)
+	}
 
-		indexSigPath = indexpath.Join(path.Base(URLSig.Path))
-		Download(d)
-		if d.Error() != nil {
-			return fmt.Errorf("downloading index signature %s: %s", URL, d.Error())
-		}
+	if err := indexpath.MkdirAll(); err != nil { //does not overwrite
+		return fmt.Errorf("can't create data directory %s: %s", indexpath, err)
+	}
 
-		valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig)
-		if err != nil {
-			return fmt.Errorf("signature verification error: %s", err)
+	if err := tmp.CopyTo(indexPath); err != nil { //does overwrite if already present
+		return fmt.Errorf("saving downloaded index %s: %s", URL, err)
+	}
+	if tmpSig != nil {
+		if err := tmpSig.CopyTo(indexSigPath); err != nil { //does overwrite if already present
+			return fmt.Errorf("saving downloaded index signature: %s", err)
 		}
-		if !valid {
-			return fmt.Errorf("index has an invalid signature")
-		}
-		// TODO: required??
-		if _, err := packageindex.LoadIndex(tmp); err != nil {
-			return fmt.Errorf("invalid package index in %s: %s", URL, err)
-		}
-
-		if err := indexpath.MkdirAll(); err != nil {
-			return fmt.Errorf("can't create data directory %s: %s", indexpath, err)
-		}
-
-		if err := tmp.CopyTo(indexPath); err != nil {
-			return fmt.Errorf("saving downloaded index %s: %s", URL, err)
-		}
-		if tmpSig != nil {
-			if err := tmpSig.CopyTo(indexSigPath); err != nil {
-				return fmt.Errorf("saving downloaded index signature: %s", err)
-			}
-		}
+		// }
 	}
 	return nil
 }
