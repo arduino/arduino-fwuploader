@@ -379,7 +379,7 @@
     "/home/alien/workspace/FirmwareUploader/firmwares/NINA": [
       {
         "version": "NINA",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/FirmwareUpdater.unowifirev2.without_bl.ino.hex",
+        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/FirmwareUpdater.unowifirev2.with_bootloader.ino.hex",
         "Name": "firmwares NINA",
         "IsLoader": true
       }

@@ -38,7 +38,7 @@ def split_property_and_drop_first_level(s):
 
 # Generate and copy loader Sketch binary data for specified board
 def create_loader_data(simple_fqbn, binary):
-    loader_path = f"firmwares/loader/{simple_fqbn}/loader.bin"
+    loader_path = f"firmwares/loader/{simple_fqbn}/loader{binary.suffix}"
     loader = Path(__file__).parent / loader_path
     loader.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(binary, loader)
@@ -79,7 +79,7 @@ def get_uploader_id(tools, tool_executable):
             return f"{packager}:{name}@{version}"
 
 
-def create_upload_data(fqbn, installed_cores):
+def create_upload_data(fqbn, installed_cores):  # noqa: C901
     upload_data = {}
     # Assume we're on Linux
     arduino15 = Path.home() / ".arduino15"
@@ -90,16 +90,14 @@ def create_upload_data(fqbn, installed_cores):
     # Get the core install dir
     core = installed_cores[core_id]
     (maintainer, arch) = core_id.split(":")
-    core_install_dir = (
-        arduino15 / "packages" / maintainer / "hardware" / arch / core["installed"]
-    )
+    core_install_dir = arduino15 / "packages" / maintainer / "hardware" / arch / core["installed"]
 
     with open(core_install_dir / "boards.txt") as f:
         boards_txt = f.readlines()
 
     board_upload_data = {}
     for line in boards_txt:
-        if line.startswith(f"{board_id}.upload"):
+        if line.startswith(f"{board_id}."):
             (k, v) = split_property_and_drop_first_level(line)
             board_upload_data[k] = v
 
@@ -110,7 +108,7 @@ def create_upload_data(fqbn, installed_cores):
 
     platform_upload_data = {}
     for line in platform_txt:
-        if line.startswith(f"tools.{tool}"):
+        if line.startswith(f"tools.{tool}."):
             (k, v) = split_property_and_drop_first_level(line)
             platform_upload_data[k] = v
 
@@ -129,12 +127,11 @@ def create_upload_data(fqbn, installed_cores):
     tools = installed_json_data["packages"][0]["platforms"][0]["toolsDependencies"]
     upload_data["uploader"] = get_uploader_id(tools, tool_executable)
 
-    # We already store the tool name in a different manner
-    del board_upload_data["upload.tool"]
-    # Save also all the upload properties
-    for k, v in board_upload_data.items():
-        if v:
-            upload_data[k] = v
+    if "upload.use_1200bps_touch" in board_upload_data:
+        upload_data["upload.use_1200bps_touch"] = board_upload_data["upload.use_1200bps_touch"]
+
+    if "upload.wait_for_upload_port" in board_upload_data:
+        upload_data["upload.wait_for_upload_port"] = board_upload_data["upload.wait_for_upload_port"]
 
     # Get the command used to upload and modifies it a bit
     command = (
@@ -144,6 +141,26 @@ def create_upload_data(fqbn, installed_cores):
         .replace("{build.path}/{build.project_name}", "{loader.sketch}")
         .replace('\\"', "")
     )
+
+    if fqbn == "arduino:megaavr:uno2018":
+        # Long story short if we don't do this we'd have to host also the bootloader
+        # for the Uno WiFi rev2 and we don't want to, so we just remove this field
+        # and use a precompiled Loader Sketh binary that includes the bootloader.
+        command = command.replace("{upload.extra_files}", "")
+
+    # Get the rest of the params
+    params = {}
+    for k, v in platform_upload_data.items():
+        if f"{tool}.upload.params." in k:
+            param = k.split(".")[-1]
+            params[f"upload.{param}"] = v
+        elif f"{tool}.upload." in k:
+            k = ".".join(k.split(".")[1:])
+            params[k] = v
+
+    # Prepare the command
+    for k, v in {**board_upload_data, **params}.items():
+        command = command.replace(f"{{{k}}}", v)
 
     upload_data["uploader.command"] = command
 
@@ -174,9 +191,7 @@ def generate_boards_json(input_data, arduino_cli_path):
     }
 
     # Gets the installed cores
-    res = arduino_cli(
-        cli_path=arduino_cli_path, args=["core", "list", "--format", "json"]
-    )
+    res = arduino_cli(cli_path=arduino_cli_path, args=["core", "list", "--format", "json"])
     installed_cores = {c["id"]: c for c in json.loads(res)}
 
     # Verify all necessary cores are installed
@@ -199,9 +214,7 @@ def generate_boards_json(input_data, arduino_cli_path):
                 boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)
             else:
                 module, version = item["version"].split("/")
-                boards[fqbn]["firmware"].append(
-                    create_firmware_data(binary, module, version)
-                )
+                boards[fqbn]["firmware"].append(create_firmware_data(binary, module, version))
                 boards[fqbn]["module"] = module
 
         res = arduino_cli(
