@@ -35,7 +35,6 @@ import (
 
 // DownloadIndex will download the index in the os temp directory
 func DownloadIndex(indexURL string) error {
-	// TODO: handle if path is already present
 	indexpath := paths.New(paths.TempDir().String(), "fwuploader")
 
 	URL, err := utils.URLParse(indexURL)
@@ -44,16 +43,16 @@ func DownloadIndex(indexURL string) error {
 	}
 
 	// Download index
-	var tmp *paths.Path // TODO rename tmp to something meaningful
+	var tmpIndex *paths.Path
 	if tmpFile, err := ioutil.TempFile("", ""); err != nil {
 		return fmt.Errorf("creating temp file for index download: %s", err)
 	} else if err := tmpFile.Close(); err != nil {
 		return fmt.Errorf("creating temp file for index download: %s", err)
 	} else {
-		tmp = paths.New(tmpFile.Name())
+		tmpIndex = paths.New(tmpFile.Name())
 	}
-	defer tmp.Remove()
-	d, err := downloader.Download(tmp.String(), URL.String())
+	defer tmpIndex.Remove()
+	d, err := downloader.Download(tmpIndex.String(), URL.String())
 	if err != nil {
 		return fmt.Errorf("downloading index %s: %s", indexURL, err)
 	}
@@ -92,15 +91,14 @@ func DownloadIndex(indexURL string) error {
 		return fmt.Errorf("downloading index signature %s: %s", URL, d.Error())
 	}
 
-	valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig)
+	valid, _, err := security.VerifyArduinoDetachedSignature(tmpIndex, tmpSig)
 	if err != nil {
 		return fmt.Errorf("signature verification error: %s", err)
 	}
 	if !valid {
 		return fmt.Errorf("index has an invalid signature")
 	}
-	// TODO: required??
-	if _, err := packageindex.LoadIndex(tmp); err != nil {
+	if _, err := packageindex.LoadIndex(tmpIndex); err != nil {
 		return fmt.Errorf("invalid package index in %s: %s", URL, err)
 	}
 
@@ -108,14 +106,13 @@ func DownloadIndex(indexURL string) error {
 		return fmt.Errorf("can't create data directory %s: %s", indexpath, err)
 	}
 
-	if err := tmp.CopyTo(indexPath); err != nil { //does overwrite if already present
+	if err := tmpIndex.CopyTo(indexPath); err != nil { //does overwrite if already present
 		return fmt.Errorf("saving downloaded index %s: %s", URL, err)
 	}
 	if tmpSig != nil {
 		if err := tmpSig.CopyTo(indexSigPath); err != nil { //does overwrite if already present
 			return fmt.Errorf("saving downloaded index signature: %s", err)
 		}
-		// }
 	}
 	return nil
 }
