@@ -49,7 +49,8 @@ func DownloadIndex(indexURL string) error {
 	} else if err := tmpFile.Close(); err != nil {
 		return fmt.Errorf("creating temp file for index download: %s", err)
 	} else {
-		tmpIndex = paths.New(tmpFile.Name())
+		tmpIndex = paths.New(tmpFile.Name() + ".json")
+		// TODO remove tmpFile
 	}
 	defer tmpIndex.Remove()
 	d, err := downloader.Download(tmpIndex.String(), URL.String())
@@ -77,7 +78,8 @@ func DownloadIndex(indexURL string) error {
 	} else if err := t.Close(); err != nil {
 		return fmt.Errorf("creating temp file for index signature download: %s", err)
 	} else {
-		tmpSig = paths.New(t.Name())
+		tmpSig = paths.New(t.Name() + ".sig")
+		// TODO remove tmpSig
 	}
 	defer tmpSig.Remove()
 	d, err = downloader.Download(tmpSig.String(), URLSig.String())
@@ -98,7 +100,8 @@ func DownloadIndex(indexURL string) error {
 	if !valid {
 		return fmt.Errorf("index has an invalid signature")
 	}
-	if _, err := packageindex.LoadIndex(tmpIndex); err != nil {
+	// the signature verification is already done above
+	if _, err := packageindex.LoadIndexNoSign(tmpIndex); err != nil {
 		return fmt.Errorf("invalid package index in %s: %s", URL, err)
 	}
 

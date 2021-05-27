@@ -21,8 +21,16 @@ package indexes
 
 import (
 	"testing"
+
+	"github.com/arduino/FirmwareUploader/cli/globals"
 )
 
 func TestDownloadIndex(t *testing.T) {
-
+	for _, u := range globals.DefaultIndexURL {
+		t.Logf("testing with index: %s", u)
+		err := DownloadIndex(u)
+		if err != nil {
+			t.Errorf("Downloading of %s index failed, encountered following error: %s", u, err)
+		}
+	}
 }
