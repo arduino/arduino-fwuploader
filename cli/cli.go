@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/arduino/FirmwareUploader/cli/version"
+	"github.com/arduino/FirmwareUploader/indexes"
 	"github.com/arduino/FirmwareUploader/modules/nina"
 	"github.com/arduino/FirmwareUploader/modules/sara"
 	"github.com/arduino/FirmwareUploader/modules/winc"
@@ -209,6 +210,8 @@ func preRun(cmd *cobra.Command, args []string) {
 	} else {
 		logrus.SetLevel(lvl)
 	}
+
+	indexes.DownloadIndex()
 
 	//
 	// Prepare the Feedback system
