@@ -208,7 +208,7 @@ def generate_boards_json(input_data, arduino_cli_path):
 
         for _, v in data.items():
             item = v[0]
-            binary = Path(item["Path"])
+            binary = Path(__file__).parent / ".." / item["Path"]
 
             if item["IsLoader"]:
                 boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)

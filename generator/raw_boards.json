@@ -1,525 +1,525 @@
 {
   "mkr1000": {
-    "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500": [
+    "firmwares/WINC1500": [
       {
         "version": "WINC1500",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/FirmwareUpdater.mkr1000.ino.bin",
+        "Path": "firmwares/WINC1500/FirmwareUpdater.mkr1000.ino.bin",
         "Name": "firmwares WINC1500",
         "IsLoader": true
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.4.4": [
+    "firmwares/WINC1500/19.4.4": [
       {
         "version": "WINC1500/19.4.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.4.4/m2m_aio_3a0.bin",
+        "Path": "firmwares/WINC1500/19.4.4/m2m_aio_3a0.bin",
         "Name": "WINC1500 19.4.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.5.2": [
+    "firmwares/WINC1500/19.5.2": [
       {
         "version": "WINC1500/19.5.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.5.2/m2m_aio_3a0.bin",
+        "Path": "firmwares/WINC1500/19.5.2/m2m_aio_3a0.bin",
         "Name": "WINC1500 19.5.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.5.4": [
+    "firmwares/WINC1500/19.5.4": [
       {
         "version": "WINC1500/19.5.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.5.4/m2m_aio_3a0.bin",
+        "Path": "firmwares/WINC1500/19.5.4/m2m_aio_3a0.bin",
         "Name": "WINC1500 19.5.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.6.1": [
+    "firmwares/WINC1500/19.6.1": [
       {
         "version": "WINC1500/19.6.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/WINC1500/19.6.1/m2m_aio_3a0.bin",
+        "Path": "firmwares/WINC1500/19.6.1/m2m_aio_3a0.bin",
         "Name": "WINC1500 19.6.1",
         "IsLoader": false
       }
     ]
   },
   "mkrwifi1010": {
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA": [
+    "firmwares/NINA": [
       {
         "version": "NINA",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/FirmwareUpdater.mkrwifi1010.ino.bin",
+        "Path": "firmwares/NINA/FirmwareUpdater.mkrwifi1010.ino.bin",
         "Name": "firmwares NINA",
         "IsLoader": true
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.0.0": [
+    "firmwares/NINA/1.0.0": [
       {
         "version": "NINA/1.0.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.0.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.0.0/NINA_W102.bin",
         "Name": "NINA 1.0.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.1.0": [
+    "firmwares/NINA/1.1.0": [
       {
         "version": "NINA/1.1.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.1.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.1.0/NINA_W102.bin",
         "Name": "NINA 1.1.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1": [
+    "firmwares/NINA/1.2.1": [
       {
         "version": "NINA/1.2.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.1/NINA_W102.bin",
         "Name": "NINA 1.2.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2": [
+    "firmwares/NINA/1.2.2": [
       {
         "version": "NINA/1.2.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.2/NINA_W102.bin",
         "Name": "NINA 1.2.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3": [
+    "firmwares/NINA/1.2.3": [
       {
         "version": "NINA/1.2.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.3/NINA_W102.bin",
         "Name": "NINA 1.2.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4": [
+    "firmwares/NINA/1.2.4": [
       {
         "version": "NINA/1.2.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.4/NINA_W102.bin",
         "Name": "NINA 1.2.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0": [
+    "firmwares/NINA/1.3.0": [
       {
         "version": "NINA/1.3.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.3.0/NINA_W102.bin",
         "Name": "NINA 1.3.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0": [
+    "firmwares/NINA/1.4.0": [
       {
         "version": "NINA/1.4.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.0/NINA_W102.bin",
         "Name": "NINA 1.4.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1": [
+    "firmwares/NINA/1.4.1": [
       {
         "version": "NINA/1.4.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.1/NINA_W102.bin",
         "Name": "NINA 1.4.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2": [
+    "firmwares/NINA/1.4.2": [
       {
         "version": "NINA/1.4.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.2/NINA_W102.bin",
         "Name": "NINA 1.4.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3": [
+    "firmwares/NINA/1.4.3": [
       {
         "version": "NINA/1.4.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.3/NINA_W102.bin",
         "Name": "NINA 1.4.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4": [
+    "firmwares/NINA/1.4.4": [
       {
         "version": "NINA/1.4.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.4/NINA_W102.bin",
         "Name": "NINA 1.4.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5": [
+    "firmwares/NINA/1.4.5": [
       {
         "version": "NINA/1.4.5",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.5/NINA_W102.bin",
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
     ]
   },
   "nano_33_iot": {
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA": [
+    "firmwares/NINA": [
       {
         "version": "NINA",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/FirmwareUpdater.nano_33_iot.ino.bin",
+        "Path": "firmwares/NINA/FirmwareUpdater.nano_33_iot.ino.bin",
         "Name": "firmwares NINA",
         "IsLoader": true
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.0.0": [
+    "firmwares/NINA/1.0.0": [
       {
         "version": "NINA/1.0.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.0.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.0.0/NINA_W102.bin",
         "Name": "NINA 1.0.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.1.0": [
+    "firmwares/NINA/1.1.0": [
       {
         "version": "NINA/1.1.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.1.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.1.0/NINA_W102.bin",
         "Name": "NINA 1.1.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1": [
+    "firmwares/NINA/1.2.1": [
       {
         "version": "NINA/1.2.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.1/NINA_W102.bin",
         "Name": "NINA 1.2.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2": [
+    "firmwares/NINA/1.2.2": [
       {
         "version": "NINA/1.2.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.2/NINA_W102.bin",
         "Name": "NINA 1.2.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3": [
+    "firmwares/NINA/1.2.3": [
       {
         "version": "NINA/1.2.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.3/NINA_W102.bin",
         "Name": "NINA 1.2.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4": [
+    "firmwares/NINA/1.2.4": [
       {
         "version": "NINA/1.2.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.4/NINA_W102.bin",
         "Name": "NINA 1.2.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0": [
+    "firmwares/NINA/1.3.0": [
       {
         "version": "NINA/1.3.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.3.0/NINA_W102.bin",
         "Name": "NINA 1.3.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0": [
+    "firmwares/NINA/1.4.0": [
       {
         "version": "NINA/1.4.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.0/NINA_W102.bin",
         "Name": "NINA 1.4.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1": [
+    "firmwares/NINA/1.4.1": [
       {
         "version": "NINA/1.4.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.1/NINA_W102.bin",
         "Name": "NINA 1.4.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2": [
+    "firmwares/NINA/1.4.2": [
       {
         "version": "NINA/1.4.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.2/NINA_W102.bin",
         "Name": "NINA 1.4.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3": [
+    "firmwares/NINA/1.4.3": [
       {
         "version": "NINA/1.4.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.3/NINA_W102.bin",
         "Name": "NINA 1.4.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4": [
+    "firmwares/NINA/1.4.4": [
       {
         "version": "NINA/1.4.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.4/NINA_W102.bin",
         "Name": "NINA 1.4.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5": [
+    "firmwares/NINA/1.4.5": [
       {
         "version": "NINA/1.4.5",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.5/NINA_W102.bin",
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
     ]
   },
   "mkrvidor4000": {
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.0.0": [
+    "firmwares/NINA/1.0.0": [
       {
         "version": "NINA/1.0.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.0.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.0.0/NINA_W102.bin",
         "Name": "NINA 1.0.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.1.0": [
+    "firmwares/NINA/1.1.0": [
       {
         "version": "NINA/1.1.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.1.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.1.0/NINA_W102.bin",
         "Name": "NINA 1.1.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1": [
+    "firmwares/NINA/1.2.1": [
       {
         "version": "NINA/1.2.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.1/NINA_W102.bin",
         "Name": "NINA 1.2.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2": [
+    "firmwares/NINA/1.2.2": [
       {
         "version": "NINA/1.2.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.2/NINA_W102.bin",
         "Name": "NINA 1.2.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3": [
+    "firmwares/NINA/1.2.3": [
       {
         "version": "NINA/1.2.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.3/NINA_W102.bin",
         "Name": "NINA 1.2.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4": [
+    "firmwares/NINA/1.2.4": [
       {
         "version": "NINA/1.2.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.2.4/NINA_W102.bin",
         "Name": "NINA 1.2.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0": [
+    "firmwares/NINA/1.3.0": [
       {
         "version": "NINA/1.3.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.3.0/NINA_W102.bin",
         "Name": "NINA 1.3.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0": [
+    "firmwares/NINA/1.4.0": [
       {
         "version": "NINA/1.4.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.0/NINA_W102.bin",
         "Name": "NINA 1.4.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1": [
+    "firmwares/NINA/1.4.1": [
       {
         "version": "NINA/1.4.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.1/NINA_W102.bin",
         "Name": "NINA 1.4.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2": [
+    "firmwares/NINA/1.4.2": [
       {
         "version": "NINA/1.4.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.2/NINA_W102.bin",
         "Name": "NINA 1.4.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3": [
+    "firmwares/NINA/1.4.3": [
       {
         "version": "NINA/1.4.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.3/NINA_W102.bin",
         "Name": "NINA 1.4.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4": [
+    "firmwares/NINA/1.4.4": [
       {
         "version": "NINA/1.4.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.4/NINA_W102.bin",
         "Name": "NINA 1.4.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5": [
+    "firmwares/NINA/1.4.5": [
       {
         "version": "NINA/1.4.5",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5/NINA_W102.bin",
+        "Path": "firmwares/NINA/1.4.5/NINA_W102.bin",
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
     ]
   },
   "uno2018": {
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA": [
+    "firmwares/NINA": [
       {
         "version": "NINA",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/FirmwareUpdater.unowifirev2.with_bootloader.ino.hex",
+        "Path": "firmwares/NINA/FirmwareUpdater.unowifirev2.with_bootloader.ino.hex",
         "Name": "firmwares NINA",
         "IsLoader": true
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1": [
+    "firmwares/NINA/1.2.1": [
       {
         "version": "NINA/1.2.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.1/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.2.1/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.2.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2": [
+    "firmwares/NINA/1.2.2": [
       {
         "version": "NINA/1.2.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.2/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.2.2/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.2.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3": [
+    "firmwares/NINA/1.2.3": [
       {
         "version": "NINA/1.2.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.3/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.2.3/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.2.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4": [
+    "firmwares/NINA/1.2.4": [
       {
         "version": "NINA/1.2.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.2.4/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.2.4/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.2.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0": [
+    "firmwares/NINA/1.3.0": [
       {
         "version": "NINA/1.3.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.3.0/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.3.0/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.3.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0": [
+    "firmwares/NINA/1.4.0": [
       {
         "version": "NINA/1.4.0",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.0/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.4.0/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.4.0",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1": [
+    "firmwares/NINA/1.4.1": [
       {
         "version": "NINA/1.4.1",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.1/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.4.1/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.4.1",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2": [
+    "firmwares/NINA/1.4.2": [
       {
         "version": "NINA/1.4.2",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.2/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.4.2/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.4.2",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3": [
+    "firmwares/NINA/1.4.3": [
       {
         "version": "NINA/1.4.3",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.3/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.4.3/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.4.3",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4": [
+    "firmwares/NINA/1.4.4": [
       {
         "version": "NINA/1.4.4",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.4/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.4.4/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.4.4",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5": [
+    "firmwares/NINA/1.4.5": [
       {
         "version": "NINA/1.4.5",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Path": "firmwares/NINA/1.4.5/NINA_W102-Uno_WiFi_Rev2.bin",
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
     ]
   },
   "mkrnb1500": {
-    "/home/alien/workspace/FirmwareUploader/firmwares/SARA": [
+    "firmwares/SARA": [
       {
         "version": "SARA",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/SARA/SerialSARAPassthrough.ino.bin",
+        "Path": "firmwares/SARA/SerialSARAPassthrough.ino.bin",
         "Name": "firmwares SARA",
         "IsLoader": true
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/SARA/5.6A2.00-to-5.6A2.01": [
+    "firmwares/SARA/5.6A2.00-to-5.6A2.01": [
       {
         "version": "SARA/5.6A2.00-to-5.6A2.01",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/SARA/5.6A2_01/5.6A2.00-to-5.6A2.01.pkg",
+        "Path": "firmwares/SARA/5.6A2_01/5.6A2.00-to-5.6A2.01.pkg",
         "Name": "SARA 5.6A2_01 (5.6A2.00-to-5.6A2.01.pkg)",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/SARA/5.6A2_01_to_99": [
+    "firmwares/SARA/5.6A2_01_to_99": [
       {
         "version": "SARA/5.6A2_01_to_99",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/SARA/5.6A2_01/5.6A2_01_to_99.pkg",
+        "Path": "firmwares/SARA/5.6A2_01/5.6A2_01_to_99.pkg",
         "Name": "SARA 5.6A2_01 (5.6A2_01_to_99.pkg)",
         "IsLoader": false
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/SARA/99_to_5.6A2_01": [
+    "firmwares/SARA/99_to_5.6A2_01": [
       {
         "version": "SARA/99_to_5.6A2_01",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/SARA/5.6A2_01/99_to_5.6A2_01.pkg",
+        "Path": "firmwares/SARA/5.6A2_01/99_to_5.6A2_01.pkg",
         "Name": "SARA 5.6A2_01 (99_to_5.6A2_01.pkg)",
         "IsLoader": false
       }
     ]
   },
   "nanorp2040connect": {
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA": [
+    "firmwares/NINA": [
       {
         "version": "NINA",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/FirmwareUpdater.nanorp2040connect.ino.elf",
+        "Path": "firmwares/NINA/FirmwareUpdater.nanorp2040connect.ino.elf",
         "Name": "firmwares NINA",
         "IsLoader": true
       }
     ],
-    "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5": [
+    "firmwares/NINA/1.4.5": [
       {
         "version": "NINA/1.4.5",
-        "Path": "/home/alien/workspace/FirmwareUploader/firmwares/NINA/1.4.5/NINA_W102-Nano_RP2040_Connect.bin",
+        "Path": "firmwares/NINA/1.4.5/NINA_W102-Nano_RP2040_Connect.bin",
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
