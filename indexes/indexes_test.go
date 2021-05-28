@@ -20,17 +20,38 @@
 package indexes
 
 import (
+	"net/url"
+	"os"
+	"path"
 	"testing"
 
-	"github.com/arduino/FirmwareUploader/cli/globals"
+	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/go-paths-helper"
+	"github.com/stretchr/testify/require"
 )
 
+var DefaultIndexURL = []string{
+	"https://downloads.arduino.cc/packages/package_index.json",
+	// "http://downloads-dev.arduino.cc/arduino-fwuploader/arduino-fwuploader/boards/board_index.json", // the index currently do not have the signature
+	// There is no sugnature, and the path is not correct see fwuploader/fwuploader. Also add downloads-dev
+}
+
 func TestDownloadIndex(t *testing.T) {
-	for _, u := range globals.DefaultIndexURL {
+	for _, u := range DefaultIndexURL {
 		t.Logf("testing with index: %s", u)
 		err := DownloadIndex(u)
-		if err != nil {
-			t.Errorf("Downloading of %s index failed, encountered following error: %s", u, err)
-		}
+		require.NoError(t, err)
+		indexPath := paths.TempDir().Join("fwuploader")
+		require.DirExists(t, indexPath.String())
+		URL, err := utils.URLParse(u)
+		require.NoError(t, err)
+		packageIndex := indexPath.Join(path.Base(URL.Path)).String()
+		require.FileExists(t, packageIndex)
+		sigURL, err := url.Parse(URL.String())
+		require.NoError(t, err)
+		sigURL.Path += ".sig"
+		signature := indexPath.Join(path.Base(sigURL.Path)).String()
+		require.FileExists(t, signature)
+		os.RemoveAll(indexPath.String()) // cleanup afer tests
 	}
 }
