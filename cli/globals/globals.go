@@ -19,8 +19,7 @@
 
 package globals
 
-var DefaultIndexURL = []string{
-	"https://downloads.arduino.cc/packages/package_index.json",
-	// "http://downloads-dev.arduino.cc/arduino-fwuploader/arduino-fwuploader/boards/board_index.json", // the index currently do not have the signature
-	// There is no sugnature, and the path is not correct see fwuploader/fwuploader. Also add downloads-dev
+var DefaultIndexGZURL = []string{
+	"https://downloads.arduino.cc/packages/package_index.json.gz",
+	"http://downloads-dev.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
 }

@@ -21,13 +21,14 @@ github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7/go.mod h1:6zEj6s6u/g
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/anmitsu/go-shlex v0.0.0-20161002113705-648efa622239/go.mod h1:2FmKhYUyUczH0OGQWaF5ceTx0UBShxjsH6f8oGKYe2c=
-github.com/arduino/arduino-cli v0.0.0-20210526080233-c342eacae40d h1:JwB+f71HvhMs2GG7/675wdr8XWQStHzI5UX2mWJsl9Y=
-github.com/arduino/arduino-cli v0.0.0-20210526080233-c342eacae40d/go.mod h1:HNbHWr7qq+9M2rhzBUJIBIpCMRlB6+mptNDLMDZNlG0=
+github.com/arduino/arduino-cli v0.0.0-20210603144340-aef5a54882fa h1:DvyTptT9ftE3wLIsg5xfh7okLWicmV2pSiVcZjuStJQ=
+github.com/arduino/arduino-cli v0.0.0-20210603144340-aef5a54882fa/go.mod h1:HNbHWr7qq+9M2rhzBUJIBIpCMRlB6+mptNDLMDZNlG0=
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c/go.mod h1:HK7SpkEax/3P+0w78iRQx1sz1vCDYYw9RXwHjQTB5i8=
 github.com/arduino/go-paths-helper v1.0.1/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
 github.com/arduino/go-paths-helper v1.2.0/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
-github.com/arduino/go-paths-helper v1.5.0 h1:RVo189hD+GhUS1rQ3gixwK1nSbvVR8MGIGa7Gxv2bdM=
 github.com/arduino/go-paths-helper v1.5.0/go.mod h1:V82BWgAAp4IbmlybxQdk9Bpkz8M4Qyx+RAFKaG9NuvU=
+github.com/arduino/go-paths-helper v1.6.0 h1:S7/d7DqB9XlnvF9KrgSiGmo2oWKmYW6O/DTjj3Bijx4=
+github.com/arduino/go-paths-helper v1.6.0/go.mod h1:V82BWgAAp4IbmlybxQdk9Bpkz8M4Qyx+RAFKaG9NuvU=
 github.com/arduino/go-properties-orderedmap v1.1.0/go.mod h1:DKjD2VXY/NZmlingh4lSFMEYCVubfeArCsGPGDwb2yk=
 github.com/arduino/go-properties-orderedmap v1.3.0 h1:4No/vQopB36e7WUIk6H6TxiSEJPiMrVOCZylYmua39o=
 github.com/arduino/go-properties-orderedmap v1.3.0/go.mod h1:DKjD2VXY/NZmlingh4lSFMEYCVubfeArCsGPGDwb2yk=

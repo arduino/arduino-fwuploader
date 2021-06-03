@@ -6,8 +6,9 @@ go 1.14
 replace go.bug.st/serial => github.com/cmaglie/go-serial v0.0.0-20200923162623-b214c147e37e
 
 require (
-	github.com/arduino/arduino-cli v0.0.0-20210526080233-c342eacae40d
-	github.com/arduino/go-paths-helper v1.5.0
+	github.com/arduino/arduino-cli v0.0.0-20210603144340-aef5a54882fa
+	github.com/arduino/go-paths-helper v1.6.0
+	github.com/cmaglie/go.rice v1.0.3
 	github.com/mattn/go-colorable v0.1.8
 	github.com/pkg/errors v0.9.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5

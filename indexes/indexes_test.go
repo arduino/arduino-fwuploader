@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -30,28 +31,27 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var DefaultIndexURL = []string{
-	"https://downloads.arduino.cc/packages/package_index.json",
-	// "http://downloads-dev.arduino.cc/arduino-fwuploader/arduino-fwuploader/boards/board_index.json", // the index currently do not have the signature
-	// There is no sugnature, and the path is not correct see fwuploader/fwuploader. Also add downloads-dev
+var DefaultIndexGZURL = []string{
+	"https://downloads.arduino.cc/packages/package_index.json.gz",
+	"http://downloads-dev.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
 }
 
 func TestDownloadIndex(t *testing.T) {
-	for _, u := range DefaultIndexURL {
+	for _, u := range DefaultIndexGZURL {
 		t.Logf("testing with index: %s", u)
 		err := DownloadIndex(u)
 		require.NoError(t, err)
-		indexPath := paths.TempDir().Join("fwuploader")
-		require.DirExists(t, indexPath.String())
+		indexFolder := paths.TempDir().Join("fwuploader")
+		require.DirExists(t, indexFolder.String())
 		URL, err := utils.URLParse(u)
 		require.NoError(t, err)
-		packageIndex := indexPath.Join(path.Base(URL.Path)).String()
-		require.FileExists(t, packageIndex)
+		indexPath := indexFolder.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
+		require.FileExists(t, indexPath.String())
 		sigURL, err := url.Parse(URL.String())
 		require.NoError(t, err)
-		sigURL.Path += ".sig"
-		signature := indexPath.Join(path.Base(sigURL.Path)).String()
-		require.FileExists(t, signature)
-		os.RemoveAll(indexPath.String()) // cleanup afer tests
+		sigURL.Path = strings.ReplaceAll(sigURL.Path, "gz", "sig")
+		signaturePath := indexFolder.Join(path.Base(sigURL.Path)).String()
+		require.FileExists(t, signaturePath)
+		defer os.RemoveAll(indexFolder.String()) // cleanup afer tests
 	}
 }
