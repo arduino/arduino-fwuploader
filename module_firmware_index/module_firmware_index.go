@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package index
+package fwindex
 
 import (
 	"encoding/json"
@@ -30,7 +30,7 @@ import (
 
 // Index represents Boards struct as seen from module_firmware_index.json file.
 type Index struct {
-	Boards    []indexBoard `json:"-"` // correct?
+	Boards    []indexBoard `json:"-"`
 	IsTrusted bool
 }
 
@@ -42,7 +42,7 @@ type indexBoard struct {
 	Module          string            `json:"module"`
 	Name            string            `json:"name"`
 	Uploader        string            `json:"uploader"`
-	UploadTouch     string            `json:"upload.use_1200bps_touch"`    // TODO remove "" in json otherwise is a string and not a bool
+	UploadTouch     string            `json:"upload.use_1200bps_touch"`    // TODO replace "true" with true in json otherwise is a string and not a bool
 	UploadWait      string            `json:"upload.wait_for_upload_port"` // TODO see above
 	UploaderCommand string            `json:"uploader.command"`
 }
@@ -75,7 +75,7 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
-	keysBox, err := rice.FindBox("gpg_keys")
+	keysBox, err := rice.FindBox("../indexes/gpg_keys")
 	if err != nil {
 		return nil, err
 	}

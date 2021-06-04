@@ -26,6 +26,7 @@ import (
 	"path"
 	"strings"
 
+	fwindex "github.com/arduino/FirmwareUploader/module_firmware_index"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -147,7 +148,8 @@ func verifySignature(targetPath, signaturePath *paths.Path, URL, sigURL *url.URL
 			return fmt.Errorf("could not find bundled signature keys")
 		}
 		valid, _, err = security.VerifySignature(targetPath, signaturePath, key)
-		//TODO missing something like packageindex.LoadIndexNoSign(targetPath) for firmware_module_index.json
+		// the signature verification is already done above
+		fwindex.LoadIndexNoSign(targetPath)
 	} else {
 		return fmt.Errorf("index %s not supported", URL.Path)
 	}

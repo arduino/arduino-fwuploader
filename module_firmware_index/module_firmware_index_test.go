@@ -17,16 +17,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package index
+package fwindex
 
 import (
-	"os"
-	"path"
-	"strings"
 	"testing"
 
-	"github.com/arduino/FirmwareUploader/indexes"
-	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -37,23 +32,19 @@ var DefaultIndexGZURL = []string{
 
 func TestIndexParsing(t *testing.T) {
 	// semver.WarnInvalidVersionWhenParsingRelaxed = true
-	for _, u := range DefaultIndexGZURL {
-		t.Logf("testing with index: %s", u)
-		err := indexes.DownloadIndex(u) // prepare for the test (indexes must be downloaded)
-		require.NoError(t, err)
-		indexFolder := paths.TempDir().Join("fwuploader")
-		URL, err := utils.URLParse(u)
-		require.NoError(t, err)
-		indexPath := indexFolder.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
-		require.FileExists(t, indexPath.String())
-		Index, e := LoadIndexNoSign(indexPath)
+	list, err := paths.New("testdata").ReadDir()
+	require.NoError(t, err)
+	for _, indexFile := range list {
+		if indexFile.Ext() != ".json" {
+			continue
+		}
+		t.Logf("testing with index: %s", indexFile)
+		Index, e := LoadIndexNoSign(indexFile)
 		require.NoError(t, e)
 		require.NotEmpty(t, Index)
 
-		Index, e = LoadIndex(indexPath)
+		Index, e = LoadIndex(indexFile)
 		require.NoError(t, e)
 		require.NotEmpty(t, Index)
-
-		defer os.RemoveAll(indexFolder.String())
 	}
 }
