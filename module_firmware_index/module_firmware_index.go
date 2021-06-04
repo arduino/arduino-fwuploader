@@ -24,26 +24,27 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
+	rice "github.com/cmaglie/go.rice"
 	"github.com/sirupsen/logrus"
 )
 
 // Index represents Boards struct as seen from module_firmware_index.json file.
 type Index struct {
-	Boards    []indexBoard // correct?
+	Boards    []indexBoard `json:"-"` // correct?
 	IsTrusted bool
 }
 
 // indexPackage represents a single entry from module_firmware_index.json file.
 type indexBoard struct {
-	Fqbn            string             `json:"fqbn"` // TODO what's "required"?
-	Firmwares       []indexFirmware    `json:"firmware"`
-	LoaderSketch    *indexLoaderSketch `json:"loader_sketch"` // single object?
-	Module          string             `json:"module"`
-	Name            string             `json:"name"`
-	Uploader        string             `json:"uploader"`
-	UploadTouch     string             `json:"upload.use_1200bps_touch"`    // TODO remove "" in json otherwise is a string and not a bool
-	UploadWait      string             `json:"upload.wait_for_upload_port"` // TODO see above
-	UploaderCommand string             `json:"uploader.command"`
+	Fqbn            string            `json:"fqbn"`
+	Firmwares       []indexFirmware   `json:"firmware"`
+	LoaderSketch    indexLoaderSketch `json:"loader_sketch"`
+	Module          string            `json:"module"`
+	Name            string            `json:"name"`
+	Uploader        string            `json:"uploader"`
+	UploadTouch     string            `json:"upload.use_1200bps_touch"`    // TODO remove "" in json otherwise is a string and not a bool
+	UploadWait      string            `json:"upload.wait_for_upload_port"` // TODO see above
+	UploaderCommand string            `json:"uploader.command"`
 }
 
 // indexFirmware represents a single Firmware version from module_firmware_index.json file.
@@ -68,13 +69,21 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 		return nil, err
 	}
 	var index Index
-	err = json.Unmarshal(buff, &index)
+	err = json.Unmarshal(buff, &index.Boards)
 	if err != nil {
 		return nil, err
 	}
 
 	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
-	trusted, _, err := security.VerifyArduinoDetachedSignature(jsonIndexFile, jsonSignatureFile)
+	keysBox, err := rice.FindBox("gpg_keys")
+	if err != nil {
+		return nil, err
+	}
+	key, err := keysBox.Open("module_firmware_index_public.gpg.key")
+	if err != nil {
+		return nil, err
+	}
+	trusted, _, err := security.VerifySignature(jsonIndexFile, jsonSignatureFile, key)
 	if err != nil {
 		logrus.
 			WithField("index", jsonIndexFile).
@@ -91,18 +100,18 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 }
 
 // LoadIndexNoSign reads a module_firmware_index.json from a file and returns the corresponding Index structure.
-func LoadIndexNoSign(jsonIndexFile *paths.Path) (*[]indexBoard, error) {
+func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	buff, err := jsonIndexFile.ReadFile()
 	if err != nil {
 		return nil, err
 	}
-	var index []indexBoard
-	err = json.Unmarshal(buff, &index)
+	var index Index
+	err = json.Unmarshal(buff, &index.Boards)
 	if err != nil {
 		return nil, err
 	}
 
-	// index.IsTrusted = true
+	index.IsTrusted = true
 
 	return &index, nil
 }

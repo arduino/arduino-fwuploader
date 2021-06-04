@@ -46,8 +46,14 @@ func TestIndexParsing(t *testing.T) {
 		require.NoError(t, err)
 		indexPath := indexFolder.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
 		require.FileExists(t, indexPath.String())
-		_, e := LoadIndexNoSign(indexPath)
+		Index, e := LoadIndexNoSign(indexPath)
 		require.NoError(t, e)
+		require.NotEmpty(t, Index)
+
+		Index, e = LoadIndex(indexPath)
+		require.NoError(t, e)
+		require.NotEmpty(t, Index)
+
 		defer os.RemoveAll(indexFolder.String())
 	}
 }
