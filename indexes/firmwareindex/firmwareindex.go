@@ -21,11 +21,13 @@ package firmwareindex
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
 	rice "github.com/cmaglie/go.rice"
 	"github.com/sirupsen/logrus"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Index represents Boards struct as seen from module_firmware_index.json file.
@@ -116,8 +118,75 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	return &index, nil
 }
 
-// implement functions that gived the id of a tool... returns the url to download it
-// member function!
-func (i *Index) GetUploaderURL(id string) string {
-	return "" // TODO implement
+// GetLatestFirmwareURL takes the fqbn as parameter and returns the URL of the latest available firmware.
+// Not currently implemented for SARA, as the version for it's firmware is a bit strange
+func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
+	for _, board := range i.Boards {
+		var latestVersion *semver.RelaxedVersion
+		var latestFirmwareURL string
+		if board.Fqbn == fqbn && board.Module != "SARA" {
+			for _, firmware := range board.Firmwares {
+				version := semver.ParseRelaxed(firmware.Version)
+				if latestVersion == nil || version.GreaterThan(latestVersion) { // TODO check the condition
+					latestVersion = version
+					latestFirmwareURL = firmware.URL
+				}
+			}
+			if latestVersion != nil {
+				return latestFirmwareURL, nil
+			} else {
+				return "", fmt.Errorf("cannot find latest version")
+			}
+		} else if board.Fqbn == fqbn { // SARA
+			// TODO implement??
+			return "", fmt.Errorf("not implemented for SARA module")
+		}
+	}
+	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+}
+
+// GetFirmwareURL will take the fqbn of the required board and the version of the firmware as parameters.
+// It will return the URL  of the required firmware
+func (i *Index) GetFirmwareURL(fqbn, version string) (string, error) {
+	for _, board := range i.Boards {
+		if board.Fqbn == fqbn {
+			for _, firmware := range board.Firmwares {
+				if firmware.Version == version {
+					return firmware.URL, nil
+				}
+			}
+			return "", fmt.Errorf("invalid version: %s", version)
+		}
+	}
+	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+}
+
+// GetLoaderSketchURL will take the board's fqbn and return the url of the loader sketch
+func (i *Index) GetLoaderSketchURL(fqbn string) (string, error) {
+	for _, board := range i.Boards {
+		if board.Fqbn == fqbn {
+			return board.LoaderSketch.URL, nil
+		}
+	}
+	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+}
+
+// GetUploaderCommand will take the board's fqbn and return the command used for upload
+func (i *Index) GetUploaderCommand(fqbn string) (string, error) {
+	for _, board := range i.Boards {
+		if board.Fqbn == fqbn {
+			return board.UploaderCommand, nil
+		}
+	}
+	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+}
+
+// GetModule will take the board's fqbn and return the name of the module
+func (i *Index) GetModule(fqbn string) (string, error) {
+	for _, board := range i.Boards {
+		if board.Fqbn == fqbn {
+			return board.Module, nil
+		}
+	}
+	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
 }
