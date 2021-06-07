@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
     Path("boards").mkdir()
 
-    with open("boards/board_index.json", "w") as f:
+    with open("boards/module_firmware_index.json", "w") as f:
         json.dump(boards_json, f, indent=2)
 
 # board_index.json must be formatted like so:
