@@ -40,12 +40,15 @@ var (
 // NewCommand created a new `version` command
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
-		Use:     "flash-firmware",
-		Short:   "Shows version number of FirmwareUploader.",
-		Long:    "Shows the version number of FirmwareUploader which is installed on your system.",
-		Example: "  " + os.Args[0] + " version",
-		Args:    cobra.NoArgs,
-		Run:     run,
+		Use:   "flash-firmware",
+		Short: "Flashes firmwares to board.",
+		Long:  "Flashes specified module firmware to board at specified address. Module name and version can be omitted to install latest version.",
+		Example: "" +
+			"  " + os.Args[0] + " flash-firmware --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2\n" +
+			"  " + os.Args[0] + " flash-firmware -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
+			"  " + os.Args[0] + " flash-firmware -b arduino:samd:mkr1000 -a COM10\n",
+		Args: cobra.NoArgs,
+		Run:  run,
 	}
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:samd:mkr1000, arduino:mbed_nano:nanorp2040connect")
