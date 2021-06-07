@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"go.bug.st/serial"
 )
 
@@ -74,9 +75,10 @@ func openSerial(portAddress string) (serial.Port, error) {
 			// Try another baudrate
 			continue
 		}
+		logrus.Infof("Opened port %s at %s", portAddress, baudRate)
 
 		if err := port.SetReadTimeout(30 * time.Second); err != nil {
-			return nil, fmt.Errorf("Could not set timeout on serial port: %s", err)
+			return nil, fmt.Errorf("could not set timeout on serial port: %s", err)
 		}
 
 		return port, nil

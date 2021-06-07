@@ -29,17 +29,20 @@ import (
 	"time"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"go.bug.st/serial"
 )
 
 func NewWincFlasher(portAddress string) (*WincFlasher, error) {
 	port, err := openSerial(portAddress)
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 	f := &WincFlasher{port: port}
 	payloadSize, err := f.getMaximumPayloadSize()
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 	if payloadSize < 1024 {
@@ -55,9 +58,10 @@ type WincFlasher struct {
 }
 
 func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path) error {
-	// log.Printf("Flashing firmware from '%v'", ctx.FirmwareFile)
+	logrus.Infof("Flashing firmware %s", firmwareFile)
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 	firmwareOffset := 0x0000
@@ -82,6 +86,7 @@ func (f *WincFlasher) hello() error {
 		Payload: nil,
 	})
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
@@ -92,6 +97,7 @@ func (f *WincFlasher) hello() error {
 	res := make([]byte, 65535)
 	n, err := f.port.Read(res)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 	// flush eventual leftover from the rx buffer
@@ -100,11 +106,15 @@ func (f *WincFlasher) hello() error {
 	}
 
 	if res[0] != 'v' {
-		return FlasherError{err: "Programmer is not responding"}
+		err = FlasherError{err: "Programmer is not responding"}
+		logrus.Error(err)
+		return err
 	}
 	if string(res) != "v10000" {
 		// TODO: Do we really need this check? What is it trying to verify?
-		return FlasherError{err: fmt.Sprintf("Programmer version mismatch, v10000 needed: %s", res)}
+		err = FlasherError{err: fmt.Sprintf("Programmer version mismatch, v10000 needed: %s", res)}
+		logrus.Error(err)
+		return err
 	}
 	return nil
 }
@@ -118,16 +128,20 @@ func (f *WincFlasher) write(address uint32, buffer []byte) error {
 		Payload: buffer,
 	})
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	// wait acknowledge
 	ack := make([]byte, 2)
 	if err := f.serialFillBuffer(ack); err != nil {
+		logrus.Error(err)
 		return err
 	}
 	if string(ack) != "OK" {
-		return FlasherError{err: fmt.Sprintf("Missing ack on write: %s", ack)}
+		err = FlasherError{err: fmt.Sprintf("Missing ack on write: %s", ack)}
+		logrus.Error(err)
+		return err
 	}
 	return nil
 }
@@ -136,17 +150,19 @@ func (f *WincFlasher) flashChunk(offset int, buffer []byte) error {
 	bufferLength := len(buffer)
 
 	if err := f.erase(uint32(offset), uint32(bufferLength)); err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	for i := 0; i < bufferLength; i += f.payloadSize {
-		fmt.Printf("\rFlashing: " + strconv.Itoa((i*100)/bufferLength) + "%%")
+		logrus.Debugf("Flashing chunk: %s%%", strconv.Itoa((i*100)/bufferLength))
 		start := i
 		end := i + f.payloadSize
 		if end > bufferLength {
 			end = bufferLength
 		}
 		if err := f.write(uint32(offset+i), buffer[start:end]); err != nil {
+			logrus.Error(err)
 			return err
 		}
 	}
@@ -160,6 +176,7 @@ func (f *WincFlasher) flashChunk(offset int, buffer []byte) error {
 
 		data, err := f.read(uint32(offset+i), uint32(readLength))
 		if err != nil {
+			logrus.Error(err)
 			return err
 		}
 
@@ -167,7 +184,9 @@ func (f *WincFlasher) flashChunk(offset int, buffer []byte) error {
 	}
 
 	if !bytes.Equal(buffer, flashData) {
-		return errors.New("flash data does not match written")
+		err := errors.New("flash data does not match written")
+		logrus.Error(err)
+		return err
 	}
 
 	return nil
@@ -182,12 +201,14 @@ func (f *WincFlasher) getMaximumPayloadSize() (uint16, error) {
 		Payload: nil,
 	})
 	if err != nil {
+		logrus.Error(err)
 		return 0, err
 	}
 
 	// Receive response
 	res := make([]byte, 2)
 	if err := f.serialFillBuffer(res); err != nil {
+		logrus.Error(err)
 		return 0, err
 	}
 	return (uint16(res[0]) << 8) + uint16(res[1]), nil
@@ -198,10 +219,13 @@ func (f *WincFlasher) serialFillBuffer(buffer []byte) error {
 	for read < len(buffer) {
 		n, err := f.port.Read(buffer[read:])
 		if err != nil {
+			logrus.Error(err)
 			return err
 		}
 		if n == 0 {
-			return &FlasherError{err: "Serial port closed unexpectedly"}
+			err = FlasherError{err: "Serial port closed unexpectedly"}
+			logrus.Error(err)
+			return err
 		}
 		read += n
 	}
@@ -209,14 +233,18 @@ func (f *WincFlasher) serialFillBuffer(buffer []byte) error {
 }
 
 func (f *WincFlasher) sendCommand(data CommandData) error {
+	logrus.Debugf("sending command data %s", data)
 	buff := new(bytes.Buffer)
 	if err := binary.Write(buff, binary.BigEndian, data.Command); err != nil {
+		logrus.Error(err)
 		return err
 	}
 	if err := binary.Write(buff, binary.BigEndian, data.Address); err != nil {
+		logrus.Error(err)
 		return err
 	}
 	if err := binary.Write(buff, binary.BigEndian, data.Value); err != nil {
+		logrus.Error(err)
 		return err
 	}
 	var length uint16
@@ -226,6 +254,7 @@ func (f *WincFlasher) sendCommand(data CommandData) error {
 		length = uint16(len(data.Payload))
 	}
 	if err := binary.Write(buff, binary.BigEndian, length); err != nil {
+		logrus.Error(err)
 		return err
 	}
 	if data.Payload != nil {
@@ -236,12 +265,13 @@ func (f *WincFlasher) sendCommand(data CommandData) error {
 	for {
 		sent, err := f.port.Write(bufferData)
 		if err != nil {
+			logrus.Error(err)
 			return err
 		}
 		if sent == len(bufferData) {
 			break
 		}
-		// fmt.Println("HEY! sent", sent, "out of", len(bufferData))
+		logrus.Debugf("Sent %d bytes out of %d", sent, len(bufferData))
 		bufferData = bufferData[sent:]
 	}
 	return nil
@@ -257,20 +287,25 @@ func (f *WincFlasher) read(address uint32, length uint32) ([]byte, error) {
 		Payload: nil,
 	})
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 
 	// Receive response
 	result := make([]byte, length)
 	if err := f.serialFillBuffer(result); err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 	ack := make([]byte, 2)
 	if err := f.serialFillBuffer(ack); err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 	if string(ack) != "OK" {
-		return nil, FlasherError{err: fmt.Sprintf("Missing ack on read: %s", ack)}
+		err = FlasherError{err: fmt.Sprintf("Missing ack on read: %s", ack)}
+		logrus.Error(err)
+		return nil, err
 	}
 	return result, nil
 }
@@ -285,6 +320,7 @@ func (f *WincFlasher) erase(address uint32, length uint32) error {
 		Payload: nil,
 	})
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
@@ -293,10 +329,13 @@ func (f *WincFlasher) erase(address uint32, length uint32) error {
 	// wait acknowledge
 	ack := make([]byte, 2)
 	if err := f.serialFillBuffer(ack); err != nil {
+		logrus.Error(err)
 		return err
 	}
 	if string(ack) != "OK" {
-		return FlasherError{err: fmt.Sprintf("Missing ack on erase: %s", ack)}
+		err = FlasherError{err: fmt.Sprintf("Missing ack on erase: %s", ack)}
+		logrus.Error(err)
+		return err
 	}
 	return nil
 }

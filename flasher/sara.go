@@ -26,12 +26,14 @@ import (
 	"time"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"go.bug.st/serial"
 )
 
 func NewSaraFlasher(portAddress string) (*SaraFlasher, error) {
 	port, err := openSerial(portAddress)
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 	// Magic numbers ¯\_(ツ)_/¯
@@ -44,24 +46,29 @@ type SaraFlasher struct {
 }
 
 func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
+	logrus.Infof("Flashing firmware %s", firmwareFile)
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	_, err = f.expectMinBytes("AT+ULSTFILE", "+ULSTFILE:", 1000, 0)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	_, err = f.expectMinBytes("AT+UDWNFILE=\"UPDATE.BIN\","+strconv.Itoa(len(data))+",\"FOAT\"", ">", 20000, 0)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	firmwareOffset := 0x0000
 	err = f.flashChunk(firmwareOffset, data)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
@@ -69,11 +76,13 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 
 	_, err = f.expectMinBytes("", "OK", 1000, 0)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
 	_, err = f.expectMinBytes("AT+UFWINSTALL", "OK", 60000, 0)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
@@ -89,6 +98,9 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 		time.Sleep(1 * time.Second)
 	}
 
+	if err != nil {
+		logrus.Error(err)
+	}
 	return err
 }
 
@@ -98,7 +110,9 @@ func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList) error 
 }
 
 func (f *SaraFlasher) Close() error {
-	return f.port.Close()
+	err := f.port.Close()
+	logrus.Error(err)
+	return err
 }
 
 func (f *SaraFlasher) hello() error {
@@ -106,6 +120,9 @@ func (f *SaraFlasher) hello() error {
 	f.expectMinBytes("ATE0", "OK", 100, 0)
 	f.expectMinBytes("ATE0", "OK", 100, 0)
 	_, err := f.expectMinBytes("AT", "OK", 100, 0)
+	if err != nil {
+		logrus.Error(err)
+	}
 	return err
 }
 
@@ -119,13 +136,14 @@ func (f *SaraFlasher) flashChunk(offset int, buffer []byte) error {
 	bufferLength := len(buffer)
 
 	for i := 0; i < bufferLength; i += f.payloadSize {
-		fmt.Printf("\rFlashing: " + strconv.Itoa((i*100)/bufferLength) + "%%")
+		logrus.Debugf("Flashing chunk: %s%%", strconv.Itoa((i*100)/bufferLength))
 		start := i
 		end := i + f.payloadSize
 		if end > bufferLength {
 			end = bufferLength
 		}
 		if err := f.write(uint32(offset+i), buffer[start:end]); err != nil {
+			logrus.Error(err)
 			return err
 		}
 		//time.Sleep(1 * time.Millisecond)
@@ -135,7 +153,7 @@ func (f *SaraFlasher) flashChunk(offset int, buffer []byte) error {
 }
 
 func (f *SaraFlasher) getMaximumPayloadSize() (uint16, error) {
-	return 0, fmt.Errorf("Not supported by SaraFlasher")
+	return 0, fmt.Errorf("not supported by SaraFlasher")
 }
 
 func (f *SaraFlasher) serialFillBuffer(buffer []byte) error {
@@ -143,10 +161,13 @@ func (f *SaraFlasher) serialFillBuffer(buffer []byte) error {
 	for read < len(buffer) {
 		n, err := f.port.Read(buffer[read:])
 		if err != nil {
+			logrus.Error(err)
 			return err
 		}
 		if n == 0 {
-			return &FlasherError{err: "Serial port closed unexpectedly"}
+			err = &FlasherError{err: "Serial port closed unexpectedly"}
+			logrus.Error(err)
+			return err
 		}
 		read += n
 	}
@@ -154,9 +175,11 @@ func (f *SaraFlasher) serialFillBuffer(buffer []byte) error {
 }
 
 func (f *SaraFlasher) sendCommand(data CommandData) error {
+	logrus.Debugf("sending command data %s", data)
 	if data.Payload != nil {
 		for {
 			if sent, err := f.port.Write(data.Payload); err != nil {
+				logrus.Error(err)
 				return err
 			} else if sent < len(data.Payload) {
 				data.Payload = data.Payload[sent:]
@@ -173,10 +196,9 @@ func (f *SaraFlasher) expectMinBytes(buffer string, response string, timeout int
 		Payload: []byte(buffer + "\r\n"),
 	})
 	if err != nil {
+		logrus.Error(err)
 		return "", err
 	}
-
-	// log.Println("Sending " + buffer)
 
 	// Receive response
 	var res []byte
@@ -190,14 +212,15 @@ func (f *SaraFlasher) expectMinBytes(buffer string, response string, timeout int
 		res = append(res, partial[:data]...)
 		n += data
 		if err != nil {
+			logrus.Error(err)
 			return "", err
 		}
 	}
 
-	// log.Println(string(res))
-
 	if !strings.Contains(string(res), response) {
-		return string(res), FlasherError{err: fmt.Sprintf("Expected %s, got %s", response, res)}
+		err = FlasherError{err: fmt.Sprintf("Expected %s, got %s", response, res)}
+		logrus.Error(err)
+		return string(res), err
 	}
 	return string(res), nil
 }
