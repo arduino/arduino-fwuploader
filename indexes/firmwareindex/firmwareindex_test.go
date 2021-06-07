@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package fwindex
+package firmwareindex
 
 import (
 	"testing"
@@ -26,25 +26,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var DefaultIndexGZURL = []string{
-	"http://downloads-dev.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
-}
-
 func TestIndexParsing(t *testing.T) {
 	// semver.WarnInvalidVersionWhenParsingRelaxed = true
 	list, err := paths.New("testdata").ReadDir()
 	require.NoError(t, err)
+	list.FilterSuffix(".json")
 	for _, indexFile := range list {
-		if indexFile.Ext() != ".json" {
-			continue
-		}
 		t.Logf("testing with index: %s", indexFile)
-		Index, e := LoadIndexNoSign(indexFile)
+		index, e := LoadIndexNoSign(indexFile)
 		require.NoError(t, e)
-		require.NotEmpty(t, Index)
+		require.NotEmpty(t, index)
 
-		Index, e = LoadIndex(indexFile)
+		index, e = LoadIndex(indexFile)
 		require.NoError(t, e)
-		require.NotEmpty(t, Index)
+		require.NotEmpty(t, index)
 	}
 }

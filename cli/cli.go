@@ -31,7 +31,7 @@ import (
 	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/FirmwareUploader/cli/version"
 	"github.com/arduino/FirmwareUploader/indexes"
-	fwindex "github.com/arduino/FirmwareUploader/module_firmware_index"
+	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/FirmwareUploader/modules/nina"
 	"github.com/arduino/FirmwareUploader/modules/sara"
 	"github.com/arduino/FirmwareUploader/modules/winc"
@@ -214,6 +214,7 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetLevel(lvl)
 	}
 
+	//TODO fare in un altro posto tutto ció ⬇️
 	// download indexes in /tmp/fwuloader/package_index.json etc..
 	for _, u := range globals.DefaultIndexGZURL {
 		indexes.DownloadIndex(u)
@@ -228,9 +229,9 @@ func preRun(cmd *cobra.Command, args []string) {
 			continue
 		}
 		if indexFile.String() == "package_index.json" {
-			PackageIndex, e := packageindex.LoadIndexNoSign(indexFile)
+			PackageIndex, e := packageindex.LoadIndexNoSign(indexFile) // TODO fare funzione che ti ritorna le strutture dati, e fa tutto quello che ci sta dietro.
 		} else if indexFile.String() == "module_firmware_index.json" {
-			ModuleFWIndex, err := fwindex.LoadIndexNoSign(indexFile)
+			ModuleFWIndex, e := firmwareindex.LoadIndexNoSign(indexFile)
 		} else {
 			feedback.Errorf("Unknown index: %s", indexFile.String())
 		}

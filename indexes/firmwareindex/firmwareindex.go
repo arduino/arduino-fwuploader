@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package fwindex
+package firmwareindex
 
 import (
 	"encoding/json"
@@ -30,36 +30,36 @@ import (
 
 // Index represents Boards struct as seen from module_firmware_index.json file.
 type Index struct {
-	Boards    []indexBoard `json:"-"`
+	Boards    []*indexBoard
 	IsTrusted bool
 }
 
 // indexPackage represents a single entry from module_firmware_index.json file.
 type indexBoard struct {
-	Fqbn            string            `json:"fqbn"`
-	Firmwares       []indexFirmware   `json:"firmware"`
-	LoaderSketch    indexLoaderSketch `json:"loader_sketch"`
-	Module          string            `json:"module"`
-	Name            string            `json:"name"`
-	Uploader        string            `json:"uploader"`
-	UploadTouch     string            `json:"upload.use_1200bps_touch"`    // TODO replace "true" with true in json otherwise is a string and not a bool
-	UploadWait      string            `json:"upload.wait_for_upload_port"` // TODO see above
-	UploaderCommand string            `json:"uploader.command"`
+	Fqbn            string             `json:"fqbn,required"`
+	Firmwares       []*indexFirmware   `json:"firmware,required"`
+	LoaderSketch    *indexLoaderSketch `json:"loader_sketch,required"`
+	Module          string             `json:"module,required"`
+	Name            string             `json:"name,required"`
+	Uploader        string             `json:"uploader,required"`
+	UploadTouch     string             `json:"upload.use_1200bps_touch"`    // TODO replace "true" with true in json otherwise is a string and not a bool
+	UploadWait      string             `json:"upload.wait_for_upload_port"` // TODO see above
+	UploaderCommand string             `json:"uploader.command,required"`
 }
 
 // indexFirmware represents a single Firmware version from module_firmware_index.json file.
 type indexFirmware struct {
-	Version  string      `json:"version"` // use `*semver.Version` instead but SARA version is giving problems
-	URL      string      `json:"url"`
-	Checksum string      `json:"checksum"`
-	Size     json.Number `json:"size"`
+	Version  string      `json:"version,required"` // `*semver.Version` but with SARA version is giving problems
+	URL      string      `json:"url,required"`
+	Checksum string      `json:"checksum,required"`
+	Size     json.Number `json:"size,required"`
 }
 
 // indexLoaderSketch represents the sketch used to upload the new firmware on a board.
 type indexLoaderSketch struct {
-	URL      string      `json:"url"`
-	Checksum string      `json:"checksum"`
-	Size     json.Number `json:"size"`
+	URL      string      `json:"url,required"`
+	Checksum string      `json:"checksum,required"`
+	Size     json.Number `json:"size,required"`
 }
 
 // LoadIndex reads a module_firmware_index.json from a file and returns the corresponding Index structure.
@@ -75,7 +75,7 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
-	keysBox, err := rice.FindBox("../indexes/gpg_keys")
+	keysBox, err := rice.FindBox("../gpg_keys")
 	if err != nil {
 		return nil, err
 	}
@@ -114,4 +114,10 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	index.IsTrusted = true
 
 	return &index, nil
+}
+
+// implement functions that gived the id of a tool... returns the url to download it
+// member function!
+func (i *Index) GetUploaderURL(id string) string {
+	return "" // TODO implement
 }

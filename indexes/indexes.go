@@ -26,7 +26,7 @@ import (
 	"path"
 	"strings"
 
-	fwindex "github.com/arduino/FirmwareUploader/module_firmware_index"
+	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -37,7 +37,7 @@ import (
 
 // DownloadIndex will download the index in the os temp directory
 func DownloadIndex(indexURL string) error {
-	fwUploaderPath := paths.TempDir().Join("fwuploader")
+	fwUploaderPath := paths.TempDir().Join("fwuploader") // TODO make global
 
 	URL, err := utils.URLParse(indexURL)
 	if err != nil {
@@ -64,7 +64,7 @@ func DownloadIndex(indexURL string) error {
 
 	// Extract the real index
 	var tmpIndex *paths.Path
-	if tmpFile, err := paths.MkTempFile(nil, ""); err != nil {
+	if tmpFile, err := paths.MkTempFile(nil, ""); err != nil { //TODO mettere tmpdir.join(URL.Base()) in modo da usare LoadIndex() e non LoadIndexNoSign
 		return fmt.Errorf("creating temp file for index extraction: %s", err)
 	} else {
 		tmpIndex = paths.New(tmpFile.Name())
@@ -114,6 +114,7 @@ func DownloadIndex(indexURL string) error {
 	return nil
 }
 
+// TODO commento e fare privato, probabilmente va spostato in altre parti (download dei tool)
 func Download(d *downloader.Downloader) error {
 	if d == nil {
 		// This signal means that the file is already downloaded
@@ -129,10 +130,11 @@ func Download(d *downloader.Downloader) error {
 	return nil
 }
 
+// TODO mettere commento di spiegazione
 func verifySignature(targetPath, signaturePath *paths.Path, URL, sigURL *url.URL) error {
 	var valid bool
 	var err error
-	if path.Base(URL.Path) == "package_index.json.gz" {
+	if path.Base(URL.Path) == "package_index.json.gz" { // TODO path.Base chiamare una sola volta
 		valid, _, err = security.VerifyArduinoDetachedSignature(targetPath, signaturePath)
 		// the signature verification is already done above
 		if _, err = packageindex.LoadIndexNoSign(targetPath); err != nil {
@@ -149,7 +151,7 @@ func verifySignature(targetPath, signaturePath *paths.Path, URL, sigURL *url.URL
 		}
 		valid, _, err = security.VerifySignature(targetPath, signaturePath, key)
 		// the signature verification is already done above
-		fwindex.LoadIndexNoSign(targetPath)
+		firmwareindex.LoadIndexNoSign(targetPath)
 	} else {
 		return fmt.Errorf("index %s not supported", URL.Path)
 	}

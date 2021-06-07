@@ -31,17 +31,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var DefaultIndexGZURL = []string{
+var defaultIndexGZURL = []string{
 	"https://downloads.arduino.cc/packages/package_index.json.gz",
 	"http://downloads-dev.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
 }
 
 func TestDownloadIndex(t *testing.T) {
-	for _, u := range DefaultIndexGZURL {
+	indexFolder := paths.TempDir().Join("fwuploader")
+	defer os.RemoveAll(indexFolder.String()) // cleanup after tests
+	for _, u := range defaultIndexGZURL {
 		t.Logf("testing with index: %s", u)
 		err := DownloadIndex(u)
 		require.NoError(t, err)
-		indexFolder := paths.TempDir().Join("fwuploader")
 		require.DirExists(t, indexFolder.String())
 		URL, err := utils.URLParse(u)
 		require.NoError(t, err)
@@ -52,6 +53,5 @@ func TestDownloadIndex(t *testing.T) {
 		sigURL.Path = strings.ReplaceAll(sigURL.Path, "gz", "sig")
 		signaturePath := indexFolder.Join(path.Base(sigURL.Path)).String()
 		require.FileExists(t, signaturePath)
-		defer os.RemoveAll(indexFolder.String()) // cleanup afer tests
 	}
 }
