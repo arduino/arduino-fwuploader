@@ -22,6 +22,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -33,9 +34,12 @@ import (
 	"github.com/arduino/FirmwareUploader/modules/winc"
 	"github.com/arduino/FirmwareUploader/utils"
 	"github.com/arduino/FirmwareUploader/utils/context"
+	v "github.com/arduino/FirmwareUploader/version"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/go-paths-helper"
+	"github.com/mattn/go-colorable"
+	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -43,6 +47,10 @@ import (
 var (
 	ctx          = &context.Context{}
 	outputFormat string
+	verbose      bool
+	logFile      string
+	logFormat    string
+	logLevel     string
 )
 
 func NewCommand() *cobra.Command {
@@ -70,7 +78,13 @@ func NewCommand() *cobra.Command {
 	firmwareUploaderCli.Flags().StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
 	firmwareUploaderCli.Flags().StringVar(&ctx.BoardName, "get_available_for", "", "Ask for available firmwares matching a given board")
 	firmwareUploaderCli.Flags().IntVar(&ctx.Retries, "retries", 9, "Number of retries in case of upload failure")
+
 	firmwareUploaderCli.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
+
+	firmwareUploaderCli.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written")
+	firmwareUploaderCli.PersistentFlags().StringVar(&logFormat, "log-format", "", "The output format for the logs, can be {text|json}.")
+	firmwareUploaderCli.PersistentFlags().StringVar(&logLevel, "log-level", "info", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
+	firmwareUploaderCli.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
 
 	return firmwareUploaderCli
 }
@@ -129,6 +143,22 @@ func run(cmd *cobra.Command, args []string) {
 	}
 }
 
+// Convert the string passed to the `--log-level` option to the corresponding
+// logrus formal level.
+func toLogLevel(s string) (t logrus.Level, found bool) {
+	t, found = map[string]logrus.Level{
+		"trace": logrus.TraceLevel,
+		"debug": logrus.DebugLevel,
+		"info":  logrus.InfoLevel,
+		"warn":  logrus.WarnLevel,
+		"error": logrus.ErrorLevel,
+		"fatal": logrus.FatalLevel,
+		"panic": logrus.PanicLevel,
+	}[s]
+
+	return
+}
+
 func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 	f, found := map[string]feedback.OutputFormat{
 		"json": feedback.JSON,
@@ -139,6 +169,47 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
+	// Prepare logging
+	if verbose {
+		// if we print on stdout, do it in full colors
+		logrus.SetOutput(colorable.NewColorableStdout())
+		logrus.SetFormatter(&logrus.TextFormatter{
+			ForceColors: true,
+		})
+	} else {
+		logrus.SetOutput(ioutil.Discard)
+	}
+
+	// Normalize the format strings
+	logFormat = strings.ToLower(logFormat)
+	if logFormat == "json" {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	}
+
+	logFile := ""
+	if logFile != "" {
+		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			fmt.Printf("Unable to open file for logging: %s", logFile)
+			os.Exit(errorcodes.ErrBadCall)
+		}
+
+		// Use a hook so we don't get color codes in the log file
+		if outputFormat == "json" {
+			logrus.AddHook(lfshook.NewHook(file, &logrus.JSONFormatter{}))
+		} else {
+			logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
+		}
+	}
+
+	// Configure logging filter
+	if lvl, found := toLogLevel(logLevel); !found {
+		feedback.Errorf("Invalid option for --log-level: %s", logLevel)
+		os.Exit(errorcodes.ErrBadArgument)
+	} else {
+		logrus.SetLevel(lvl)
+	}
+
 	//
 	// Prepare the Feedback system
 	//
@@ -148,12 +219,14 @@ func preRun(cmd *cobra.Command, args []string) {
 	// check the right output format was passed
 	format, found := parseFormatString(outputFormat)
 	if !found {
-		feedback.Error("Invalid output format: " + outputFormat)
+		feedback.Errorf("Invalid output format: %s", outputFormat)
 		os.Exit(errorcodes.ErrBadCall)
 	}
 
 	// use the output format to configure the Feedback
 	feedback.SetFormat(format)
+
+	logrus.Info(v.VersionInfo)
 
 	if outputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
