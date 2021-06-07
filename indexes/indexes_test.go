@@ -26,8 +26,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/arduino-cli/arduino/utils"
-	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,21 +37,20 @@ var defaultIndexGZURL = []string{
 }
 
 func TestDownloadIndex(t *testing.T) {
-	indexFolder := paths.TempDir().Join("fwuploader")
-	defer os.RemoveAll(indexFolder.String()) // cleanup after tests
+	defer os.RemoveAll(globals.FwUploaderPath.String()) // cleanup after tests
 	for _, u := range defaultIndexGZURL {
 		t.Logf("testing with index: %s", u)
 		err := DownloadIndex(u)
 		require.NoError(t, err)
-		require.DirExists(t, indexFolder.String())
+		require.DirExists(t, globals.FwUploaderPath.String())
 		URL, err := utils.URLParse(u)
 		require.NoError(t, err)
-		indexPath := indexFolder.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
+		indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
 		require.FileExists(t, indexPath.String())
 		sigURL, err := url.Parse(URL.String())
 		require.NoError(t, err)
 		sigURL.Path = strings.ReplaceAll(sigURL.Path, "gz", "sig")
-		signaturePath := indexFolder.Join(path.Base(sigURL.Path)).String()
+		signaturePath := globals.FwUploaderPath.Join(path.Base(sigURL.Path)).String()
 		require.FileExists(t, signaturePath)
 	}
 }

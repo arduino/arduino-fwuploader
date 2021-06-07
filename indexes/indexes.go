@@ -26,6 +26,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/security"
@@ -37,8 +38,6 @@ import (
 
 // DownloadIndex will download the index in the os temp directory
 func DownloadIndex(indexURL string) error {
-	fwUploaderPath := paths.TempDir().Join("fwuploader") // TODO make global
-
 	URL, err := utils.URLParse(indexURL)
 	if err != nil {
 		return fmt.Errorf("unable to parse URL %s: %s", indexURL, err)
@@ -57,7 +56,7 @@ func DownloadIndex(indexURL string) error {
 	if err != nil {
 		return fmt.Errorf("downloading index %s: %s", indexURL, err)
 	}
-	indexPath := fwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
+	indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
 	if err := Download(d); err != nil || d.Error() != nil {
 		return fmt.Errorf("downloading index %s: %s %s", URL, d.Error(), err)
 	}
@@ -93,15 +92,15 @@ func DownloadIndex(indexURL string) error {
 	if err != nil {
 		return fmt.Errorf("downloading index signature %s: %s", sigURL, err)
 	}
-	indexSigPath := fwUploaderPath.Join(path.Base(sigURL.Path))
+	indexSigPath := globals.FwUploaderPath.Join(path.Base(sigURL.Path))
 	if err := Download(d); err != nil || d.Error() != nil {
 		return fmt.Errorf("downloading index signature %s: %s %s", URL, d.Error(), err)
 	}
 	if err := verifySignature(tmpIndex, tmpSig, URL, sigURL); err != nil {
 		return fmt.Errorf("signature verification failed: %s", err)
 	}
-	if err := fwUploaderPath.MkdirAll(); err != nil { //does not overwrite if dir already present
-		return fmt.Errorf("can't create data directory %s: %s", fwUploaderPath, err)
+	if err := globals.FwUploaderPath.MkdirAll(); err != nil { //does not overwrite if dir already present
+		return fmt.Errorf("can't create data directory %s: %s", globals.FwUploaderPath, err)
 	}
 	if err := tmpIndex.CopyTo(indexPath); err != nil { //does overwrite
 		return fmt.Errorf("saving downloaded index %s: %s", URL, err)

@@ -220,7 +220,7 @@ func preRun(cmd *cobra.Command, args []string) {
 		indexes.DownloadIndex(u)
 	}
 
-	list, err := paths.TempDir().Join("fwuploader").ReadDir()
+	list, err := globals.FwUploaderPath.ReadDir()
 	if err != nil {
 		feedback.Errorf("Can't read fwuploader directory: %s", err)
 	}
