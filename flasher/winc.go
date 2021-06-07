@@ -21,6 +21,9 @@ package flasher
 
 import (
 	"bytes"
+	"crypto/rsa"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -68,9 +71,113 @@ func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 	return f.flashChunk(firmwareOffset, data)
 }
 
-func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList) error {
-	// TODO
-	return nil
+func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+	var certificatesData []byte
+	certificatesNumber := 0
+	for _, certPath := range *certificatePaths {
+		logrus.Infof("Converting and flashing certificate %s", certPath)
+
+		data, err := f.certificateFromFile(certPath)
+		if err != nil {
+			return err
+		}
+		certificatesData = append(certificatesData, data...)
+		certificatesNumber++
+	}
+
+	for _, URL := range URLs {
+		logrus.Infof("Converting and flashing certificate from %s", URL)
+		data, err := f.certificateFromURL(URL)
+		if err != nil {
+			return err
+		}
+		certificatesData = append(certificatesData, data...)
+		certificatesNumber++
+	}
+
+	certificatesOffset := 0x4000
+	return f.flashChunk(certificatesOffset, certificatesData)
+}
+
+func (f *WincFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {
+	data, err := certificateFile.ReadFile()
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	cert, err := x509.ParseCertificate(data)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	return f.getCertificateData(cert)
+}
+
+func (f *WincFlasher) certificateFromURL(URL string) ([]byte, error) {
+	config := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	conn, err := tls.Dial("tcp", URL, config)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	defer conn.Close()
+
+	if err := conn.Handshake(); err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	peerCertificates := conn.ConnectionState().PeerCertificates
+	if len(peerCertificates) == 0 {
+		err = fmt.Errorf("no peer certificates found at %s", URL)
+		logrus.Error(err)
+		return nil, err
+	}
+	rootCertificate := peerCertificates[len(peerCertificates)-1]
+	return f.getCertificateData(rootCertificate)
+}
+
+func (f *WincFlasher) getCertificateData(cert *x509.Certificate) ([]byte, error) {
+	b := []byte{}
+	nameSHA1Bytes, err := calculateNameSha1(cert)
+	if err != nil {
+		return nil, err
+	}
+
+	notBeforeBytes, err := convertTime(cert.NotBefore)
+	if err != nil {
+		return nil, err
+	}
+
+	notAfterBytes, err := convertTime(cert.NotAfter)
+	if err != nil {
+		return nil, err
+	}
+
+	rsaPublicKey := *cert.PublicKey.(*rsa.PublicKey)
+
+	rsaModulusNBytes := modulusN(rsaPublicKey)
+	rsaPublicExponentBytes := publicExponent(rsaPublicKey)
+
+	rsaModulusNLenBytes := uint16ToBytes(len(rsaModulusNBytes))
+	rsaPublicExponentLenBytes := uint16ToBytes(len(rsaPublicExponentBytes))
+
+	b = append(b, nameSHA1Bytes...)
+	b = append(b, rsaModulusNLenBytes...)
+	b = append(b, rsaPublicExponentLenBytes...)
+	b = append(b, notBeforeBytes...)
+	b = append(b, notAfterBytes...)
+	b = append(b, rsaModulusNBytes...)
+	b = append(b, rsaPublicExponentBytes...)
+	for (len(b) & 3) != 0 {
+		b = append(b, 0xff) // padding
+	}
+	return b, nil
 }
 
 func (f *WincFlasher) Close() error {

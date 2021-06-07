@@ -104,9 +104,8 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 	return err
 }
 
-func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList) error {
-	// TODO
-	return nil
+func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+	return fmt.Errorf("not supported by SaraFlasher")
 }
 
 func (f *SaraFlasher) Close() error {

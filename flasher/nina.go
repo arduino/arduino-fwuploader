@@ -22,7 +22,10 @@ package flasher
 import (
 	"bytes"
 	"crypto/md5"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/binary"
+	"encoding/pem"
 	"fmt"
 	"strconv"
 	"time"
@@ -82,9 +85,85 @@ func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 	return f.md5sum(data)
 }
 
-func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList) error {
-	// TODO
-	return nil
+func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+	var certificatesData []byte
+	for _, certPath := range *certificatePaths {
+		logrus.Infof("Converting and flashing certificate %s", certPath)
+
+		data, err := f.certificateFromFile(certPath)
+		if err != nil {
+			return err
+		}
+		certificatesData = append(certificatesData, data...)
+	}
+
+	for _, URL := range URLs {
+		logrus.Infof("Converting and flashing certificate from %s", URL)
+		data, err := f.certificateFromURL(URL)
+		if err != nil {
+			return err
+		}
+		certificatesData = append(certificatesData, data...)
+	}
+
+	certificatesDataLimit := 0x20000
+	if len(certificatesData) > certificatesDataLimit {
+		err := fmt.Errorf("certificates data %d exceeds limit of %d bytes", len(certificatesData), certificatesDataLimit)
+		logrus.Error(err)
+		return err
+	}
+
+	// Pad certificatesData to flash page
+	for len(certificatesData)%int(f.payloadSize) != 0 {
+		certificatesData = append(certificatesData, 0)
+	}
+
+	certificatesOffset := 0x10000
+	return f.flashChunk(certificatesOffset, certificatesData)
+}
+
+func (f *NinaFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {
+	data, err := certificateFile.ReadFile()
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	cert, err := x509.ParseCertificate(data)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw}), nil
+}
+
+func (f *NinaFlasher) certificateFromURL(URL string) ([]byte, error) {
+	config := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	conn, err := tls.Dial("tcp", URL, config)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	defer conn.Close()
+
+	if err := conn.Handshake(); err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	peerCertificates := conn.ConnectionState().PeerCertificates
+	if len(peerCertificates) == 0 {
+		err = fmt.Errorf("no peer certificates found at %s", URL)
+		logrus.Error(err)
+		return nil, err
+	}
+
+	rootCertificate := peerCertificates[len(peerCertificates)-1]
+	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: rootCertificate.Raw}), nil
 }
 
 // Close the port used by this flasher

@@ -45,7 +45,7 @@ func (e FlasherError) Error() string {
 
 type Flasher interface {
 	FlashFirmware(firmwareFile *paths.Path) error
-	FlashCertificates(certificatePaths *paths.PathList) error
+	FlashCertificates(certificatePaths *paths.PathList, URLs []string) error
 	Close() error
 
 	hello() error
