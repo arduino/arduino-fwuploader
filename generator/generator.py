@@ -128,10 +128,10 @@ def create_upload_data(fqbn, installed_cores):  # noqa: C901
     upload_data["uploader"] = get_uploader_id(tools, tool_executable)
 
     if "upload.use_1200bps_touch" in board_upload_data:
-        upload_data["upload.use_1200bps_touch"] = board_upload_data["upload.use_1200bps_touch"]
+        upload_data["upload.use_1200bps_touch"] = bool(board_upload_data["upload.use_1200bps_touch"])
 
     if "upload.wait_for_upload_port" in board_upload_data:
-        upload_data["upload.wait_for_upload_port"] = board_upload_data["upload.wait_for_upload_port"]
+        upload_data["upload.wait_for_upload_port"] = bool(board_upload_data["upload.wait_for_upload_port"])
 
     # Get the command used to upload and modifies it a bit
     command = (
