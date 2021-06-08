@@ -67,6 +67,7 @@ def create_firmware_data(binary, module, version):
         "url": f"{DOWNLOAD_URL}/{firmware_path}",
         "checksum": f"SHA-256:{file_hash}",
         "size": f"{firmware.stat().st_size}",
+        "module": module,
     }
 
 
