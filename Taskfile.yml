@@ -26,6 +26,11 @@ tasks:
     cmds:
       - npx {{ .PRETTIER }} --write "**/*.md"
 
+  docs:build:
+    desc: Build documentation website contents
+    cmds:
+      - mkdocs build -s
+
   build:
     desc: Build the project
     cmds:
