@@ -57,7 +57,7 @@ func DownloadIndex(indexURL string) error {
 		return fmt.Errorf("downloading index %s: %s", indexURL, err)
 	}
 	indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
-	if err := Download(d); err != nil || d.Error() != nil {
+	if err := download(d); err != nil || d.Error() != nil {
 		return fmt.Errorf("downloading index %s: %s %s", URL, d.Error(), err)
 	}
 
@@ -93,7 +93,7 @@ func DownloadIndex(indexURL string) error {
 		return fmt.Errorf("downloading index signature %s: %s", sigURL, err)
 	}
 	indexSigPath := globals.FwUploaderPath.Join(path.Base(sigURL.Path))
-	if err := Download(d); err != nil || d.Error() != nil {
+	if err := download(d); err != nil || d.Error() != nil {
 		return fmt.Errorf("downloading index signature %s: %s %s", URL, d.Error(), err)
 	}
 	if err := verifySignature(tmpIndex, tmpSig, URL, sigURL); err != nil {
@@ -113,8 +113,9 @@ func DownloadIndex(indexURL string) error {
 	return nil
 }
 
-// TODO commento e fare privato, probabilmente va spostato in altre parti (download dei tool)
-func Download(d *downloader.Downloader) error {
+// TODO probably move to tool downloads
+// download will take a downloader.Downloader as parameter. It will download the file specified in the downloader
+func download(d *downloader.Downloader) error {
 	if d == nil {
 		// This signal means that the file is already downloaded
 		return nil
@@ -129,17 +130,19 @@ func Download(d *downloader.Downloader) error {
 	return nil
 }
 
-// TODO mettere commento di spiegazione
+// verifySignature will take the indexPath and the signaturePath as parameters and verify if the signature is correct.
+// it will also verify if the index is parsable.
 func verifySignature(targetPath, signaturePath *paths.Path, URL, sigURL *url.URL) error {
 	var valid bool
 	var err error
-	if path.Base(URL.Path) == "package_index.json.gz" { // TODO path.Base chiamare una sola volta
+	index := path.Base(URL.Path)
+	if index == "package_index.json.gz" {
 		valid, _, err = security.VerifyArduinoDetachedSignature(targetPath, signaturePath)
 		// the signature verification is already done above
 		if _, err = packageindex.LoadIndexNoSign(targetPath); err != nil {
 			return fmt.Errorf("invalid package index: %s", err)
 		}
-	} else if path.Base(URL.Path) == "module_firmware_index.json.gz" {
+	} else if index == "module_firmware_index.json.gz" {
 		keysBox, err := rice.FindBox("gpg_keys")
 		if err != nil {
 			return fmt.Errorf("could not find bundled signature keys")
