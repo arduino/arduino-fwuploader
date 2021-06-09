@@ -35,6 +35,10 @@ type CommandData struct {
 	Payload []byte
 }
 
+func (d CommandData) String() string {
+	return fmt.Sprintf("%+v, %+v, %+v, %+v", d.Command, d.Address, d.Value, d.Payload)
+}
+
 type FlasherError struct {
 	err string
 }
@@ -75,7 +79,7 @@ func openSerial(portAddress string) (serial.Port, error) {
 			// Try another baudrate
 			continue
 		}
-		logrus.Infof("Opened port %s at %s", portAddress, baudRate)
+		logrus.Infof("Opened port %s at %d", portAddress, baudRate)
 
 		if err := port.SetReadTimeout(30 * time.Second); err != nil {
 			return nil, fmt.Errorf("could not set timeout on serial port: %s", err)
