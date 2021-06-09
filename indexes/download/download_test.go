@@ -33,24 +33,6 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-// TODO not working because of include loop
-// func TestDownloadTool(t *testing.T) {
-// 	defer os.RemoveAll(globals.FwUploaderPath.String()) // cleanup after tests
-// 	t.Logf("testing with index: %s", packageIndexGZURL)
-// 	err := DownloadIndex(packageIndexGZURL)
-// 	require.NoError(t, err)
-// 	require.DirExists(t, globals.FwUploaderPath.String())
-// 	URL, err := utils.URLParse(packageIndexGZURL)
-// 	require.NoError(t, err)
-// 	indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
-// 	require.FileExists(t, indexPath.String())
-// 	sigURL, err := url.Parse(URL.String())
-// 	require.NoError(t, err)
-// 	sigURL.Path = strings.ReplaceAll(sigURL.Path, "gz", "sig")
-// 	signaturePath := globals.FwUploaderPath.Join(path.Base(sigURL.Path)).String()
-// 	require.FileExists(t, signaturePath)
-// }
-
 var defaultIndexGZURL = []string{
 	"https://downloads.arduino.cc/packages/package_index.json.gz",
 	"http://downloads.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
