@@ -210,9 +210,7 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetLevel(lvl)
 	}
 
-	//
 	// Prepare the Feedback system
-	//
 
 	// normalize the format strings
 	outputFormat = strings.ToLower(outputFormat)
