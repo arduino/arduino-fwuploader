@@ -39,8 +39,8 @@ type Index struct {
 // indexPackage represents a single entry from module_firmware_index.json file.
 type indexBoard struct {
 	Fqbn            string             `json:"fqbn,required"`
-	Firmwares       []*indexFirmware   `json:"firmware,required"`
-	LoaderSketch    *indexLoaderSketch `json:"loader_sketch,required"`
+	Firmwares       []*IndexFirmware   `json:"firmware,required"`
+	LoaderSketch    *IndexLoaderSketch `json:"loader_sketch,required"`
 	Module          string             `json:"module,required"`
 	Name            string             `json:"name,required"`
 	Uploader        string             `json:"uploader,required"`
@@ -49,16 +49,17 @@ type indexBoard struct {
 	UploaderCommand string             `json:"uploader.command,required"`
 }
 
-// indexFirmware represents a single Firmware version from module_firmware_index.json file.
-type indexFirmware struct {
+// IndexFirmware represents a single Firmware version from module_firmware_index.json file.
+type IndexFirmware struct {
 	Version  string      `json:"version,required"` // `*semver.Version` but with SARA version is giving problems
 	URL      string      `json:"url,required"`
 	Checksum string      `json:"checksum,required"`
 	Size     json.Number `json:"size,required"`
+	Module   string      `json:module,required`
 }
 
-// indexLoaderSketch represents the sketch used to upload the new firmware on a board.
-type indexLoaderSketch struct {
+// IndexLoaderSketch represents the sketch used to upload the new firmware on a board.
+type IndexLoaderSketch struct {
 	URL      string      `json:"url,required"`
 	Checksum string      `json:"checksum,required"`
 	Size     json.Number `json:"size,required"`
@@ -124,7 +125,7 @@ func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
 	for _, board := range i.Boards {
 		var latestVersion *semver.RelaxedVersion
 		var latestFirmwareURL string
-		if board.Fqbn == fqbn && board.Module != "SARA" {
+		if board.Fqbn == fqbn && board.Module != "SARA" { // TODO togliere sara, lo assumo giá nel comando
 			for _, firmware := range board.Firmwares {
 				version := semver.ParseRelaxed(firmware.Version)
 				if latestVersion == nil || version.GreaterThan(latestVersion) { // TODO check the condition
@@ -138,7 +139,7 @@ func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
 				return "", fmt.Errorf("cannot find latest version")
 			}
 		} else if board.Fqbn == fqbn { // SARA
-			// TODO implement??
+			// TODO implement?? by defualt you have to specify the version
 			return "", fmt.Errorf("not implemented for SARA module")
 		}
 	}

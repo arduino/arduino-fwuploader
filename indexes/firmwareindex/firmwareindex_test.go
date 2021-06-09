@@ -28,7 +28,7 @@ import (
 
 func TestIndexParsing(t *testing.T) {
 	// semver.WarnInvalidVersionWhenParsingRelaxed = true
-	list, err := paths.New("testdata").ReadDir()
+	list, err := paths.New("../testdata").ReadDir()
 	require.NoError(t, err)
 	list.FilterSuffix(".json")
 	for _, indexFile := range list {
@@ -44,7 +44,7 @@ func TestIndexParsing(t *testing.T) {
 }
 
 func TestGetLatestFirmwareURL(t *testing.T) {
-	list, err := paths.New("testdata").ReadDir()
+	list, err := paths.New("../testdata").ReadDir()
 	require.NoError(t, err)
 	list.FilterSuffix(".json")
 	for _, indexFile := range list {
@@ -65,7 +65,7 @@ func TestGetLatestFirmwareURL(t *testing.T) {
 }
 
 func TestGetFirmwareURL(t *testing.T) {
-	list, err := paths.New("testdata").ReadDir()
+	list, err := paths.New("../testdata").ReadDir()
 	require.NoError(t, err)
 	list.FilterSuffix(".json")
 	for _, indexFile := range list {
@@ -89,7 +89,7 @@ func TestGetFirmwareURL(t *testing.T) {
 }
 
 func TestGetLoaderSketchURL(t *testing.T) {
-	list, err := paths.New("testdata").ReadDir()
+	list, err := paths.New("../testdata").ReadDir()
 	require.NoError(t, err)
 	list.FilterSuffix(".json")
 	for _, indexFile := range list {
@@ -109,7 +109,7 @@ func TestGetLoaderSketchURL(t *testing.T) {
 }
 
 func TestGetUploaderCommand(t *testing.T) {
-	list, err := paths.New("testdata").ReadDir()
+	list, err := paths.New("../testdata").ReadDir()
 	require.NoError(t, err)
 	list.FilterSuffix(".json")
 	for _, indexFile := range list {
@@ -129,7 +129,7 @@ func TestGetUploaderCommand(t *testing.T) {
 }
 
 func TestGetModule(t *testing.T) {
-	list, err := paths.New("testdata").ReadDir()
+	list, err := paths.New("../testdata").ReadDir()
 	require.NoError(t, err)
 	list.FilterSuffix(".json")
 	for _, indexFile := range list {
