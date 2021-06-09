@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
+	"sort"
 
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
@@ -89,7 +90,6 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	trusted, _, err := security.VerifySignature(jsonIndexFile, jsonSignatureFile, key)
 	if err != nil {
 		logrus.
@@ -136,44 +136,15 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	return &index, nil
 }
 
-// GetLatestFirmwareURL takes the fqbn as parameter and returns the URL of the latest available firmware.
-// Not currently implemented for SARA, as the version for it's firmware is a bit strange
-func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
-	board := i.GetBoard(fqbn)
-	if board == nil {
-		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
-	}
-
-	if board.Latest == nil {
-		return "", fmt.Errorf("cannot find latest version")
-	}
-
-	return board.Latest.URL, nil
-}
-
-// GetFirmwareURL will take the fqbn of the required board and the version of the firmware as parameters.
-// It will return the URL of the required firmware
-func (i *Index) GetFirmwareURL(fqbn, v string) (string, error) {
-	board := i.GetBoard(fqbn)
-	if board == nil {
-		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
-	}
-	version := semver.ParseRelaxed(v)
-	for _, firmware := range board.Firmwares {
-		if firmware.Version.Equal(version) {
-			return firmware.URL, nil
+// GetLatestFirmware returns the specified IndexFirmware version for this board.
+// Returns nil if version is not found.
+func (b *IndexBoard) GetFirmware(version string) *IndexFirmware {
+	for _, firmware := range b.Firmwares {
+		if firmware.Version == version {
+			return firmware
 		}
 	}
-	return "", fmt.Errorf("version not found: %s", version)
-}
-
-// GetLoaderSketchURL will take the board's fqbn and return the url of the loader sketch
-func (i *Index) GetLoaderSketchURL(fqbn string) (string, error) {
-	board := i.GetBoard(fqbn)
-	if board == nil {
-		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
-	}
-	return board.LoaderSketch.URL, nil
+	return nil
 }
 
 // GetBoard returns the IndexBoard for the given FQBN
@@ -196,12 +167,3 @@ func (b *IndexBoard) GetUploaderCommand() string {
 	return b.UploaderCommand.Linux
 }
 
-// GetModule will take the board's fqbn and return the name of the module
-func (i *Index) GetModule(fqbn string) (string, error) {
-	for _, board := range i.Boards {
-		if board.Fqbn == fqbn {
-			return board.Module, nil
-		}
-	}
-	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
-}
