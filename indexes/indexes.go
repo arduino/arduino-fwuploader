@@ -28,10 +28,13 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
 
+// GetToolRelease returns a ToolRelease by searching the toolID in the index.
+// Returns nil if no matching tool release is found
+// Assumes toolID is formatted correctly as <packager>:<tool_name>@<version>
 func GetToolRelease(index *packageindex.Index, toolID string) *cores.ToolRelease {
 	split := strings.Split(toolID, ":")
 	packageName := split[0]
@@ -70,39 +73,32 @@ func GetToolRelease(index *packageindex.Index, toolID string) *cores.ToolRelease
 	return nil
 }
 
-func downloadIndexes() (*paths.Path, error) {
-
-}
-
+// GetPackageIndex downloads and loads the Arduino package_index.json
 func GetPackageIndex() (*packageindex.Index, error) {
-	if err := download.DownloadIndex(globals.PackageIndexGZURL)
-
+	indexPath, err := download.DownloadIndex(globals.PackageIndexGZURL)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	in, err := packageindex.LoadIndex(indexPath)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	return in, err
 }
 
+// GetFirmwareIndex downloads and loads the FirmwareUploader module_firmware_index.json
 func GetFirmwareIndex() (*firmwareindex.Index, error) {
-
+	indexPath, err := download.DownloadIndex(globals.ModuleFirmwareIndexGZURL)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	in, err := firmwareindex.LoadIndex(indexPath)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	return in, err
 }
-
-// download indexes in /tmp/fwuloader/package_index.json etc..
-// for _, u := range globals.DefaultIndexGZURL {
-// 	indexes.DownloadIndex(u)
-// }
-
-// list, err := globals.FwUploaderPath.ReadDir()
-// if err != nil {
-// 	feedback.Errorf("Can't read fwuploader directory: %s", err)
-// }
-// for _, indexFile := range list {
-// 	if indexFile.Ext() != ".json" {
-// 		continue
-// 	}
-// 	if indexFile.String() == "package_index.json" {
-// 		PackageIndex, e := packageindex.LoadIndexNoSign(indexFile) // TODO fare funzione che ti ritorna le strutture dati, e fa tutto quello che ci sta dietro.
-// 	} else if indexFile.String() == "module_firmware_index.json" {
-// 		ModuleFWIndex, e := firmwareindex.LoadIndexNoSign(indexFile)
-// 	} else {
-// 		feedback.Errorf("Unknown index: %s", indexFile.String())
-// 	}
-// }
-
-// //TODO ⬇️ study in the CLI how the indexes are passed to other modules
