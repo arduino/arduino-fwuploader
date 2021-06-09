@@ -4,9 +4,10 @@
     "firmware": [
       {
         "version": "19.4.4",
-        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/WINC1500/19.4.4/m2m_aio_3a0.bin",
+        "url": "https://downloads-dev.arduino.cc/arduino-fwuploader/firmwares/WINC1500/19.4.4/m2m_aio_3a0.bin",
         "checksum": "SHA-256:f8be2a5ef10e109f685b7550d211ed11c07487de430b0e5994ca557160116c27",
-        "size": "412308"
+        "size": "412308",
+        "module": "WINC1500"
       },
       {
         "version": "19.5.2",
@@ -28,7 +29,7 @@
       }
     ],
     "loader_sketch": {
-      "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/loader/arduino.samd.mkr1000/loader.bin",
+      "url": "https://downloads-dev.arduino.cc/arduino-fwuploader/firmwares/loader/arduino.samd.mkr1000/loader.bin",
       "checksum": "SHA-256:1d904bf745c8df448358d70837a36ee8dec4c2a01e0e3b2ef8ef51c6a6c9d385",
       "size": "16328"
     },
