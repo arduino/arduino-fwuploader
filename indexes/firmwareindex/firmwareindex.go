@@ -78,7 +78,7 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
-	keysBox, err := rice.FindBox("../gpg_keys")
+	keysBox, err := rice.FindBox("gpg_keys")
 	if err != nil {
 		return nil, err
 	}
