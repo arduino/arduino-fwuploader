@@ -44,8 +44,8 @@ type indexBoard struct {
 	Module          string             `json:"module,required"`
 	Name            string             `json:"name,required"`
 	Uploader        string             `json:"uploader,required"`
-	UploadTouch     string             `json:"upload.use_1200bps_touch"`    // TODO replace "true" with true in json otherwise is a string and not a bool
-	UploadWait      string             `json:"upload.wait_for_upload_port"` // TODO see above
+	UploadTouch     bool               `json:"upload.use_1200bps_touch"`
+	UploadWait      bool               `json:"upload.wait_for_upload_port"`
 	UploaderCommand string             `json:"uploader.command,required"`
 }
 

@@ -21,7 +21,6 @@ package download
 
 import (
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/arduino/FirmwareUploader/cli/globals"
@@ -52,94 +51,124 @@ import (
 // 	require.FileExists(t, signaturePath)
 // }
 
-func TestDownloadTool(t *testing.T) {
-	defer os.RemoveAll(globals.FwUploaderPath.String())
-	// semver.WarnInvalidVersionWhenParsingRelaxed = true
-	list, err := paths.New("testdata").ReadDir()
-	require.NoError(t, err)
-	list.FilterSuffix("package_index.json")
-	for _, indexFile := range list {
-		t.Logf("testing with index: %s", indexFile)
-		index, e := packageindex.LoadIndexNoSign(indexFile)
-		require.NoError(t, e)
-		require.NotEmpty(t, index)
-		tool := GetToolRelease(index, "arduino:bossac@1.7.0-arduino3")
-		toolPath, err := DownloadTool(tool)
-		// TODO verify that the tool is installed
+var defaultIndexGZURL = []string{
+	"https://downloads.arduino.cc/packages/package_index.json.gz",
+	"http://downloads.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
+}
+
+func TestDownloadIndex(t *testing.T) {
+	defer os.RemoveAll(globals.FwUploaderPath.String()) // cleanup after tests
+	for _, u := range defaultIndexGZURL {
+		t.Logf("testing with index: %s", u)
+		indexPath, err := DownloadIndex(u)
 		require.NoError(t, err)
-		require.NotEmpty(t, toolPath)
-		require.FileExists(t, toolPath.String())
+		require.DirExists(t, globals.FwUploaderPath.String())
+		require.FileExists(t, indexPath.String())
+		signaturePath := globals.FwUploaderPath.Join(indexPath.Base() + ".sig").String()
+		require.FileExists(t, signaturePath)
 	}
+}
+
+func TestDownloadTool(t *testing.T) {
+	toolRelease := &cores.ToolRelease{
+		Version: semver.ParseRelaxed("1.7.0-arduino3"),
+		Tool: &cores.Tool{
+			Name: "bossac",
+		},
+		Flavors: []*cores.Flavor{
+			{
+				OS: "i686-mingw32",
+				Resource: &resources.DownloadResource{
+					URL:             "http://downloads.arduino.cc/tools/bossac-1.7.0-arduino3-windows.tar.gz",
+					ArchiveFileName: "bossac-1.7.0-arduino3-windows.tar.gz",
+					Checksum:        "SHA-256:62745cc5a98c26949ec9041ef20420643c561ec43e99dae659debf44e6836526",
+					Size:            3607421,
+				},
+			},
+			{
+				OS: "x86_64-apple-darwin",
+				Resource: &resources.DownloadResource{
+					URL:             "http://downloads.arduino.cc/tools/bossac-1.7.0-arduino3-osx.tar.gz",
+					ArchiveFileName: "bossac-1.7.0-arduino3-osx.tar.gz",
+					Checksum:        "SHA-256:adb3c14debd397d8135e9e970215c6972f0e592c7af7532fa15f9ce5e64b991f",
+					Size:            75510,
+				},
+			},
+			{
+				OS: "x86_64-pc-linux-gnu",
+				Resource: &resources.DownloadResource{
+					URL:             "http://downloads.arduino.cc/tools/bossac-1.7.0-arduino3-linux64.tar.gz",
+					ArchiveFileName: "bossac-1.7.0-arduino3-linux64.tar.gz",
+					Checksum:        "SHA-256:1ae54999c1f97234a5c603eb99ad39313b11746a4ca517269a9285afa05f9100",
+					Size:            207271,
+				},
+			},
+			{
+				OS: "i686-pc-linux-gnu",
+				Resource: &resources.DownloadResource{
+					URL:             "http://downloads.arduino.cc/tools/bossac-1.7.0-arduino3-linux32.tar.gz",
+					ArchiveFileName: "bossac-1.7.0-arduino3-linux32.tar.gz",
+					Checksum:        "SHA-256:4ac4354746d1a09258f49a43ef4d1baf030d81c022f8434774268b00f55d3ec3",
+					Size:            193577,
+				},
+			},
+			{
+				OS: "arm-linux-gnueabihf",
+				Resource: &resources.DownloadResource{
+					URL:             "http://downloads.arduino.cc/tools/bossac-1.7.0-arduino3-linuxarm.tar.gz",
+					ArchiveFileName: "bossac-1.7.0-arduino3-linuxarm.tar.gz",
+					Checksum:        "SHA-256:626c6cc548046901143037b782bf019af1663bae0d78cf19181a876fb9abbb90",
+					Size:            193941,
+				},
+			},
+			{
+				OS: "aarch64-linux-gnu",
+				Resource: &resources.DownloadResource{
+					URL:             "http://downloads.arduino.cc/tools/bossac-1.7.0-arduino3-linuxaarch64.tar.gz",
+					ArchiveFileName: "bossac-1.7.0-arduino3-linuxaarch64.tar.gz",
+					Checksum:        "SHA-256:a098b2cc23e29f0dc468416210d097c4a808752cd5da1a7b9b8b7b931a04180b",
+					Size:            268365,
+				},
+			},
+		},
+	}
+	defer os.RemoveAll(globals.FwUploaderPath.String())
+	indexFile := paths.New("testdata/package_index.json")
+	t.Logf("testing with index: %s", indexFile)
+	index, e := packageindex.LoadIndexNoSign(indexFile)
+	require.NoError(t, e)
+	require.NotEmpty(t, index)
+	toolDir, err := DownloadTool(toolRelease)
+	require.NoError(t, err)
+	require.NotEmpty(t, toolDir)
+	require.DirExists(t, toolDir.String())
+	toolDirContent, err := toolDir.ReadDir()
+	require.NoError(t, err)
+	require.True(t, len(toolDirContent) > 0)
 }
 
 func TestDownloadFirmware(t *testing.T) {
 	defer os.RemoveAll(globals.FwUploaderPath.String())
-	list, err := paths.New("../testdata").ReadDir() // TODO fix this
+	indexFile := paths.New("testdata/module_firmware_index.json")
+	t.Logf("testing with index: %s", indexFile)
+	index, e := firmwareindex.LoadIndexNoSign(indexFile)
+	require.NoError(t, e)
+	require.NotEmpty(t, index)
+	firmwarePath, err := DownloadFirmware(index.Boards[0].Firmwares[0])
 	require.NoError(t, err)
-	list.FilterSuffix("module_firmware_index.json")
-	for _, indexFile := range list {
-		t.Logf("testing with index: %s", indexFile)
-		index, e := firmwareindex.LoadIndexNoSign(indexFile)
-		require.NoError(t, e)
-		require.NotEmpty(t, index)
-		firmwarePath, err := DownloadFirmware(index.Boards[0].Firmwares[0])
-		require.NoError(t, err)
-		require.NotEmpty(t, firmwarePath)
-		require.FileExists(t, firmwarePath.String())
-	}
+	require.NotEmpty(t, firmwarePath)
+	require.FileExists(t, firmwarePath.String())
 }
 
 func TestDownloadLoaderSketch(t *testing.T) {
 	defer os.RemoveAll(globals.FwUploaderPath.String())
-	list, err := paths.New("../testdata").ReadDir() // TODO fix this
+	indexFile := paths.New("testdata/module_firmware_index.json")
+	t.Logf("testing with index: %s", indexFile)
+	index, e := firmwareindex.LoadIndexNoSign(indexFile)
+	require.NoError(t, e)
+	require.NotEmpty(t, index)
+	loaderPath, err := DownloadLoaderSketch(index.Boards[0].LoaderSketch)
 	require.NoError(t, err)
-	list.FilterSuffix("module_firmware_index.json")
-	for _, indexFile := range list {
-		t.Logf("testing with index: %s", indexFile)
-		index, e := firmwareindex.LoadIndexNoSign(indexFile)
-		require.NoError(t, e)
-		require.NotEmpty(t, index)
-		loaderPath, err := DownloadLoaderSketch(index.Boards[0].LoaderSketch)
-		require.NoError(t, err)
-		require.NotEmpty(t, loaderPath)
-		require.FileExists(t, loaderPath.String())
-	}
-}
-
-func GetToolRelease(index *packageindex.Index, toolID string) *cores.ToolRelease { // TODO put this logic in index.go in cli
-	split := strings.Split(toolID, ":")
-	packageName := split[0]
-	split = strings.Split(split[1], "@")
-	toolName := split[0]
-	version := semver.ParseRelaxed(split[1])
-	for _, pack := range index.Packages {
-		if pack.Name != packageName {
-			continue
-		}
-		for _, tool := range pack.Tools {
-			if tool.Name == toolName && tool.Version.Equal(version) {
-				flavors := []*cores.Flavor{}
-				for _, system := range tool.Systems {
-					size, _ := system.Size.Int64()
-					flavors = append(flavors, &cores.Flavor{
-						OS: system.OS,
-						Resource: &resources.DownloadResource{
-							URL:             system.URL,
-							ArchiveFileName: system.ArchiveFileName,
-							Checksum:        system.Checksum,
-							Size:            size,
-						},
-					})
-				}
-				return &cores.ToolRelease{
-					Version: version,
-					Flavors: flavors,
-					Tool: &cores.Tool{
-						Name: toolName,
-					},
-				}
-			}
-		}
-	}
-	return nil
+	require.NotEmpty(t, loaderPath)
+	require.FileExists(t, loaderPath.String())
 }

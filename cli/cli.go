@@ -28,17 +28,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/FirmwareUploader/cli/version"
-	"github.com/arduino/FirmwareUploader/indexes"
-	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/FirmwareUploader/modules/nina"
 	"github.com/arduino/FirmwareUploader/modules/sara"
 	"github.com/arduino/FirmwareUploader/modules/winc"
 	"github.com/arduino/FirmwareUploader/utils"
 	"github.com/arduino/FirmwareUploader/utils/context"
 	v "github.com/arduino/FirmwareUploader/version"
-	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/go-paths-helper"
@@ -213,31 +209,6 @@ func preRun(cmd *cobra.Command, args []string) {
 	} else {
 		logrus.SetLevel(lvl)
 	}
-
-	//TODO fare in un altro posto tutto ció ⬇️
-	// download indexes in /tmp/fwuloader/package_index.json etc..
-	for _, u := range globals.DefaultIndexGZURL {
-		indexes.DownloadIndex(u)
-	}
-
-	list, err := globals.FwUploaderPath.ReadDir()
-	if err != nil {
-		feedback.Errorf("Can't read fwuploader directory: %s", err)
-	}
-	for _, indexFile := range list {
-		if indexFile.Ext() != ".json" {
-			continue
-		}
-		if indexFile.String() == "package_index.json" {
-			PackageIndex, e := packageindex.LoadIndexNoSign(indexFile) // TODO fare funzione che ti ritorna le strutture dati, e fa tutto quello che ci sta dietro.
-		} else if indexFile.String() == "module_firmware_index.json" {
-			ModuleFWIndex, e := firmwareindex.LoadIndexNoSign(indexFile)
-		} else {
-			feedback.Errorf("Unknown index: %s", indexFile.String())
-		}
-	}
-
-	//TODO ⬇️ study in the CLI how the indexes are passed to other modules
 
 	// Prepare the Feedback system
 

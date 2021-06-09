@@ -26,13 +26,19 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"net/url"
+	"os"
 	"path"
 	"strings"
 
 	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
+	"github.com/arduino/arduino-cli/arduino/security"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/go-paths-helper"
+	rice "github.com/cmaglie/go.rice"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )
@@ -43,8 +49,24 @@ func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 		"tools",
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
-	installDir.Parent().MkdirAll()
-	if err := resource.Install(paths.TempDir(), paths.TempDir(), installDir); err != nil {
+	installDir.MkdirAll()
+	downloadsDir := globals.FwUploaderPath.Join("downloads")
+	archivePath := downloadsDir.Join(resource.ArchiveFileName)
+	archivePath.Parent().MkdirAll()
+	if err := archivePath.WriteFile(nil); err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	d, err := downloader.Download(archivePath.String(), resource.URL)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	if err := Download(d); err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	if err := resource.Install(downloadsDir, paths.TempDir(), installDir); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
@@ -181,5 +203,117 @@ func VerifyFileSize(size int64, filePath *paths.Path) error {
 		return fmt.Errorf("fetched archive size differs from size specified in index")
 	}
 
+	return nil
+}
+
+// DownloadIndex will download the index in the os temp directory
+func DownloadIndex(indexURL string) (*paths.Path, error) {
+	URL, err := utils.URLParse(indexURL)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse URL %s: %s", indexURL, err)
+	}
+
+	// Download index
+	tmpGZFile, err := paths.MkTempFile(nil, "")
+	if err != nil {
+		return nil, fmt.Errorf("creating temp file for compressed index download: %s", err)
+	}
+	tmpGZIndex := paths.New(tmpGZFile.Name())
+	defer os.Remove(tmpGZFile.Name())
+	defer tmpGZIndex.Remove()
+
+	d, err := downloader.Download(tmpGZIndex.String(), URL.String())
+	if err != nil {
+		return nil, fmt.Errorf("downloading index %s: %s", indexURL, err)
+	}
+	indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
+	if err := Download(d); err != nil || d.Error() != nil {
+		return nil, fmt.Errorf("downloading index %s: %s %s", URL, d.Error(), err)
+	}
+
+	// Extract the real index
+	tmpFile, err := paths.MkTempFile(nil, "")
+	if err != nil { //TODO mettere tmpdir.join(URL.Base()) in modo da usare LoadIndex() e non LoadIndexNoSign
+		return nil, fmt.Errorf("creating temp file for index extraction: %s", err)
+	}
+	tmpIndex := paths.New(tmpFile.Name())
+	defer os.Remove(tmpFile.Name())
+	defer tmpIndex.Remove()
+	if err := paths.GUnzip(tmpGZIndex, tmpIndex); err != nil {
+		return nil, fmt.Errorf("unzipping %s", URL)
+	}
+
+	// Download Signature
+	sigURL, err := url.Parse(URL.String())
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse URL %s: %s", sigURL, err)
+	}
+	sigURL.Path = strings.ReplaceAll(sigURL.Path, "gz", "sig")
+	var tmpSig *paths.Path
+	if t, err := paths.MkTempFile(nil, ""); err != nil {
+		return nil, fmt.Errorf("creating temp file for index signature download: %s", err)
+	} else {
+		tmpSig = paths.New(t.Name())
+		defer tmpSig.Remove()
+		defer os.Remove(t.Name())
+	}
+	d, err = downloader.Download(tmpSig.String(), sigURL.String())
+	if err != nil {
+		return nil, fmt.Errorf("downloading index signature %s: %s", sigURL, err)
+	}
+	indexSigPath := globals.FwUploaderPath.Join(path.Base(sigURL.Path))
+	if err := Download(d); err != nil || d.Error() != nil {
+		return nil, fmt.Errorf("downloading index signature %s: %s %s", URL, d.Error(), err)
+	}
+	if err := verifySignature(tmpIndex, tmpSig, URL, sigURL); err != nil {
+		return nil, fmt.Errorf("signature verification failed: %s", err)
+	}
+	if err := globals.FwUploaderPath.MkdirAll(); err != nil { //does not overwrite if dir already present
+		return nil, fmt.Errorf("can't create data directory %s: %s", globals.FwUploaderPath, err)
+	}
+	if err := tmpIndex.CopyTo(indexPath); err != nil { //does overwrite
+		return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
+	}
+	if tmpSig != nil {
+		if err := tmpSig.CopyTo(indexSigPath); err != nil { //does overwrite
+			return nil, fmt.Errorf("saving downloaded index signature: %s", err)
+		}
+	}
+	return indexPath, nil
+}
+
+// verifySignature will take the indexPath and the signaturePath as parameters and verify if the signature is correct.
+// it will also verify if the index is parsable.
+func verifySignature(targetPath, signaturePath *paths.Path, URL, sigURL *url.URL) error {
+	var valid bool
+	var err error
+	index := path.Base(URL.Path)
+	if index == "package_index.json.gz" {
+		valid, _, err = security.VerifyArduinoDetachedSignature(targetPath, signaturePath)
+		// the signature verification is already done above
+		if _, err = packageindex.LoadIndexNoSign(targetPath); err != nil {
+			return fmt.Errorf("invalid package index: %s", err)
+		}
+	} else if index == "module_firmware_index.json.gz" {
+		keysBox, err := rice.FindBox("gpg_keys")
+		if err != nil {
+			return fmt.Errorf("could not find bundled signature keys")
+		}
+		key, err := keysBox.Open("module_firmware_index_public.gpg.key")
+		if err != nil {
+			return fmt.Errorf("could not find bundled signature keys")
+		}
+		valid, _, err = security.VerifySignature(targetPath, signaturePath, key)
+		// the signature verification is already done above
+		firmwareindex.LoadIndexNoSign(targetPath)
+	} else {
+		return fmt.Errorf("index %s not supported", URL.Path)
+	}
+	if err != nil {
+		return fmt.Errorf("signature verification error: %s for index %s", err, URL)
+	}
+	if !valid {
+		return fmt.Errorf("index \"%s\" has an invalid signature", URL)
+	}
 	return nil
 }

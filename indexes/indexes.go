@@ -20,132 +20,89 @@
 package indexes
 
 import (
-	"fmt"
-	"net/url"
-	"os"
-	"path"
 	"strings"
 
 	"github.com/arduino/FirmwareUploader/cli/globals"
 	"github.com/arduino/FirmwareUploader/indexes/download"
 	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
-	"github.com/arduino/arduino-cli/arduino/security"
-	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/go-paths-helper"
-	rice "github.com/cmaglie/go.rice"
-	"go.bug.st/downloader/v2"
+	semver "go.bug.st/relaxed-semver"
 )
 
-// DownloadIndex will download the index in the os temp directory
-func DownloadIndex(indexURL string) error {
-	URL, err := utils.URLParse(indexURL)
-	if err != nil {
-		return fmt.Errorf("unable to parse URL %s: %s", indexURL, err)
-	}
-
-	// Download index
-	var tmpGZIndex *paths.Path
-	if tmpGZFile, err := paths.MkTempFile(nil, ""); err != nil {
-		return fmt.Errorf("creating temp file for compressed index download: %s", err)
-	} else {
-		tmpGZIndex = paths.New(tmpGZFile.Name())
-		defer os.Remove(tmpGZFile.Name())
-		defer tmpGZIndex.Remove()
-	}
-	d, err := downloader.Download(tmpGZIndex.String(), URL.String())
-	if err != nil {
-		return fmt.Errorf("downloading index %s: %s", indexURL, err)
-	}
-	indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
-	if err := download.Download(d); err != nil || d.Error() != nil {
-		return fmt.Errorf("downloading index %s: %s %s", URL, d.Error(), err)
-	}
-
-	// Extract the real index
-	var tmpIndex *paths.Path
-	if tmpFile, err := paths.MkTempFile(nil, ""); err != nil { //TODO mettere tmpdir.join(URL.Base()) in modo da usare LoadIndex() e non LoadIndexNoSign
-		return fmt.Errorf("creating temp file for index extraction: %s", err)
-	} else {
-		tmpIndex = paths.New(tmpFile.Name())
-		defer os.Remove(tmpFile.Name())
-		defer tmpIndex.Remove()
-	}
-	if err := paths.GUnzip(tmpGZIndex, tmpIndex); err != nil {
-		return fmt.Errorf("unzipping %s", URL)
-	}
-
-	// Download Signature
-	sigURL, err := url.Parse(URL.String())
-	if err != nil {
-		return fmt.Errorf("unable to parse URL %s: %s", sigURL, err)
-	}
-	sigURL.Path = strings.ReplaceAll(sigURL.Path, "gz", "sig")
-	var tmpSig *paths.Path
-	if t, err := paths.MkTempFile(nil, ""); err != nil {
-		return fmt.Errorf("creating temp file for index signature download: %s", err)
-	} else {
-		tmpSig = paths.New(t.Name())
-		defer tmpSig.Remove()
-		defer os.Remove(t.Name())
-	}
-	d, err = downloader.Download(tmpSig.String(), sigURL.String())
-	if err != nil {
-		return fmt.Errorf("downloading index signature %s: %s", sigURL, err)
-	}
-	indexSigPath := globals.FwUploaderPath.Join(path.Base(sigURL.Path))
-	if err := download.Download(d); err != nil || d.Error() != nil {
-		return fmt.Errorf("downloading index signature %s: %s %s", URL, d.Error(), err)
-	}
-	if err := verifySignature(tmpIndex, tmpSig, URL, sigURL); err != nil {
-		return fmt.Errorf("signature verification failed: %s", err)
-	}
-	if err := globals.FwUploaderPath.MkdirAll(); err != nil { //does not overwrite if dir already present
-		return fmt.Errorf("can't create data directory %s: %s", globals.FwUploaderPath, err)
-	}
-	if err := tmpIndex.CopyTo(indexPath); err != nil { //does overwrite
-		return fmt.Errorf("saving downloaded index %s: %s", URL, err)
-	}
-	if tmpSig != nil {
-		if err := tmpSig.CopyTo(indexSigPath); err != nil { //does overwrite
-			return fmt.Errorf("saving downloaded index signature: %s", err)
+func GetToolRelease(index *packageindex.Index, toolID string) *cores.ToolRelease {
+	split := strings.Split(toolID, ":")
+	packageName := split[0]
+	split = strings.Split(split[1], "@")
+	toolName := split[0]
+	version := semver.ParseRelaxed(split[1])
+	for _, pack := range index.Packages {
+		if pack.Name != packageName {
+			continue
+		}
+		for _, tool := range pack.Tools {
+			if tool.Name == toolName && tool.Version.Equal(version) {
+				flavors := []*cores.Flavor{}
+				for _, system := range tool.Systems {
+					size, _ := system.Size.Int64()
+					flavors = append(flavors, &cores.Flavor{
+						OS: system.OS,
+						Resource: &resources.DownloadResource{
+							URL:             system.URL,
+							ArchiveFileName: system.ArchiveFileName,
+							Checksum:        system.Checksum,
+							Size:            size,
+						},
+					})
+				}
+				return &cores.ToolRelease{
+					Version: version,
+					Flavors: flavors,
+					Tool: &cores.Tool{
+						Name: toolName,
+					},
+				}
+			}
 		}
 	}
 	return nil
 }
 
-// verifySignature will take the indexPath and the signaturePath as parameters and verify if the signature is correct.
-// it will also verify if the index is parsable.
-func verifySignature(targetPath, signaturePath *paths.Path, URL, sigURL *url.URL) error {
-	var valid bool
-	var err error
-	index := path.Base(URL.Path)
-	if index == "package_index.json.gz" {
-		valid, _, err = security.VerifyArduinoDetachedSignature(targetPath, signaturePath)
-		// the signature verification is already done above
-		if _, err = packageindex.LoadIndexNoSign(targetPath); err != nil {
-			return fmt.Errorf("invalid package index: %s", err)
-		}
-	} else if index == "module_firmware_index.json.gz" {
-		keysBox, err := rice.FindBox("gpg_keys")
-		if err != nil {
-			return fmt.Errorf("could not find bundled signature keys")
-		}
-		key, err := keysBox.Open("module_firmware_index_public.gpg.key")
-		if err != nil {
-			return fmt.Errorf("could not find bundled signature keys")
-		}
-		valid, _, err = security.VerifySignature(targetPath, signaturePath, key)
-		// the signature verification is already done above
-		firmwareindex.LoadIndexNoSign(targetPath)
-	} else {
-		return fmt.Errorf("index %s not supported", URL.Path)
-	}
-	if err != nil {
-		return fmt.Errorf("signature verification error: %s for index %s", err, URL)
-	}
-	if !valid {
-		return fmt.Errorf("index \"%s\" has an invalid signature", sigURL)
-	}
-	return nil
+func downloadIndexes() (*paths.Path, error) {
+
 }
+
+func GetPackageIndex() (*packageindex.Index, error) {
+	if err := download.DownloadIndex(globals.PackageIndexGZURL)
+
+}
+
+func GetFirmwareIndex() (*firmwareindex.Index, error) {
+
+}
+
+// download indexes in /tmp/fwuloader/package_index.json etc..
+// for _, u := range globals.DefaultIndexGZURL {
+// 	indexes.DownloadIndex(u)
+// }
+
+// list, err := globals.FwUploaderPath.ReadDir()
+// if err != nil {
+// 	feedback.Errorf("Can't read fwuploader directory: %s", err)
+// }
+// for _, indexFile := range list {
+// 	if indexFile.Ext() != ".json" {
+// 		continue
+// 	}
+// 	if indexFile.String() == "package_index.json" {
+// 		PackageIndex, e := packageindex.LoadIndexNoSign(indexFile) // TODO fare funzione che ti ritorna le strutture dati, e fa tutto quello che ci sta dietro.
+// 	} else if indexFile.String() == "module_firmware_index.json" {
+// 		ModuleFWIndex, e := firmwareindex.LoadIndexNoSign(indexFile)
+// 	} else {
+// 		feedback.Errorf("Unknown index: %s", indexFile.String())
+// 	}
+// }
+
+// //TODO ⬇️ study in the CLI how the indexes are passed to other modules
