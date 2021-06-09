@@ -35,7 +35,7 @@ import (
 
 var defaultIndexGZURL = []string{
 	"https://downloads.arduino.cc/packages/package_index.json.gz",
-	"http://downloads.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
+	"https://downloads.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
 }
 
 func TestDownloadIndex(t *testing.T) {
