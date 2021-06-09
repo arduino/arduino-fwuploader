@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/arduino/FirmwareUploader/cli/globals"
+	"github.com/arduino/FirmwareUploader/indexes/download"
 	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/security"
@@ -57,7 +58,7 @@ func DownloadIndex(indexURL string) error {
 		return fmt.Errorf("downloading index %s: %s", indexURL, err)
 	}
 	indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(URL.Path, ".gz", "")))
-	if err := download(d); err != nil || d.Error() != nil {
+	if err := download.Download(d); err != nil || d.Error() != nil {
 		return fmt.Errorf("downloading index %s: %s %s", URL, d.Error(), err)
 	}
 
@@ -93,7 +94,7 @@ func DownloadIndex(indexURL string) error {
 		return fmt.Errorf("downloading index signature %s: %s", sigURL, err)
 	}
 	indexSigPath := globals.FwUploaderPath.Join(path.Base(sigURL.Path))
-	if err := download(d); err != nil || d.Error() != nil {
+	if err := download.Download(d); err != nil || d.Error() != nil {
 		return fmt.Errorf("downloading index signature %s: %s %s", URL, d.Error(), err)
 	}
 	if err := verifySignature(tmpIndex, tmpSig, URL, sigURL); err != nil {
@@ -109,23 +110,6 @@ func DownloadIndex(indexURL string) error {
 		if err := tmpSig.CopyTo(indexSigPath); err != nil { //does overwrite
 			return fmt.Errorf("saving downloaded index signature: %s", err)
 		}
-	}
-	return nil
-}
-
-// TODO probably move to tool downloads
-// download will take a downloader.Downloader as parameter. It will download the file specified in the downloader
-func download(d *downloader.Downloader) error {
-	if d == nil {
-		// This signal means that the file is already downloaded
-		return nil
-	}
-	if err := d.Run(); err != nil {
-		return fmt.Errorf("failed to download file from %s : %s", d.URL, err)
-	}
-	// The URL is not reachable for some reason
-	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		return fmt.Errorf(d.Resp.Status)
 	}
 	return nil
 }
