@@ -21,7 +21,6 @@ package firmwareindex
 
 import (
 	"encoding/json"
-	"fmt"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/security"
@@ -48,7 +47,7 @@ type IndexBoard struct {
 	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
 	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
 	UploaderCommand *IndexUploaderCommand `json:"uploader.command,required"`
-	Latest          *IndexFirmware        `json:"-"`
+	LatestFirmware  *IndexFirmware        `json:"-"`
 }
 
 type IndexUploaderCommand struct {
@@ -89,7 +88,6 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	trusted, _, err := security.VerifySignature(jsonIndexFile, jsonSignatureFile, key)
 	if err != nil {
 		logrus.
@@ -123,12 +121,12 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	// Determine latest firmware for each board
 	for _, board := range index.Boards {
 		if board.Module == "SARA" {
-			// TODO implement?? by defualt you have to specify the version
+			// TODO implement?? by default you have to specify the version
 			continue
 		}
 		for _, firmware := range board.Firmwares {
-			if board.Latest == nil || firmware.Version.GreaterThan(board.Latest.Version) {
-				board.Latest = firmware
+			if board.LatestFirmware == nil || firmware.Version.GreaterThan(board.LatestFirmware.Version) {
+				board.LatestFirmware = firmware
 			}
 		}
 	}
@@ -136,51 +134,23 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	return &index, nil
 }
 
-// GetLatestFirmwareURL takes the fqbn as parameter and returns the URL of the latest available firmware.
-// Not currently implemented for SARA, as the version for it's firmware is a bit strange
-func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
-	board := i.GetBoard(fqbn)
-	if board == nil {
-		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
-	}
-
-	if board.Latest == nil {
-		return "", fmt.Errorf("cannot find latest version")
-	}
-
-	return board.Latest.URL, nil
-}
-
-// GetFirmwareURL will take the fqbn of the required board and the version of the firmware as parameters.
-// It will return the URL of the required firmware
-func (i *Index) GetFirmwareURL(fqbn, v string) (string, error) {
-	board := i.GetBoard(fqbn)
-	if board == nil {
-		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
-	}
-	version := semver.ParseRelaxed(v)
-	for _, firmware := range board.Firmwares {
-		if firmware.Version.Equal(version) {
-			return firmware.URL, nil
-		}
-	}
-	return "", fmt.Errorf("version not found: %s", version)
-}
-
-// GetLoaderSketchURL will take the board's fqbn and return the url of the loader sketch
-func (i *Index) GetLoaderSketchURL(fqbn string) (string, error) {
-	board := i.GetBoard(fqbn)
-	if board == nil {
-		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
-	}
-	return board.LoaderSketch.URL, nil
-}
-
 // GetBoard returns the IndexBoard for the given FQBN
 func (i *Index) GetBoard(fqbn string) *IndexBoard {
 	for _, b := range i.Boards {
 		if b.Fqbn == fqbn {
 			return b
+		}
+	}
+	return nil
+}
+
+// GetLatestFirmware returns the specified IndexFirmware version for this board.
+// Returns nil if version is not found.
+func (b *IndexBoard) GetFirmware(version string) *IndexFirmware {
+	v := semver.ParseRelaxed(version)
+	for _, firmware := range b.Firmwares {
+		if firmware.Version.Equal(v) {
+			return firmware
 		}
 	}
 	return nil
@@ -194,14 +164,4 @@ func (b *IndexBoard) GetUploaderCommand() string {
 	}
 	// The linux uploader command is considere to be the generic one
 	return b.UploaderCommand.Linux
-}
-
-// GetModule will take the board's fqbn and return the name of the module
-func (i *Index) GetModule(fqbn string) (string, error) {
-	for _, board := range i.Boards {
-		if board.Fqbn == fqbn {
-			return board.Module, nil
-		}
-	}
-	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
 }

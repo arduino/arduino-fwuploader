@@ -17,23 +17,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package firmware
+package programmer
 
 import (
-	"os"
+	"io"
 
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/executils"
 )
 
-func NewCommand() *cobra.Command {
-	firmwareCmd := &cobra.Command{
-		Use:     "firmware",
-		Short:   "Commands to operate on firmwares.",
-		Long:    "A subset of commands to perform various firmware operations.",
-		Example: "  " + os.Args[0] + " firmware ...",
+// Flash runs the upload command and outputs to outStream and errStream
+func Flash(command []string, outStream, errStream io.Writer) error {
+	cmd, err := executils.NewProcess(command...)
+	if err != nil {
+		return err
 	}
-
-	firmwareCmd.AddCommand(NewFlashCommand())
-	firmwareCmd.AddCommand(newListCommand())
-	return firmwareCmd
+	cmd.RedirectStdoutTo(outStream)
+	cmd.RedirectStderrTo(errStream)
+	return cmd.Run()
 }

@@ -6,7 +6,6 @@
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
-
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -38,71 +37,49 @@ func TestIndexParsing(t *testing.T) {
 	require.NotEmpty(t, index)
 }
 
-func TestGetLatestFirmwareURL(t *testing.T) {
+func TestGetBoard(t *testing.T) {
 	indexFile := paths.New("testdata/module_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 
-	result, err := index.GetLatestFirmwareURL("arduino:samd:mkr1000")
-	require.NoError(t, err)
-	require.NotEmpty(t, result)
-	require.Equal(t, "https://downloads.arduino.cc/arduino-fwuploader/firmwares/WINC1500/19.6.1/m2m_aio_3a0.bin", result)
+	board := index.GetBoard("arduino:samd:mkr1000")
+	require.NotNil(t, board)
+	require.Equal(t, board.Fqbn, "arduino:samd:mkr1000")
 
-	result, err = index.GetLatestFirmwareURL("arduino:samd:mkr1001")
-	require.Error(t, err)
-	require.Empty(t, result)
+	board = index.GetBoard("arduino:samd:nano_33_iot")
+	require.NotNil(t, board)
+	require.Equal(t, board.Fqbn, "arduino:samd:nano_33_iot")
+
+	board = index.GetBoard("arduino:avr:nessuno")
+	require.Nil(t, board)
 }
 
-func TestGetFirmwareURL(t *testing.T) {
+func TestGetLatestFirmware(t *testing.T) {
 	indexFile := paths.New("testdata/module_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 
-	result, err := index.GetFirmwareURL("arduino:samd:mkr1000", "19.6.1")
-	require.NoError(t, err)
-	require.NotEmpty(t, result)
-
-	result, err = index.GetFirmwareURL("arduino:samd:mkr1000", "0.0.0")
-	require.Error(t, err)
-	require.Empty(t, result)
-
-	result, err = index.GetFirmwareURL("arduino:samd:mkr1001", "19.6.1")
-	require.Error(t, err)
-	require.Empty(t, result)
+	firmware := index.GetBoard("arduino:samd:mkr1000").LatestFirmware
+	require.Equal(t, firmware.Version.String(), "19.6.1")
 }
 
-func TestGetLoaderSketchURL(t *testing.T) {
+func TestGetFirmware(t *testing.T) {
 	indexFile := paths.New("testdata/module_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 
-	result, err := index.GetLoaderSketchURL("arduino:samd:mkr1000")
-	require.NoError(t, err)
-	require.NotEmpty(t, result)
+	firmware := index.GetBoard("arduino:samd:mkr1000").GetFirmware("19.6.1")
+	require.Equal(t, firmware.Version.String(), "19.6.1")
 
-	result, err = index.GetLoaderSketchURL("arduino:samd:mkr1001")
-	require.Error(t, err)
-	require.Empty(t, result)
-}
+	firmware = index.GetBoard("arduino:samd:mkr1000").GetFirmware("19.5.2")
+	require.Equal(t, firmware.Version.String(), "19.5.2")
 
-func TestGetModule(t *testing.T) {
-	indexFile := paths.New("testdata/module_firmware_index.json")
-	t.Logf("testing with index: %s", indexFile)
-	index, e := LoadIndexNoSign(indexFile)
-	require.NoError(t, e)
-	require.NotEmpty(t, index)
-
-	result, err := index.GetModule("arduino:samd:mkr1000")
-	require.NoError(t, err)
-	require.Equal(t, result, "WINC1500")
-
-	result, err = index.GetModule("arduino:samd:mkr1001")
-	require.Error(t, err)
-	require.Empty(t, result)
+	firmware = index.GetBoard("arduino:samd:mkr1000").GetFirmware("0.0.0")
+	require.Nil(t, firmware)
 }
