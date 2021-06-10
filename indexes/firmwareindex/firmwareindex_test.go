@@ -91,22 +91,6 @@ func TestGetLoaderSketchURL(t *testing.T) {
 	require.Empty(t, result)
 }
 
-func TestGetUploaderCommand(t *testing.T) {
-	indexFile := paths.New("testdata/module_firmware_index.json")
-	t.Logf("testing with index: %s", indexFile)
-	index, e := LoadIndexNoSign(indexFile)
-	require.NoError(t, e)
-	require.NotEmpty(t, index)
-
-	result, err := index.GetUploaderCommand("arduino:samd:mkr1000")
-	require.NoError(t, err)
-	require.NotEmpty(t, result)
-
-	result, err = index.GetUploaderCommand("arduino:samd:mkr1001")
-	require.Error(t, err)
-	require.Empty(t, result)
-}
-
 func TestGetModule(t *testing.T) {
 	indexFile := paths.New("testdata/module_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)

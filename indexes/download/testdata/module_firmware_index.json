@@ -41,7 +41,10 @@
     "uploader": "arduino:bossac@1.7.0-arduino3",
     "upload.use_1200bps_touch": true,
     "upload.wait_for_upload_port": true,
-    "uploader.command": "\"{uploader}\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    "uploader.command": {
+      "linux": "\"{tool_dir}/bossac\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R",
+      "windows": "\"{tool_dir}\\bossac.exe\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    }
   },
   {
     "fqbn": "arduino:samd:mkrwifi1010",
@@ -148,7 +151,10 @@
     "uploader": "arduino:bossac@1.7.0-arduino3",
     "upload.use_1200bps_touch": true,
     "upload.wait_for_upload_port": true,
-    "uploader.command": "\"{uploader}\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    "uploader.command": {
+      "linux": "\"{tool_dir}/bossac\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R",
+      "windows": "\"{tool_dir}\\bossac.exe\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    }
   },
   {
     "fqbn": "arduino:samd:nano_33_iot",
@@ -255,7 +261,10 @@
     "uploader": "arduino:bossac@1.7.0-arduino3",
     "upload.use_1200bps_touch": true,
     "upload.wait_for_upload_port": true,
-    "uploader.command": "\"{uploader}\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    "uploader.command": {
+      "linux": "\"{tool_dir}/bossac\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R",
+      "windows": "\"{tool_dir}\\bossac.exe\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    }
   },
   {
     "fqbn": "arduino:samd:mkrvidor4000",
@@ -357,7 +366,10 @@
     "uploader": "arduino:bossac@1.7.0-arduino3",
     "upload.use_1200bps_touch": true,
     "upload.wait_for_upload_port": true,
-    "uploader.command": "\"{uploader}\" -i -d --port={serial.port.file} -I -U true -i -e -w \"{loader.sketch}.bin\" -R"
+    "uploader.command": {
+      "linux": "\"{tool_dir}/bossac\" -i -d --port={serial.port.file} -I -U true -i -e -w \"{loader.sketch}.bin\" -R",
+      "windows": "\"{tool_dir}\\bossac.exe\" -i -d --port={serial.port.file} -I -U true -i -e -w \"{loader.sketch}.bin\" -R"
+    }
   },
   {
     "fqbn": "arduino:megaavr:uno2018",
@@ -448,7 +460,9 @@
     "module": "NINA",
     "name": "Arduino Uno WiFi Rev2",
     "uploader": "arduino:avrdude@6.3.0-arduino17",
-    "uploader.command": "\"{uploader}\" \"-C{config.path}\" -v  -patmega4809 -cxplainedmini_updi -Pusb  -b115200 -e -D \"-Uflash:w:{loader.sketch}.hex:i\" \"-Ufuse2:w:0x01:m\" \"-Ufuse5:w:0xC9:m\" \"-Ufuse8:w:0x02:m\" "
+    "uploader.command": {
+      "linux": "\"{tool_dir}/bin/avrdude\" \"-C{tool_dir}/etc/avrdude.conf\" -v  -patmega4809 -cxplainedmini_updi -Pusb  -b115200 -e -D \"-Uflash:w:{loader.sketch}.hex:i\" \"-Ufuse2:w:0x01:m\" \"-Ufuse5:w:0xC9:m\" \"-Ufuse8:w:0x02:m\" "
+    }
   },
   {
     "fqbn": "arduino:samd:mkrnb1500",
@@ -485,7 +499,10 @@
     "uploader": "arduino:bossac@1.7.0-arduino3",
     "upload.use_1200bps_touch": true,
     "upload.wait_for_upload_port": true,
-    "uploader.command": "\"{uploader}\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    "uploader.command": {
+      "linux": "\"{tool_dir}/bossac\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R",
+      "windows": "\"{tool_dir}\\bossac.exe\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
+    }
   },
   {
     "fqbn": "arduino:mbed_nano:nanorp2040connect",
@@ -508,6 +525,8 @@
     "uploader": "arduino:rp2040tools@1.0.2",
     "upload.use_1200bps_touch": true,
     "upload.wait_for_upload_port": true,
-    "uploader.command": "\"{uploader}\" -v -D \"{loader.sketch}.elf\""
+    "uploader.command": {
+      "linux": "\"{tool_dir}/rp2040load\" -v -D \"{loader.sketch}.elf\""
+    }
   }
 ]
