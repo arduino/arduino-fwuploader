@@ -160,7 +160,7 @@ func (i *Index) GetFirmwareURL(fqbn, v string) (string, error) {
 	}
 	version := semver.ParseRelaxed(v)
 	for _, firmware := range board.Firmwares {
-		if firmware.Version == version {
+		if firmware.Version.Equal(version) {
 			return firmware.URL, nil
 		}
 	}
