@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func newListCommand() *cobra.Command {
@@ -46,10 +47,10 @@ func newListCommand() *cobra.Command {
 }
 
 type FirmwareResult struct {
-	BoardName       string `json:"board_name"`
-	BoardFQBN       string `json:"board_fqbn"`
-	Module          string `json:"module"`
-	FirmwareVersion string `json:"firmware_version"`
+	BoardName       string                 `json:"board_name"`
+	BoardFQBN       string                 `json:"board_fqbn"`
+	Module          string                 `json:"module"`
+	FirmwareVersion *semver.RelaxedVersion `json:"firmware_version"`
 	Latest          bool
 }
 

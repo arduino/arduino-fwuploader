@@ -58,11 +58,11 @@ type IndexUploaderCommand struct {
 
 // IndexFirmware represents a single Firmware version from module_firmware_index.json file.
 type IndexFirmware struct {
-	Version  string      `json:"version,required"` // `*semver.Version` but with SARA version is giving problems
-	URL      string      `json:"url,required"`
-	Checksum string      `json:"checksum,required"`
-	Size     json.Number `json:"size,required"`
-	Module   string      `json:"module,required"`
+	Version  *semver.RelaxedVersion `json:"version,required"`
+	URL      string                 `json:"url,required"`
+	Checksum string                 `json:"checksum,required"`
+	Size     json.Number            `json:"size,required"`
+	Module   string                 `json:"module,required"`
 }
 
 // IndexLoaderSketch represents the sketch used to upload the new firmware on a board.
@@ -137,8 +137,8 @@ func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
 	var latestVersion *semver.RelaxedVersion
 	var latestFirmwareURL string
 	for _, firmware := range board.Firmwares {
-		version := semver.ParseRelaxed(firmware.Version)
-		if latestVersion == nil || version.GreaterThan(latestVersion) { // TODO check the condition
+		version := firmware.Version
+		if latestVersion == nil || version.GreaterThan(latestVersion) {
 			latestVersion = version
 			latestFirmwareURL = firmware.URL
 		}
@@ -152,11 +152,12 @@ func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
 
 // GetFirmwareURL will take the fqbn of the required board and the version of the firmware as parameters.
 // It will return the URL of the required firmware
-func (i *Index) GetFirmwareURL(fqbn, version string) (string, error) {
+func (i *Index) GetFirmwareURL(fqbn, v string) (string, error) {
 	board := i.GetBoard(fqbn)
 	if board == nil {
 		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
 	}
+	version := semver.ParseRelaxed(v)
 	for _, firmware := range board.Firmwares {
 		if firmware.Version == version {
 			return firmware.URL, nil
