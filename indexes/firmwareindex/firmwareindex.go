@@ -74,12 +74,7 @@ type IndexLoaderSketch struct {
 
 // LoadIndex reads a module_firmware_index.json from a file and returns the corresponding Index structure.
 func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
-	buff, err := jsonIndexFile.ReadFile()
-	if err != nil {
-		return nil, err
-	}
-	var index Index
-	err = json.Unmarshal(buff, &index.Boards)
+	index, err := LoadIndexNoSign(jsonIndexFile)
 	if err != nil {
 		return nil, err
 	}
@@ -93,20 +88,21 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	trusted, _, err := security.VerifySignature(jsonIndexFile, jsonSignatureFile, key)
 	if err != nil {
 		logrus.
 			WithField("index", jsonIndexFile).
 			WithField("signatureFile", jsonSignatureFile).
 			WithError(err).Infof("Checking signature")
-	} else {
-		logrus.
-			WithField("index", jsonIndexFile).
-			WithField("signatureFile", jsonSignatureFile).
-			WithField("trusted", trusted).Infof("Checking signature")
-		index.IsTrusted = trusted
+		return nil, err
 	}
-	return &index, nil
+	logrus.
+		WithField("index", jsonIndexFile).
+		WithField("signatureFile", jsonSignatureFile).
+		WithField("trusted", trusted).Infof("Checking signature")
+	index.IsTrusted = trusted
+	return index, nil
 }
 
 // LoadIndexNoSign reads a module_firmware_index.json from a file and returns the corresponding Index structure.
