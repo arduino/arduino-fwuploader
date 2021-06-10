@@ -28,6 +28,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/FirmwareUploader/cli/firmware"
 	"github.com/arduino/FirmwareUploader/cli/version"
 	"github.com/arduino/FirmwareUploader/modules/nina"
 	"github.com/arduino/FirmwareUploader/modules/sara"
@@ -67,6 +68,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.AddCommand(version.NewCommand())
 
+	rootCmd.AddCommand(firmware.NewCommand())
 
 	rootCmd.Flags().StringVar(&ctx.PortName, "port", "", "serial port to use for flashing")
 	rootCmd.Flags().StringVar(&ctx.RootCertDir, "certs", "", "root certificate directory")
