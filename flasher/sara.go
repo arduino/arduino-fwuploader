@@ -109,9 +109,7 @@ func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 }
 
 func (f *SaraFlasher) Close() error {
-	err := f.port.Close()
-	logrus.Error(err)
-	return err
+	return f.port.Close()
 }
 
 func (f *SaraFlasher) hello() error {

@@ -82,7 +82,9 @@ func openSerial(portAddress string) (serial.Port, error) {
 		logrus.Infof("Opened port %s at %d", portAddress, baudRate)
 
 		if err := port.SetReadTimeout(30 * time.Second); err != nil {
-			return nil, fmt.Errorf("could not set timeout on serial port: %s", err)
+			err = fmt.Errorf("could not set timeout on serial port: %s", err)
+			logrus.Error(err)
+			return nil, err
 		}
 
 		return port, nil

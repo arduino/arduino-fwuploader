@@ -71,19 +71,28 @@ func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 		return err
 	}
 
+	logrus.Debugf("Reading file %s", firmwareFile)
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
 		logrus.Error(err)
 		return err
 	}
 
+	logrus.Debugf("Flashing chunks")
 	firmwareOffset := 0x0000
 	if err := f.flashChunk(firmwareOffset, data); err != nil {
 		logrus.Error(err)
 		return err
 	}
 
-	return f.md5sum(data)
+	logrus.Debugf("Checking md5")
+	err = f.md5sum(data)
+	if err != nil {
+		logrus.Error(err)
+		return err
+	}
+	logrus.Debugf("Flashed all the things")
+	return nil
 }
 
 func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
@@ -169,9 +178,7 @@ func (f *NinaFlasher) certificateFromURL(URL string) ([]byte, error) {
 
 // Close the port used by this flasher
 func (f *NinaFlasher) Close() error {
-	err := f.port.Close()
-	logrus.Error(err)
-	return err
+	return f.port.Close()
 }
 
 // Ping the programmer to see if it is alive.
