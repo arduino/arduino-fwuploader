@@ -22,7 +22,6 @@ package firmwareindex
 import (
 	"encoding/json"
 	"runtime"
-	"sort"
 
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
@@ -48,7 +47,7 @@ type IndexBoard struct {
 	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
 	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
 	UploaderCommand *IndexUploaderCommand `json:"uploader.command,required"`
-	Latest          *IndexFirmware        `json:"-"`
+	LatestFirmware  *IndexFirmware        `json:"-"`
 }
 
 type IndexUploaderCommand struct {
@@ -122,12 +121,12 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	// Determine latest firmware for each board
 	for _, board := range index.Boards {
 		if board.Module == "SARA" {
-			// TODO implement?? by defualt you have to specify the version
+			// TODO implement?? by default you have to specify the version
 			continue
 		}
 		for _, firmware := range board.Firmwares {
-			if board.Latest == nil || firmware.Version.GreaterThan(board.Latest.Version) {
-				board.Latest = firmware
+			if board.LatestFirmware == nil || firmware.Version.GreaterThan(board.LatestFirmware.Version) {
+				board.LatestFirmware = firmware
 			}
 		}
 	}
@@ -135,22 +134,23 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	return &index, nil
 }
 
-// GetLatestFirmware returns the specified IndexFirmware version for this board.
-// Returns nil if version is not found.
-func (b *IndexBoard) GetFirmware(version string) *IndexFirmware {
-	for _, firmware := range b.Firmwares {
-		if firmware.Version == version {
-			return firmware
-		}
-	}
-	return nil
-}
-
 // GetBoard returns the IndexBoard for the given FQBN
 func (i *Index) GetBoard(fqbn string) *IndexBoard {
 	for _, b := range i.Boards {
 		if b.Fqbn == fqbn {
 			return b
+		}
+	}
+	return nil
+}
+
+// GetLatestFirmware returns the specified IndexFirmware version for this board.
+// Returns nil if version is not found.
+func (b *IndexBoard) GetFirmware(version string) *IndexFirmware {
+	v := semver.ParseRelaxed(version)
+	for _, firmware := range b.Firmwares {
+		if firmware.Version.Equal(v) {
+			return firmware
 		}
 	}
 	return nil
