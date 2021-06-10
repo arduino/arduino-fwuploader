@@ -71,9 +71,9 @@ def create_firmware_data(binary, module, version):
     }
 
 
-def get_uploader_id(tools, tool_executable):
+def get_uploader_id(tools, tool_name):
     for t in tools:
-        if t["name"] == tool_executable:
+        if t["name"] == tool_name:
             packager = t["packager"]
             name = t["name"]
             version = t["version"]
@@ -118,15 +118,27 @@ def create_upload_data(fqbn, installed_cores):  # noqa: C901
         installed_json_data = json.load(f)
 
     if f"{tool}.cmd" in platform_upload_data:
-        tool_executable = platform_upload_data[f"{tool}.cmd"]
+        tool_executable_generic = platform_upload_data[f"{tool}.cmd"]
+        tool_executable_linux = platform_upload_data.get(f"{tool}.cmd.linux", tool_executable_generic)
+        tool_executable_windows = platform_upload_data.get(f"{tool}.cmd.windows", "")
+        tool_executable_macosx = platform_upload_data.get(f"{tool}.cmd.macosx", "")
+        tool_name = tool_executable_generic
     elif f"{tool}.cmd.path" in platform_upload_data:
-        tool_executable = platform_upload_data[f"{tool}.cmd.path"].split("/")[-1]
+        tool_executable_generic = "/".join(platform_upload_data[f"{tool}.cmd.path"].split("/")[1:])
+        tool_executable_linux = platform_upload_data.get(f"{tool}.cmd.path.linux", tool_executable_generic)
+        tool_executable_windows = platform_upload_data.get(f"{tool}.cmd.path.windows", "")
+        tool_executable_macosx = platform_upload_data.get(f"{tool}.cmd.path.macosx", "")
+        tool_name = tool_executable_generic.split("/")[-1]
 
-    if tool_executable == "rp2040load":
-        tool_executable = "rp2040tools"
+    tool_config_path = ""
+    if f"{tool}.config.path" in platform_upload_data:
+        tool_config_path = "/".join(platform_upload_data[f"{tool}.config.path"].split("/")[1:])
+
+    if tool_name == "rp2040load":
+        tool_name = "rp2040tools"
 
     tools = installed_json_data["packages"][0]["platforms"][0]["toolsDependencies"]
-    upload_data["uploader"] = get_uploader_id(tools, tool_executable)
+    upload_data["uploader"] = get_uploader_id(tools, tool_name)
 
     if "upload.use_1200bps_touch" in board_upload_data:
         upload_data["upload.use_1200bps_touch"] = bool(board_upload_data["upload.use_1200bps_touch"])
@@ -140,6 +152,7 @@ def create_upload_data(fqbn, installed_cores):  # noqa: C901
         .replace("{path}/{cmd}", "{uploader}")
         .replace("{cmd.path}", "{uploader}")
         .replace("{build.path}/{build.project_name}", "{loader.sketch}")
+        .replace("{config.path}", f"{{tool_dir}}/{tool_config_path}")
         .replace('\\"', "")
     )
 
@@ -163,7 +176,22 @@ def create_upload_data(fqbn, installed_cores):  # noqa: C901
     for k, v in {**board_upload_data, **params}.items():
         command = command.replace(f"{{{k}}}", v)
 
-    upload_data["uploader.command"] = command
+    # This is ugly as hell and I don't care
+    upload_data["uploader.command"] = {}
+    if tool_executable_linux:
+        upload_data["uploader.command"]["linux"] = command.replace(
+            "{uploader}", f"{{tool_dir}}/{tool_executable_linux}"
+        )
+
+    if tool_executable_windows:
+        upload_data["uploader.command"]["windows"] = command.replace(
+            "{uploader}", f"{{tool_dir}}\\{tool_executable_windows}"
+        )
+
+    if tool_executable_macosx:
+        upload_data["uploader.command"]["macosx"] = command.replace(
+            "{uploader}", f"{{tool_dir}}/{tool_executable_macosx}"
+        )
 
     return upload_data
 

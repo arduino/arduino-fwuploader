@@ -22,6 +22,7 @@ package firmwareindex
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
@@ -32,21 +33,27 @@ import (
 
 // Index represents Boards struct as seen from module_firmware_index.json file.
 type Index struct {
-	Boards    []*indexBoard
+	Boards    []*IndexBoard
 	IsTrusted bool
 }
 
 // indexPackage represents a single entry from module_firmware_index.json file.
-type indexBoard struct {
-	Fqbn            string             `json:"fqbn,required"`
-	Firmwares       []*IndexFirmware   `json:"firmware,required"`
-	LoaderSketch    *IndexLoaderSketch `json:"loader_sketch,required"`
-	Module          string             `json:"module,required"`
-	Name            string             `json:"name,required"`
-	Uploader        string             `json:"uploader,required"`
-	UploadTouch     bool               `json:"upload.use_1200bps_touch"`
-	UploadWait      bool               `json:"upload.wait_for_upload_port"`
-	UploaderCommand string             `json:"uploader.command,required"`
+type IndexBoard struct {
+	Fqbn            string                `json:"fqbn,required"`
+	Firmwares       []*IndexFirmware      `json:"firmware,required"`
+	LoaderSketch    *IndexLoaderSketch    `json:"loader_sketch,required"`
+	Module          string                `json:"module,required"`
+	Name            string                `json:"name,required"`
+	Uploader        string                `json:"uploader,required"`
+	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
+	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
+	UploaderCommand *IndexUploaderCommand `json:"uploader.command,required"`
+}
+
+type IndexUploaderCommand struct {
+	Linux   string `json:"linux,required"`
+	Windows string `json:"windows"`
+	Macosx  string `json:"macosx"`
 }
 
 // IndexFirmware represents a single Firmware version from module_firmware_index.json file.
@@ -172,14 +179,14 @@ func (i *Index) GetLoaderSketchURL(fqbn string) (string, error) {
 	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
 }
 
-// GetUploaderCommand will take the board's fqbn and return the command used for upload
-func (i *Index) GetUploaderCommand(fqbn string) (string, error) {
-	for _, board := range i.Boards {
-		if board.Fqbn == fqbn {
-			return board.UploaderCommand, nil
-		}
+func (b *IndexBoard) GetUploaderCommand() string {
+	if runtime.GOOS == "windows" && b.UploaderCommand.Windows != "" {
+		return b.UploaderCommand.Linux
+	} else if runtime.GOOS == "darwin" && b.UploaderCommand.Macosx != "" {
+		return b.UploaderCommand.Macosx
 	}
-	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+	// The linux uploader command is considere to be the generic one
+	return b.UploaderCommand.Linux
 }
 
 // GetModule will take the board's fqbn and return the name of the module
