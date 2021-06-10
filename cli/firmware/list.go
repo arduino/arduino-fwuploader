@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func newListCommand() *cobra.Command {
@@ -46,10 +47,10 @@ func newListCommand() *cobra.Command {
 }
 
 type FirmwareResult struct {
-	BoardName       string `json:"board_name"`
-	BoardFQBN       string `json:"board_fqbn"`
-	Module          string `json:"module"`
-	FirmwareVersion string `json:"firmware_version"`
+	BoardName       string                 `json:"board_name"`
+	BoardFQBN       string                 `json:"board_fqbn"`
+	Module          string                 `json:"module"`
+	FirmwareVersion *semver.RelaxedVersion `json:"firmware_version"`
 	Latest          bool
 }
 
@@ -70,6 +71,7 @@ func list(fqbn string) {
 					BoardFQBN:       board.Fqbn,
 					Module:          board.Module,
 					FirmwareVersion: firmware.Version,
+					Latest:          board.Latest == firmware,
 				})
 			}
 		}
@@ -83,9 +85,13 @@ func (f FirmwareListResult) String() string {
 		return "No firmwares available."
 	}
 	t := table.New()
-	t.SetHeader("Board", "FQBN", "Module", "Version")
+	t.SetHeader("Board", "FQBN", "Module", "", "Version")
 	for _, fw := range f {
-		t.AddRow(fw.BoardName, fw.BoardFQBN, fw.Module, fw.FirmwareVersion)
+		latest := ""
+		if fw.Latest {
+			latest = "✔"
+		}
+		t.AddRow(fw.BoardName, fw.BoardFQBN, fw.Module, latest, fw.FirmwareVersion)
 	}
 	return t.Render()
 }

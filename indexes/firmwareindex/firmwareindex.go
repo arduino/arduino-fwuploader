@@ -48,6 +48,7 @@ type IndexBoard struct {
 	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
 	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
 	UploaderCommand *IndexUploaderCommand `json:"uploader.command,required"`
+	Latest          *IndexFirmware        `json:"-"`
 }
 
 type IndexUploaderCommand struct {
@@ -58,11 +59,11 @@ type IndexUploaderCommand struct {
 
 // IndexFirmware represents a single Firmware version from module_firmware_index.json file.
 type IndexFirmware struct {
-	Version  string      `json:"version,required"` // `*semver.Version` but with SARA version is giving problems
-	URL      string      `json:"url,required"`
-	Checksum string      `json:"checksum,required"`
-	Size     json.Number `json:"size,required"`
-	Module   string      `json:"module,required"`
+	Version  *semver.RelaxedVersion `json:"version,required"`
+	URL      string                 `json:"url,required"`
+	Checksum string                 `json:"checksum,required"`
+	Size     json.Number            `json:"size,required"`
+	Module   string                 `json:"module,required"`
 }
 
 // IndexLoaderSketch represents the sketch used to upload the new firmware on a board.
@@ -74,12 +75,7 @@ type IndexLoaderSketch struct {
 
 // LoadIndex reads a module_firmware_index.json from a file and returns the corresponding Index structure.
 func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
-	buff, err := jsonIndexFile.ReadFile()
-	if err != nil {
-		return nil, err
-	}
-	var index Index
-	err = json.Unmarshal(buff, &index.Boards)
+	index, err := LoadIndexNoSign(jsonIndexFile)
 	if err != nil {
 		return nil, err
 	}
@@ -93,20 +89,21 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	trusted, _, err := security.VerifySignature(jsonIndexFile, jsonSignatureFile, key)
 	if err != nil {
 		logrus.
 			WithField("index", jsonIndexFile).
 			WithField("signatureFile", jsonSignatureFile).
 			WithError(err).Infof("Checking signature")
-	} else {
-		logrus.
-			WithField("index", jsonIndexFile).
-			WithField("signatureFile", jsonSignatureFile).
-			WithField("trusted", trusted).Infof("Checking signature")
-		index.IsTrusted = trusted
+		return nil, err
 	}
-	return &index, nil
+	logrus.
+		WithField("index", jsonIndexFile).
+		WithField("signatureFile", jsonSignatureFile).
+		WithField("trusted", trusted).Infof("Checking signature")
+	index.IsTrusted = trusted
+	return index, nil
 }
 
 // LoadIndexNoSign reads a module_firmware_index.json from a file and returns the corresponding Index structure.
@@ -123,6 +120,19 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 
 	index.IsTrusted = true
 
+	// Determine latest firmware for each board
+	for _, board := range index.Boards {
+		if board.Module == "SARA" {
+			// TODO implement?? by defualt you have to specify the version
+			continue
+		}
+		for _, firmware := range board.Firmwares {
+			if board.Latest == nil || firmware.Version.GreaterThan(board.Latest.Version) {
+				board.Latest = firmware
+			}
+		}
+	}
+
 	return &index, nil
 }
 
@@ -133,40 +143,28 @@ func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
 	if board == nil {
 		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
 	}
-	if board.Module == "SARA" { // TODO togliere sara, lo assumo giá nel comando
-		// TODO implement?? by defualt you have to specify the version
-		return "", fmt.Errorf("not implemented for SARA module")
-	}
 
-	var latestVersion *semver.RelaxedVersion
-	var latestFirmwareURL string
-	for _, firmware := range board.Firmwares {
-		version := semver.ParseRelaxed(firmware.Version)
-		if latestVersion == nil || version.GreaterThan(latestVersion) { // TODO check the condition
-			latestVersion = version
-			latestFirmwareURL = firmware.URL
-		}
-	}
-	if latestVersion != nil {
-		return latestFirmwareURL, nil
-	} else {
+	if board.Latest == nil {
 		return "", fmt.Errorf("cannot find latest version")
 	}
+
+	return board.Latest.URL, nil
 }
 
 // GetFirmwareURL will take the fqbn of the required board and the version of the firmware as parameters.
 // It will return the URL of the required firmware
-func (i *Index) GetFirmwareURL(fqbn, version string) (string, error) {
+func (i *Index) GetFirmwareURL(fqbn, v string) (string, error) {
 	board := i.GetBoard(fqbn)
 	if board == nil {
 		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
 	}
+	version := semver.ParseRelaxed(v)
 	for _, firmware := range board.Firmwares {
-		if firmware.Version == version {
+		if firmware.Version.Equal(version) {
 			return firmware.URL, nil
 		}
 	}
-	return "", fmt.Errorf("invalid version: %s", version)
+	return "", fmt.Errorf("version not found: %s", version)
 }
 
 // GetLoaderSketchURL will take the board's fqbn and return the url of the loader sketch

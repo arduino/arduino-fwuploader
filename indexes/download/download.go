@@ -77,7 +77,7 @@ func DownloadFirmware(firmware *firmwareindex.IndexFirmware) (*paths.Path, error
 	firmwarePath := globals.FwUploaderPath.Join(
 		"firmwares",
 		firmware.Module,
-		firmware.Version,
+		firmware.Version.String(),
 		path.Base(firmware.URL))
 	firmwarePath.Parent().MkdirAll()
 	if err := firmwarePath.WriteFile(nil); err != nil {
