@@ -33,6 +33,7 @@ func NewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " firmware ...",
 	}
 
+	firmwareCmd.AddCommand(NewFlashCommand())
 	firmwareCmd.AddCommand(newListCommand())
 	return firmwareCmd
 }

@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package flash_firmware
+package firmware
 
 import (
 	"bytes"
@@ -46,15 +46,15 @@ var (
 )
 
 // NewCommand created a new `version` command
-func NewCommand() *cobra.Command {
+func NewFlashCommand() *cobra.Command {
 	command := &cobra.Command{
-		Use:   "flash-firmware",
+		Use:   "flash",
 		Short: "Flashes firmwares to board.",
 		Long:  "Flashes specified module firmware to board at specified address. Module name and version can be omitted to install latest version.",
 		Example: "" +
-			"  " + os.Args[0] + " flash-firmware --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2\n" +
-			"  " + os.Args[0] + " flash-firmware -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
-			"  " + os.Args[0] + " flash-firmware -b arduino:samd:mkr1000 -a COM10\n",
+			"  " + os.Args[0] + " flash --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2\n" +
+			"  " + os.Args[0] + " flash -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
+			"  " + os.Args[0] + " flash -b arduino:samd:mkr1000 -a COM10\n",
 		Args: cobra.NoArgs,
 		Run:  run,
 	}
@@ -113,7 +113,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	var firmware *firmwareindex.IndexFirmware
 	if moduleVersion == "" {
-		firmware = board.GetLatestFirmware()
+		firmware = board.LatestFirmware
 	} else {
 		firmware = board.GetFirmware(moduleVersion)
 	}
