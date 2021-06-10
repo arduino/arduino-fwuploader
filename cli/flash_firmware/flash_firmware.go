@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/arduino/FirmwareUploader/flasher"
 	"github.com/arduino/FirmwareUploader/indexes"
@@ -121,7 +122,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	firwareFile, err := download.DownloadFirmware(firmware)
+	firmwareFile, err := download.DownloadFirmware(firmware)
 	if err != nil {
 		feedback.Errorf("Error downloading firmware from %s: %s", firmware.URL, err)
 		os.Exit(errorcodes.ErrGeneric)
@@ -151,7 +152,6 @@ func run(cmd *cobra.Command, args []string) {
 	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", address)
 	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
 
-	// TODO: Get uploader command line
 	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
 	if err != nil {
 		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
@@ -182,6 +182,10 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
+	// Wait a bit after flashing the loader sketch for the board to become
+	// available again.
+	time.Sleep(1 * time.Second)
+
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
 	switch moduleName {
@@ -198,7 +202,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	defer f.Close()
 
-	if err := f.FlashFirmware(firwareFile); err != nil {
+	if err := f.FlashFirmware(firmwareFile); err != nil {
 		feedback.Errorf("Error during firmware flashing: %s", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
