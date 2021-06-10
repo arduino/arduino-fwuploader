@@ -8,6 +8,7 @@ replace go.bug.st/serial => github.com/cmaglie/go-serial v0.0.0-20200923162623-b
 require (
 	github.com/arduino/arduino-cli v0.0.0-20210603144340-aef5a54882fa
 	github.com/arduino/go-paths-helper v1.6.0
+	github.com/arduino/go-properties-orderedmap v1.3.0 // indirect
 	github.com/cmaglie/go.rice v1.0.3
 	github.com/mattn/go-colorable v0.1.8
 	github.com/pkg/errors v0.9.1

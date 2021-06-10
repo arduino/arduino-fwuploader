@@ -22,12 +22,19 @@ package flash_firmware
 import (
 	"bytes"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/arduino/FirmwareUploader/flasher"
+	"github.com/arduino/FirmwareUploader/indexes"
+	"github.com/arduino/FirmwareUploader/indexes/download"
+	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	programmer "github.com/arduino/FirmwareUploader/programmers"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/go-properties-orderedmap"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -58,60 +65,126 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
+	packageIndex, err := indexes.GetPackageIndex()
+	if err != nil {
+		feedback.Errorf("Can't load package index: %s", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	firmwareIndex, err := indexes.GetFirmwareIndex()
+	if err != nil {
+		feedback.Errorf("Can't load firmware index: %s", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	if fqbn == "" {
 		feedback.Errorf("Error during firmware flashing: missing board fqbn")
-		os.Exit(errorcodes.ErrGeneric)
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	if address == "" {
 		feedback.Errorf("Error during firmware flashing: missing board address")
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+
+	board := firmwareIndex.GetBoard(fqbn)
+	if board == nil {
+		feedback.Errorf("Can't find board with %s fqbn", fqbn)
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+
+	// Get module name if not specified
+	moduleName := ""
+	moduleVersion := ""
+	if module == "" {
+		moduleName = board.Module
+	} else {
+		moduleSplit := strings.Split(module, "@")
+		if len(moduleSplit) == 2 {
+			moduleName = moduleSplit[0]
+			moduleVersion = moduleSplit[1]
+		} else {
+			moduleName = module
+		}
+	}
+	// Normalize module name
+	moduleName = strings.ToUpper(moduleName)
+
+	var firmware *firmwareindex.IndexFirmware
+	if moduleVersion == "" {
+		firmware = board.GetLatestFirmware()
+	} else {
+		firmware = board.GetFirmware(moduleVersion)
+	}
+	if firmware == nil {
+		feedback.Errorf("Error getting firmware for board: %s", fqbn)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if module == "" {
-		// TODO: Get firmware ID for board if not provided
+	firwareFile, err := download.DownloadFirmware(firmware)
+	if err != nil {
+		feedback.Errorf("Error downloading firmware from %s: %s", firmware.URL, err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	// TODO: Get firmware binary from given ID
+	toolRelease := indexes.GetToolRelease(packageIndex, board.Uploader)
+	if toolRelease == nil {
+		feedback.Errorf("Error getting upload tool %s for board %s", board.Uploader, board.Fqbn)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	uploadToolDir, err := download.DownloadTool(toolRelease)
+	if err != nil {
+		feedback.Errorf("Error downloading tool %s: %s", board.Uploader, err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
-	// TODO: Get uploader executable path
+	loaderSketchPath, err := download.DownloadLoaderSketch(board.LoaderSketch)
+	if err != nil {
+		feedback.Errorf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
+
+	uploaderCommand := board.GetUploaderCommand()
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{tool_dir}", filepath.FromSlash(uploadToolDir.String()))
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", address)
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
 
 	// TODO: Get uploader command line
-	commandLine := []string{""}
+	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
+	if err != nil {
+		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
-	// TODO: Build uploader command line using uploader path, eventual config path and Loader Sketch binary
-
-	// TODO: Get 1200bps touch from upload properties
-	use1200bpsTouch := false
-	if use1200bpsTouch {
-		feedback.Print("Putting board into bootloader mode")
-		// TODO: Get waitForUploadPort from upload properties
-		waitForUploadPort := false
-		_, err := serialutils.Reset(address, waitForUploadPort, nil)
+	// Check if board needs a 1200bps touch for upload
+	if board.UploadTouch {
+		logrus.Info("Putting board into bootloader mode")
+		_, err := serialutils.Reset(address, board.UploadWait, nil)
 		if err != nil {
-			// TODO
+			feedback.Errorf("Error during firmware flashing: missing board address")
+			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 
-	// TODO: Flash loader Sketch
+	// Flash loader Sketch
 	flashOut := new(bytes.Buffer)
 	flashErr := new(bytes.Buffer)
-	// TODO: Maybe this can be done differently?
-	var err error
-	// TODO: OutputFormat is not stored globally, we must store it globally since we need it
-	OutputFormat := "json"
-	if OutputFormat == "json" {
+	// var err error
+	if feedback.GetFormat() == feedback.JSON {
 		err = programmer.Flash(commandLine, flashOut, flashErr)
 	} else {
 		err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
 	}
 	if err != nil {
-		// TODO
+		feedback.Errorf("Error during firmware flashing: %s", err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
-	switch module {
+	switch moduleName {
 	case "NINA":
 		f, err = flasher.NewNinaFlasher(address)
 	case "SARA":
@@ -120,9 +193,13 @@ func run(cmd *cobra.Command, args []string) {
 		f, err = flasher.NewWincFlasher(address)
 	}
 	if err != nil {
-		// TODO
+		feedback.Errorf("Error during firmware flashing: %s", err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 	defer f.Close()
 
-	// TODO: Flash firmware
+	if err := f.FlashFirmware(firwareFile); err != nil {
+		feedback.Errorf("Error during firmware flashing: %s", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 }
