@@ -62,7 +62,7 @@ type IndexFirmware struct {
 	URL      string      `json:"url,required"`
 	Checksum string      `json:"checksum,required"`
 	Size     json.Number `json:"size,required"`
-	Module   string      `json:module,required`
+	Module   string      `json:"module,required"`
 }
 
 // IndexLoaderSketch represents the sketch used to upload the new firmware on a board.
@@ -129,54 +129,63 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 // GetLatestFirmwareURL takes the fqbn as parameter and returns the URL of the latest available firmware.
 // Not currently implemented for SARA, as the version for it's firmware is a bit strange
 func (i *Index) GetLatestFirmwareURL(fqbn string) (string, error) {
-	for _, board := range i.Boards {
-		var latestVersion *semver.RelaxedVersion
-		var latestFirmwareURL string
-		if board.Fqbn == fqbn && board.Module != "SARA" { // TODO togliere sara, lo assumo giá nel comando
-			for _, firmware := range board.Firmwares {
-				version := semver.ParseRelaxed(firmware.Version)
-				if latestVersion == nil || version.GreaterThan(latestVersion) { // TODO check the condition
-					latestVersion = version
-					latestFirmwareURL = firmware.URL
-				}
-			}
-			if latestVersion != nil {
-				return latestFirmwareURL, nil
-			} else {
-				return "", fmt.Errorf("cannot find latest version")
-			}
-		} else if board.Fqbn == fqbn { // SARA
-			// TODO implement?? by defualt you have to specify the version
-			return "", fmt.Errorf("not implemented for SARA module")
+	board := i.GetBoard(fqbn)
+	if board == nil {
+		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+	}
+	if board.Module == "SARA" { // TODO togliere sara, lo assumo giá nel comando
+		// TODO implement?? by defualt you have to specify the version
+		return "", fmt.Errorf("not implemented for SARA module")
+	}
+
+	var latestVersion *semver.RelaxedVersion
+	var latestFirmwareURL string
+	for _, firmware := range board.Firmwares {
+		version := semver.ParseRelaxed(firmware.Version)
+		if latestVersion == nil || version.GreaterThan(latestVersion) { // TODO check the condition
+			latestVersion = version
+			latestFirmwareURL = firmware.URL
 		}
 	}
-	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+	if latestVersion != nil {
+		return latestFirmwareURL, nil
+	} else {
+		return "", fmt.Errorf("cannot find latest version")
+	}
 }
 
 // GetFirmwareURL will take the fqbn of the required board and the version of the firmware as parameters.
-// It will return the URL  of the required firmware
+// It will return the URL of the required firmware
 func (i *Index) GetFirmwareURL(fqbn, version string) (string, error) {
-	for _, board := range i.Boards {
-		if board.Fqbn == fqbn {
-			for _, firmware := range board.Firmwares {
-				if firmware.Version == version {
-					return firmware.URL, nil
-				}
-			}
-			return "", fmt.Errorf("invalid version: %s", version)
+	board := i.GetBoard(fqbn)
+	if board == nil {
+		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+	}
+	for _, firmware := range board.Firmwares {
+		if firmware.Version == version {
+			return firmware.URL, nil
 		}
 	}
-	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+	return "", fmt.Errorf("invalid version: %s", version)
 }
 
 // GetLoaderSketchURL will take the board's fqbn and return the url of the loader sketch
 func (i *Index) GetLoaderSketchURL(fqbn string) (string, error) {
-	for _, board := range i.Boards {
-		if board.Fqbn == fqbn {
-			return board.LoaderSketch.URL, nil
+	board := i.GetBoard(fqbn)
+	if board == nil {
+		return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+	}
+	return board.LoaderSketch.URL, nil
+}
+
+// GetBoard returns the IndexBoard for the given FQBN
+func (i *Index) GetBoard(fqbn string) *IndexBoard {
+	for _, b := range i.Boards {
+		if b.Fqbn == fqbn {
+			return b
 		}
 	}
-	return "", fmt.Errorf("invalid FQBN: %s", fqbn)
+	return nil
 }
 
 func (b *IndexBoard) GetUploaderCommand() string {

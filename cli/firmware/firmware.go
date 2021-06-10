@@ -17,22 +17,22 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package main
+package firmware
 
 import (
 	"os"
 
-	"github.com/arduino/FirmwareUploader/cli"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	uploaderCmd := cli.NewCommand()
-	if len(os.Args) == 1 {
-		// Show help if user doesn't specify any parameter
-		uploaderCmd.Help()
-		os.Exit(1)
+func NewCommand() *cobra.Command {
+	firmwareCmd := &cobra.Command{
+		Use:     "firmware",
+		Short:   "Commands to operate on firmwares.",
+		Long:    "A subset of commands to perform various firmware operations.",
+		Example: "  " + os.Args[0] + " firmware ...",
 	}
-	if err := uploaderCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+
+	firmwareCmd.AddCommand(newListCommand())
+	return firmwareCmd
 }

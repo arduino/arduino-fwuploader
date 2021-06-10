@@ -28,6 +28,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/FirmwareUploader/cli/firmware"
 	"github.com/arduino/FirmwareUploader/cli/version"
 	"github.com/arduino/FirmwareUploader/modules/nina"
 	"github.com/arduino/FirmwareUploader/modules/sara"
@@ -55,7 +56,7 @@ var (
 
 func NewCommand() *cobra.Command {
 	// FirmwareUploader is the root command
-	firmwareUploaderCli := &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:              "FirmwareUploader",
 		Short:            "FirmwareUploader.",
 		Long:             "FirmwareUploader (FirmwareUploader).",
@@ -65,28 +66,30 @@ func NewCommand() *cobra.Command {
 		PersistentPreRun: preRun,
 	}
 
-	firmwareUploaderCli.AddCommand(version.NewCommand())
+	rootCmd.AddCommand(version.NewCommand())
 
-	firmwareUploaderCli.Flags().StringVar(&ctx.PortName, "port", "", "serial port to use for flashing")
-	firmwareUploaderCli.Flags().StringVar(&ctx.RootCertDir, "certs", "", "root certificate directory")
-	firmwareUploaderCli.Flags().StringSliceVar(&ctx.Addresses, "address", []string{}, "address (host:port) to fetch and flash root certificate for, multiple values allowed")
-	firmwareUploaderCli.Flags().StringVar(&ctx.FirmwareFile, "firmware", "", "firmware file to flash")
-	firmwareUploaderCli.Flags().BoolVar(&ctx.ReadAll, "read", false, "read all firmware and output to stdout")
-	firmwareUploaderCli.Flags().StringVar(&ctx.FWUploaderBinary, "flasher", "", "firmware upload binary (precompiled for the right target)")
-	firmwareUploaderCli.Flags().StringVar(&ctx.BinaryToRestore, "restore_binary", "", "binary to restore after the firmware upload (precompiled for the right target)")
-	firmwareUploaderCli.Flags().StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
-	firmwareUploaderCli.Flags().StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
-	firmwareUploaderCli.Flags().StringVar(&ctx.BoardName, "get_available_for", "", "Ask for available firmwares matching a given board")
-	firmwareUploaderCli.Flags().IntVar(&ctx.Retries, "retries", 9, "Number of retries in case of upload failure")
+	rootCmd.AddCommand(firmware.NewCommand())
 
-	firmwareUploaderCli.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
+	rootCmd.Flags().StringVar(&ctx.PortName, "port", "", "serial port to use for flashing")
+	rootCmd.Flags().StringVar(&ctx.RootCertDir, "certs", "", "root certificate directory")
+	rootCmd.Flags().StringSliceVar(&ctx.Addresses, "address", []string{}, "address (host:port) to fetch and flash root certificate for, multiple values allowed")
+	rootCmd.Flags().StringVar(&ctx.FirmwareFile, "firmware", "", "firmware file to flash")
+	rootCmd.Flags().BoolVar(&ctx.ReadAll, "read", false, "read all firmware and output to stdout")
+	rootCmd.Flags().StringVar(&ctx.FWUploaderBinary, "flasher", "", "firmware upload binary (precompiled for the right target)")
+	rootCmd.Flags().StringVar(&ctx.BinaryToRestore, "restore_binary", "", "binary to restore after the firmware upload (precompiled for the right target)")
+	rootCmd.Flags().StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
+	rootCmd.Flags().StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
+	rootCmd.Flags().StringVar(&ctx.BoardName, "get_available_for", "", "Ask for available firmwares matching a given board")
+	rootCmd.Flags().IntVar(&ctx.Retries, "retries", 9, "Number of retries in case of upload failure")
 
-	firmwareUploaderCli.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written")
-	firmwareUploaderCli.PersistentFlags().StringVar(&logFormat, "log-format", "", "The output format for the logs, can be {text|json}.")
-	firmwareUploaderCli.PersistentFlags().StringVar(&logLevel, "log-level", "info", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
-	firmwareUploaderCli.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
+	rootCmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
 
-	return firmwareUploaderCli
+	rootCmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written")
+	rootCmd.PersistentFlags().StringVar(&logFormat, "log-format", "", "The output format for the logs, can be {text|json}.")
+	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
+
+	return rootCmd
 }
 
 func run(cmd *cobra.Command, args []string) {
