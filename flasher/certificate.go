@@ -51,35 +51,35 @@ func calculateNameSha1(cert *x509.Certificate) (b []byte, err error) {
 	return
 }
 
-func convertTime(time time.Time) (b []byte, err error) {
+func convertTime(time time.Time) ([]byte, error) {
 	asn1Bytes, err := asn1.Marshal(time)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
 
-	b = bytes.Repeat([]byte{0x00}, 20) // value must be zero bytes
-	copy(b, asn1Bytes[2:])             // copy but drop the first two bytes
+	b := bytes.Repeat([]byte{0x00}, 20) // value must be zero bytes
+	copy(b, asn1Bytes[2:])              // copy but drop the first two bytes
 
-	return
+	return b, err
 }
 
 func modulusN(publicKey rsa.PublicKey) []byte {
 	return publicKey.N.Bytes()
 }
 
-func publicExponent(publicKey rsa.PublicKey) (b []byte) {
-	b = make([]byte, 4)
+func publicExponent(publicKey rsa.PublicKey) []byte {
+	b := make([]byte, 4)
 	binary.BigEndian.PutUint32(b, uint32(publicKey.E))
 	// strip leading zeros
 	for b[0] == 0 {
 		b = b[1:]
 	}
-	return
+	return b
 }
 
-func uint16ToBytes(i int) (b []byte) {
-	b = make([]byte, 2)
+func uint16ToBytes(i int) []byte {
+	b := make([]byte, 2)
 	binary.LittleEndian.PutUint16(b, uint16(i))
-	return
+	return b
 }
