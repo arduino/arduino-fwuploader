@@ -19,7 +19,77 @@
 
 package firmware
 
-import "github.com/spf13/cobra"
+import (
+	"os"
 
-func list(cmd *cobra.Command, args []string) {
+	"github.com/arduino/FirmwareUploader/indexes"
+	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/table"
+	"github.com/spf13/cobra"
+)
+
+func newListCommand() *cobra.Command {
+	var fqbn *string
+
+	listCmd := &cobra.Command{
+		Use:     "list",
+		Short:   "List available firmwares",
+		Long:    "Displays the availale firmwares, is it possible to filter results for a specific board.",
+		Example: "  " + os.Args[0] + " firmware list -b arduino:samd:mkr1000",
+		Args:    cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			list(*fqbn)
+		},
+	}
+	fqbn = listCmd.Flags().StringP("fqbn", "b", "", "Filter result for the specified board FQBN")
+	return listCmd
+}
+
+type FirmwareResult struct {
+	BoardName       string `json:"board_name"`
+	BoardFQBN       string `json:"board_fqbn"`
+	Module          string `json:"module"`
+	FirmwareVersion string `json:"firmware_version"`
+	Latest          bool
+}
+
+type FirmwareListResult []*FirmwareResult
+
+func list(fqbn string) {
+	firmwareIndex, err := indexes.GetFirmwareIndex()
+	if err != nil {
+		feedback.Error(err)
+	}
+
+	res := FirmwareListResult{}
+	for _, board := range firmwareIndex.Boards {
+		if fqbn == "" || board.Fqbn == fqbn {
+			for _, firmware := range board.Firmwares {
+				res = append(res, &FirmwareResult{
+					BoardName:       board.Name,
+					BoardFQBN:       board.Fqbn,
+					Module:          board.Module,
+					FirmwareVersion: firmware.Version,
+				})
+			}
+		}
+	}
+
+	feedback.PrintResult(res)
+}
+
+func (f FirmwareListResult) String() string {
+	if len(f) == 0 {
+		return "No firmwares available."
+	}
+	t := table.New()
+	t.SetHeader("Board", "FQBN", "Module", "Version")
+	for _, fw := range f {
+		t.AddRow(fw.BoardName, fw.BoardFQBN, fw.Module, fw.FirmwareVersion)
+	}
+	return t.Render()
+}
+
+func (f FirmwareListResult) Data() interface{} {
+	return f
 }
