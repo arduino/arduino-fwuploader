@@ -21,7 +21,6 @@ package firmwareindex
 
 import (
 	"encoding/json"
-	"fmt"
 	"runtime"
 	"sort"
 
@@ -166,4 +165,3 @@ func (b *IndexBoard) GetUploaderCommand() string {
 	// The linux uploader command is considere to be the generic one
 	return b.UploaderCommand.Linux
 }
-
