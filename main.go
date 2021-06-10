@@ -27,6 +27,11 @@ import (
 
 func main() {
 	uploaderCmd := cli.NewCommand()
+	if len(os.Args) == 1 {
+		// Show help if user doesn't specify any parameter
+		uploaderCmd.Help()
+		os.Exit(1)
+	}
 	if err := uploaderCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
