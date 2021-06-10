@@ -62,7 +62,7 @@ type IndexFirmware struct {
 	URL      string      `json:"url,required"`
 	Checksum string      `json:"checksum,required"`
 	Size     json.Number `json:"size,required"`
-	Module   string      `json:module,required`
+	Module   string      `json:"module,required"`
 }
 
 // IndexLoaderSketch represents the sketch used to upload the new firmware on a board.
