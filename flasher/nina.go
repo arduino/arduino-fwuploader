@@ -42,6 +42,7 @@ func NewNinaFlasher(portAddress string) (*NinaFlasher, error) {
 		logrus.Error(err)
 		return nil, err
 	}
+	time.Sleep(2 * time.Second)
 	f := &NinaFlasher{port: port}
 	payloadSize, err := f.getMaximumPayloadSize()
 	if err != nil {
@@ -290,14 +291,17 @@ func (f *NinaFlasher) sendCommand(data CommandData) error {
 	logrus.Debugf("sending command data %s", data)
 	buff := new(bytes.Buffer)
 	if err := binary.Write(buff, binary.BigEndian, data.Command); err != nil {
+		err = fmt.Errorf("writing command: %s", err)
 		logrus.Error(err)
 		return err
 	}
 	if err := binary.Write(buff, binary.BigEndian, data.Address); err != nil {
+		err = fmt.Errorf("writing address: %s", err)
 		logrus.Error(err)
 		return err
 	}
 	if err := binary.Write(buff, binary.BigEndian, data.Value); err != nil {
+		err = fmt.Errorf("writing value: %s", err)
 		logrus.Error(err)
 		return err
 	}
@@ -308,6 +312,7 @@ func (f *NinaFlasher) sendCommand(data CommandData) error {
 		length = uint16(len(data.Payload))
 	}
 	if err := binary.Write(buff, binary.BigEndian, length); err != nil {
+		err = fmt.Errorf("writing payload length: %s", err)
 		logrus.Error(err)
 		return err
 	}
@@ -318,6 +323,7 @@ func (f *NinaFlasher) sendCommand(data CommandData) error {
 	for {
 		sent, err := f.port.Write(bufferData)
 		if err != nil {
+			err = fmt.Errorf("writing data: %s", err)
 			logrus.Error(err)
 			return err
 		}
