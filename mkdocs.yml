@@ -1,7 +1,7 @@
 # Project information
 site_name: Arduino Firmware Uploader
 site_description: A firmware uploader/updater for Arduino Boards.
-site_url: https://arduino.github.io/arduino-firmware-uploader/
+site_url: https://arduino.github.io/FirmwareUploader/
 
 # Repository
 repo_name: arduino/FirmwareUploader
