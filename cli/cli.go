@@ -20,26 +20,18 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/arduino/FirmwareUploader/cli/certificates"
 	"github.com/arduino/FirmwareUploader/cli/firmware"
 	"github.com/arduino/FirmwareUploader/cli/version"
-	"github.com/arduino/FirmwareUploader/modules/nina"
-	"github.com/arduino/FirmwareUploader/modules/sara"
-	"github.com/arduino/FirmwareUploader/modules/winc"
-	"github.com/arduino/FirmwareUploader/utils"
-	"github.com/arduino/FirmwareUploader/utils/context"
+
 	v "github.com/arduino/FirmwareUploader/version"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/go-paths-helper"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
@@ -47,7 +39,6 @@ import (
 )
 
 var (
-	ctx          = &context.Context{}
 	outputFormat string
 	verbose      bool
 	logFile      string
@@ -63,7 +54,6 @@ func NewCommand() *cobra.Command {
 		Long:             "FirmwareUploader (FirmwareUploader).",
 		Example:          "  " + os.Args[0] + " <command> [flags...]",
 		Args:             cobra.NoArgs,
-		Run:              run,
 		PersistentPreRun: preRun,
 	}
 
@@ -71,80 +61,13 @@ func NewCommand() *cobra.Command {
 	rootCmd.AddCommand(firmware.NewCommand())
 	rootCmd.AddCommand(certificates.NewCommand())
 
-	rootCmd.Flags().StringVar(&ctx.PortName, "port", "", "serial port to use for flashing")
-	rootCmd.Flags().StringVar(&ctx.RootCertDir, "certs", "", "root certificate directory")
-	rootCmd.Flags().StringSliceVar(&ctx.Addresses, "address", []string{}, "address (host:port) to fetch and flash root certificate for, multiple values allowed")
-	rootCmd.Flags().StringVar(&ctx.FirmwareFile, "firmware", "", "firmware file to flash")
-	rootCmd.Flags().BoolVar(&ctx.ReadAll, "read", false, "read all firmware and output to stdout")
-	rootCmd.Flags().StringVar(&ctx.FWUploaderBinary, "flasher", "", "firmware upload binary (precompiled for the right target)")
-	rootCmd.Flags().StringVar(&ctx.BinaryToRestore, "restore_binary", "", "binary to restore after the firmware upload (precompiled for the right target)")
-	rootCmd.Flags().StringVar(&ctx.ProgrammerPath, "programmer", "", "path of programmer in use (avrdude/bossac)")
-	rootCmd.Flags().StringVar(&ctx.Model, "model", "", "module model (winc, nina or sara)")
-	rootCmd.Flags().StringVar(&ctx.BoardName, "get_available_for", "", "Ask for available firmwares matching a given board")
-	rootCmd.Flags().IntVar(&ctx.Retries, "retries", 9, "Number of retries in case of upload failure")
-
 	rootCmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
-
 	rootCmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written")
 	rootCmd.PersistentFlags().StringVar(&logFormat, "log-format", "", "The output format for the logs, can be {text|json}.")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
 
 	return rootCmd
-}
-
-func run(cmd *cobra.Command, args []string) {
-	if ctx.BoardName != "" {
-		el, _ := json.Marshal(utils.GetCompatibleWith(ctx.BoardName, ""))
-		fmt.Println(string(el))
-		os.Exit(0)
-	}
-
-	if ctx.PortName == "" {
-		log.Fatal("Please specify a serial port")
-	}
-
-	if ctx.BinaryToRestore != "" {
-		// sanity check for BinaryToRestore
-		f := paths.New(ctx.BinaryToRestore)
-		info, err := f.Stat()
-		if err != nil {
-			log.Fatalf("Error opening restore_binary: %s", err)
-		}
-		if info.IsDir() {
-			log.Fatalf("Error opening restore_binary: is a directory...")
-		}
-		if info.Size() == 0 {
-			log.Println("WARNING: restore_binary is empty! Will not restore binary after upload.")
-			ctx.BinaryToRestore = ""
-		}
-	}
-
-	retry := 0
-	for {
-		var err error
-		if ctx.Model == "nina" || strings.Contains(ctx.FirmwareFile, "NINA") || strings.Contains(ctx.FWUploaderBinary, "NINA") {
-			err = nina.Run(ctx)
-		} else if ctx.Model == "winc" || strings.Contains(ctx.FirmwareFile, "WINC") || strings.Contains(ctx.FWUploaderBinary, "WINC") {
-			err = winc.Run(ctx)
-		} else {
-			err = sara.Run(ctx)
-		}
-		if err == nil {
-			log.Println("Operation completed: success! :-)")
-			break
-		}
-		log.Println("Error: " + err.Error())
-
-		if retry >= ctx.Retries {
-			log.Fatal("Operation failed. :-(")
-		}
-
-		retry++
-		log.Println("Waiting 1 second before retrying...")
-		time.Sleep(time.Second)
-		log.Printf("Retrying upload (%d of %d)", retry, ctx.Retries)
-	}
 }
 
 // Convert the string passed to the `--log-level` option to the corresponding
