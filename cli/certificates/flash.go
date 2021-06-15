@@ -21,6 +21,7 @@ package certificates
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -161,13 +162,16 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
-	switch board.Module {
+	moduleName := board.Module
+	switch moduleName {
 	case "NINA":
 		f, err = flasher.NewNinaFlasher(address)
 	case "SARA":
 		f, err = flasher.NewSaraFlasher(address)
-	case "WINC":
+	case "WINC1500":
 		f, err = flasher.NewWincFlasher(address)
+	default:
+		err = fmt.Errorf("unknown module: %s", moduleName)
 	}
 	if err != nil {
 		feedback.Errorf("Error during certificates flashing: %s", err)
