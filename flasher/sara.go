@@ -101,7 +101,8 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 	if err != nil {
 		logrus.Error(err)
 	}
-	return err
+	logrus.Infof("Flashed all the things")
+	return err //should be nil
 }
 
 func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {

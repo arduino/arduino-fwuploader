@@ -86,13 +86,12 @@ func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 	}
 
 	logrus.Debugf("Checking md5")
-	err = f.md5sum(data)
-	if err != nil {
+	if err := f.md5sum(data); err != nil {
 		logrus.Error(err)
 		return err
 	}
-	logrus.Debugf("Flashed all the things")
-	return nil
+	logrus.Infof("Flashed all the things")
+	return err //should be nil
 }
 
 func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {

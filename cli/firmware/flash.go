@@ -171,7 +171,6 @@ func run(cmd *cobra.Command, args []string) {
 	// Flash loader Sketch
 	programmerOut := new(bytes.Buffer)
 	programmerErr := new(bytes.Buffer)
-	// var err error
 	if feedback.GetFormat() == feedback.JSON {
 		err = programmer.Flash(commandLine, programmerOut, programmerErr)
 	} else {

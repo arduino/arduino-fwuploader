@@ -27,7 +27,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -68,7 +67,12 @@ func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 		return err
 	}
 	firmwareOffset := 0x0000
-	return f.flashChunk(firmwareOffset, data)
+	if err = f.flashChunk(firmwareOffset, data); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	logrus.Infof("Flashed all the things")
+	return err //should be nil
 }
 
 func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
@@ -431,7 +435,7 @@ func (f *WincFlasher) erase(address uint32, length uint32) error {
 		return err
 	}
 
-	log.Printf("Erasing %d bytes from address 0x%X\n", length, address)
+	logrus.Debugf("Erasing %d bytes from address 0x%X\n", length, address)
 
 	// wait acknowledge
 	ack := make([]byte, 2)
