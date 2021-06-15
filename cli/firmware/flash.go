@@ -169,11 +169,11 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Flash loader Sketch
-	flashOut := new(bytes.Buffer)
-	flashErr := new(bytes.Buffer)
+	programmerOut := new(bytes.Buffer)
+	programmerErr := new(bytes.Buffer)
 	// var err error
 	if feedback.GetFormat() == feedback.JSON {
-		err = programmer.Flash(commandLine, flashOut, flashErr)
+		err = programmer.Flash(commandLine, programmerOut, programmerErr)
 	} else {
 		err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
 	}
@@ -206,4 +206,24 @@ func run(cmd *cobra.Command, args []string) {
 		feedback.Errorf("Error during firmware flashing: %s", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+
+	// Print the results
+	feedback.PrintResult(&flashResult{
+		ProgrammerOut: programmerOut.String(),
+		ProgrammerErr: programmerErr.String(),
+	})
+}
+
+type flashResult struct {
+	ProgrammerOut string
+	ProgrammerErr string
+}
+
+func (r *flashResult) Data() interface{} {
+	return r
+}
+
+func (r *flashResult) String() string {
+	// The output is already printed via os.Stdout/os.Stdin
+	return ""
 }
