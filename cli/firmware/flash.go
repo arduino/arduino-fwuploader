@@ -216,12 +216,12 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Print the results
-	feedback.PrintResult(&flashResult{
-		Programmer: (&ExecOutput{
+	feedback.PrintResult(&flasher.FlashResult{
+		Programmer: (&flasher.ExecOutput{
 			Stdout: programmerOut.String(),
 			Stderr: programmerErr.String(),
 		}),
-		Flasher: (&ExecOutput{
+		Flasher: (&flasher.ExecOutput{
 			Stdout: flasherOut.String(),
 			Stderr: flasherErr.String(),
 		}),
@@ -230,23 +230,4 @@ func run(cmd *cobra.Command, args []string) {
 	if err != nil {
 		os.Exit(errorcodes.ErrGeneric)
 	}
-}
-
-type flashResult struct {
-	Programmer *ExecOutput `json:"programmer"`
-	Flasher    *ExecOutput `json:"flasher"`
-}
-
-type ExecOutput struct {
-	Stdout string `json:"stdout"`
-	Stderr string `json:"stderr"`
-}
-
-func (r *flashResult) Data() interface{} {
-	return r
-}
-
-func (r *flashResult) String() string {
-	// The output is already printed via os.Stdout/os.Stdin
-	return ""
 }

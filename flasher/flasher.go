@@ -93,3 +93,22 @@ func openSerial(portAddress string) (serial.Port, error) {
 
 	return nil, lastError
 }
+
+type FlashResult struct {
+	Programmer *ExecOutput `json:"programmer"`
+	Flasher    *ExecOutput `json:"flasher"`
+}
+
+type ExecOutput struct {
+	Stdout string `json:"stdout"`
+	Stderr string `json:"stderr"`
+}
+
+func (r *FlashResult) Data() interface{} {
+	return r
+}
+
+func (r *FlashResult) String() string {
+	// The output is already printed via os.Stdout/os.Stdin
+	return ""
+}
