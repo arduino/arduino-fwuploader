@@ -21,6 +21,7 @@ package flasher
 
 import (
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -45,8 +46,10 @@ type SaraFlasher struct {
 	payloadSize int
 }
 
-func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
+func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s", firmwareFile)))
+	flasherOut.Write([]byte(fmt.Sprintln()))
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
 		logrus.Error(err)
@@ -102,6 +105,8 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 		logrus.Error(err)
 	}
 	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things"))
+	flasherOut.Write([]byte(fmt.Sprintln()))
 	return err //should be nil
 }
 

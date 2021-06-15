@@ -21,6 +21,7 @@ package flasher
 
 import (
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/arduino/go-paths-helper"
@@ -48,7 +49,7 @@ func (e FlasherError) Error() string {
 }
 
 type Flasher interface {
-	FlashFirmware(firmwareFile *paths.Path) error
+	FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error
 	FlashCertificates(certificatePaths *paths.PathList, URLs []string) error
 	Close() error
 

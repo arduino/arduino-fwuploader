@@ -27,6 +27,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
@@ -59,8 +60,10 @@ type WincFlasher struct {
 	payloadSize int
 }
 
-func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path) error {
+func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s", firmwareFile)))
+	flasherOut.Write([]byte(fmt.Sprintln()))
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
 		logrus.Error(err)
@@ -72,6 +75,8 @@ func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 		return err
 	}
 	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things"))
+	flasherOut.Write([]byte(fmt.Sprintln()))
 	return err //should be nil
 }
 

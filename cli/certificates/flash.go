@@ -21,6 +21,7 @@ package certificates
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"

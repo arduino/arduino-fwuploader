@@ -21,6 +21,7 @@ package firmware
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -201,21 +202,44 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	defer f.Close()
 
-	if err := f.FlashFirmware(firmwareFile); err != nil {
+	// now flash the actual firmware
+	flasherOut := new(bytes.Buffer)
+	flasherErr := new(bytes.Buffer)
+	if feedback.GetFormat() == feedback.JSON {
+		err = f.FlashFirmware(firmwareFile, flasherOut)
+	} else {
+		err = f.FlashFirmware(firmwareFile, os.Stdout)
+	}
+	if err != nil {
 		feedback.Errorf("Error during firmware flashing: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+		flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
 	}
 
 	// Print the results
 	feedback.PrintResult(&flashResult{
-		ProgrammerOut: programmerOut.String(),
-		ProgrammerErr: programmerErr.String(),
+		Programmer: (&ExecOutput{
+			Stdout: programmerOut.String(),
+			Stderr: programmerErr.String(),
+		}),
+		Flasher: (&ExecOutput{
+			Stdout: flasherOut.String(),
+			Stderr: flasherErr.String(),
+		}),
 	})
+	// Exit if something went wrong but after printing
+	if err != nil {
+		os.Exit(errorcodes.ErrGeneric)
+	}
 }
 
 type flashResult struct {
-	ProgrammerOut string
-	ProgrammerErr string
+	Programmer *ExecOutput `json:"programmer"`
+	Flasher    *ExecOutput `json:"flasher"`
+}
+
+type ExecOutput struct {
+	Stdout string `json:"stdout"`
+	Stderr string `json:"stderr"`
 }
 
 func (r *flashResult) Data() interface{} {

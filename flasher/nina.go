@@ -27,6 +27,7 @@ import (
 	"encoding/binary"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
@@ -64,8 +65,10 @@ type NinaFlasher struct {
 }
 
 // FlashFirmware in board connected to port using data from firmwareFile
-func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path) error {
+func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s", firmwareFile)))
+	flasherOut.Write([]byte(fmt.Sprintln()))
 	if err := f.hello(); err != nil {
 		logrus.Error(err)
 		return err
@@ -91,6 +94,8 @@ func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 		return err
 	}
 	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things"))
+	flasherOut.Write([]byte(fmt.Sprintln()))
 	return err //should be nil
 }
 
