@@ -99,10 +99,12 @@ func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 	return err //should be nil
 }
 
-func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error {
 	var certificatesData []byte
 	for _, certPath := range *certificatePaths {
 		logrus.Infof("Converting and flashing certificate %s", certPath)
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s", certPath)))
+		flasherOut.Write([]byte(fmt.Sprintln()))
 
 		data, err := f.certificateFromFile(certPath)
 		if err != nil {
@@ -113,6 +115,8 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 
 	for _, URL := range URLs {
 		logrus.Infof("Converting and flashing certificate from %s", URL)
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s", URL)))
+		flasherOut.Write([]byte(fmt.Sprintln()))
 		data, err := f.certificateFromURL(URL)
 		if err != nil {
 			return err
@@ -133,7 +137,14 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	}
 
 	certificatesOffset := 0x10000
-	return f.flashChunk(certificatesOffset, certificatesData)
+	if err := f.flashChunk(certificatesOffset, certificatesData); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things"))
+	flasherOut.Write([]byte(fmt.Sprintln()))
+	return nil
 }
 
 func (f *NinaFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {

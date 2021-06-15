@@ -110,7 +110,7 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 	return err //should be nil
 }
 
-func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, _ io.Writer) error {
 	return fmt.Errorf("not supported by SaraFlasher")
 }
 
