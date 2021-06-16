@@ -190,7 +190,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
