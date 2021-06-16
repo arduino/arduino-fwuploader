@@ -21,6 +21,7 @@ package firmware
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -193,8 +194,10 @@ func run(cmd *cobra.Command, args []string) {
 		f, err = flasher.NewNinaFlasher(address)
 	case "SARA":
 		f, err = flasher.NewSaraFlasher(address)
-	case "WINC":
+	case "WINC1500":
 		f, err = flasher.NewWincFlasher(address)
+	default:
+		err = fmt.Errorf("unknown module: %s", moduleName)
 	}
 	if err != nil {
 		feedback.Errorf("Error during firmware flashing: %s", err)
