@@ -173,7 +173,6 @@ func run(cmd *cobra.Command, args []string) {
 			uploadPort = newUploadPort
 		}
 	}
-	// TODO use uploadPort instead of address
 
 	// Flash loader Sketch
 	programmerOut := new(bytes.Buffer)
