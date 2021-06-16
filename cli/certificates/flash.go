@@ -138,7 +138,7 @@ func run(cmd *cobra.Command, args []string) {
 		logrus.Info("Putting board into bootloader mode")
 		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
 		if err != nil {
-			feedback.Errorf("Error during firmware flashing: missing board address")
+			feedback.Errorf("Error during certificates flashing: missing board address")
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		if newUploadPort != "" {
