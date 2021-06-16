@@ -133,12 +133,17 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Check if board needs a 1200bps touch for upload
+	uploadPort := address
 	if board.UploadTouch {
 		logrus.Info("Putting board into bootloader mode")
-		_, err := serialutils.Reset(address, board.UploadWait, nil)
+		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
 		if err != nil {
 			feedback.Errorf("Error during certificates flashing: missing board address")
 			os.Exit(errorcodes.ErrGeneric)
+		}
+		if newUploadPort != "" {
+			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
+			uploadPort = newUploadPort
 		}
 	}
 
@@ -157,18 +162,18 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
 	moduleName := board.Module
 	switch moduleName {
 	case "NINA":
-		f, err = flasher.NewNinaFlasher(address)
+		f, err = flasher.NewNinaFlasher(uploadPort)
 	case "SARA":
-		f, err = flasher.NewSaraFlasher(address)
+		f, err = flasher.NewSaraFlasher(uploadPort)
 	case "WINC1500":
-		f, err = flasher.NewWincFlasher(address)
+		f, err = flasher.NewWincFlasher(uploadPort)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
 	}
