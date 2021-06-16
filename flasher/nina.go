@@ -27,6 +27,7 @@ import (
 	"encoding/binary"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
@@ -64,8 +65,9 @@ type NinaFlasher struct {
 }
 
 // FlashFirmware in board connected to port using data from firmwareFile
-func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path) error {
+func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s\n", firmwareFile)))
 	if err := f.hello(); err != nil {
 		logrus.Error(err)
 		return err
@@ -86,19 +88,20 @@ func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 	}
 
 	logrus.Debugf("Checking md5")
-	err = f.md5sum(data)
-	if err != nil {
+	if err := f.md5sum(data); err != nil {
 		logrus.Error(err)
 		return err
 	}
-	logrus.Debugf("Flashed all the things")
+	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things\n"))
 	return nil
 }
 
-func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error {
 	var certificatesData []byte
 	for _, certPath := range *certificatePaths {
 		logrus.Infof("Converting and flashing certificate %s", certPath)
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
 
 		data, err := f.certificateFromFile(certPath)
 		if err != nil {
@@ -109,6 +112,7 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 
 	for _, URL := range URLs {
 		logrus.Infof("Converting and flashing certificate from %s", URL)
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s\n", URL)))
 		data, err := f.certificateFromURL(URL)
 		if err != nil {
 			return err
@@ -129,7 +133,13 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	}
 
 	certificatesOffset := 0x10000
-	return f.flashChunk(certificatesOffset, certificatesData)
+	if err := f.flashChunk(certificatesOffset, certificatesData); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things\n"))
+	return nil
 }
 
 func (f *NinaFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {

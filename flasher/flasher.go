@@ -21,6 +21,7 @@ package flasher
 
 import (
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/arduino/go-paths-helper"
@@ -48,8 +49,8 @@ func (e FlasherError) Error() string {
 }
 
 type Flasher interface {
-	FlashFirmware(firmwareFile *paths.Path) error
-	FlashCertificates(certificatePaths *paths.PathList, URLs []string) error
+	FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error
+	FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error
 	Close() error
 
 	hello() error
@@ -91,4 +92,23 @@ func openSerial(portAddress string) (serial.Port, error) {
 	}
 
 	return nil, lastError
+}
+
+type FlashResult struct {
+	Programmer *ExecOutput `json:"programmer"`
+	Flasher    *ExecOutput `json:"flasher"`
+}
+
+type ExecOutput struct {
+	Stdout string `json:"stdout"`
+	Stderr string `json:"stderr"`
+}
+
+func (r *FlashResult) Data() interface{} {
+	return r
+}
+
+func (r *FlashResult) String() string {
+	// The output is already printed via os.Stdout/os.Stdin
+	return ""
 }

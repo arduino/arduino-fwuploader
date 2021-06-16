@@ -27,7 +27,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"log"
+	"io"
 	"strconv"
 	"time"
 
@@ -60,22 +60,30 @@ type WincFlasher struct {
 	payloadSize int
 }
 
-func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path) error {
+func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s\n", firmwareFile)))
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
 		logrus.Error(err)
 		return err
 	}
 	firmwareOffset := 0x0000
-	return f.flashChunk(firmwareOffset, data)
+	if err = f.flashChunk(firmwareOffset, data); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things\n"))
+	return nil
 }
 
-func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error {
 	var certificatesData []byte
 	certificatesNumber := 0
 	for _, certPath := range *certificatePaths {
 		logrus.Infof("Converting and flashing certificate %s", certPath)
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
 
 		data, err := f.certificateFromFile(certPath)
 		if err != nil {
@@ -87,6 +95,7 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 
 	for _, URL := range URLs {
 		logrus.Infof("Converting and flashing certificate from %s", URL)
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s\n", URL)))
 		data, err := f.certificateFromURL(URL)
 		if err != nil {
 			return err
@@ -96,7 +105,13 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	}
 
 	certificatesOffset := 0x4000
-	return f.flashChunk(certificatesOffset, certificatesData)
+	if err := f.flashChunk(certificatesOffset, certificatesData); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things\n"))
+	return nil
 }
 
 func (f *WincFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {
@@ -431,7 +446,7 @@ func (f *WincFlasher) erase(address uint32, length uint32) error {
 		return err
 	}
 
-	log.Printf("Erasing %d bytes from address 0x%X\n", length, address)
+	logrus.Debugf("Erasing %d bytes from address 0x%X\n", length, address)
 
 	// wait acknowledge
 	ack := make([]byte, 2)

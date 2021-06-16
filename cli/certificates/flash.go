@@ -143,11 +143,10 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Flash loader Sketch
-	flashOut := new(bytes.Buffer)
-	flashErr := new(bytes.Buffer)
-	// var err error
+	programmerOut := new(bytes.Buffer)
+	programmerErr := new(bytes.Buffer)
 	if feedback.GetFormat() == feedback.JSON {
-		err = programmer.Flash(commandLine, flashOut, flashErr)
+		err = programmer.Flash(commandLine, programmerOut, programmerErr)
 	} else {
 		err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
 	}
@@ -179,9 +178,33 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	defer f.Close()
 
+	// now flash the certificate
+	flasherOut := new(bytes.Buffer)
+	flasherErr := new(bytes.Buffer)
 	certFileList := paths.NewPathList(certificatePaths...)
-	if err := f.FlashCertificates(&certFileList, certificateURLs); err != nil {
+	if feedback.GetFormat() == feedback.JSON {
+		err = f.FlashCertificates(&certFileList, certificateURLs, flasherOut)
+	} else {
+		err = f.FlashCertificates(&certFileList, certificateURLs, os.Stdout)
+	}
+	if err != nil {
 		feedback.Errorf("Error during certificates flashing: %s", err)
+		flasherErr.Write([]byte(fmt.Sprintf("Error during certificates flashing: %s", err)))
+	}
+
+	// Print the results
+	feedback.PrintResult(&flasher.FlashResult{
+		Programmer: (&flasher.ExecOutput{
+			Stdout: programmerOut.String(),
+			Stderr: programmerErr.String(),
+		}),
+		Flasher: (&flasher.ExecOutput{
+			Stdout: flasherOut.String(),
+			Stderr: flasherErr.String(),
+		}),
+	})
+	// Exit if something went wrong but after printing
+	if err != nil {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

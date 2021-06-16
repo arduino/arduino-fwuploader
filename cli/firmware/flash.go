@@ -170,11 +170,10 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Flash loader Sketch
-	flashOut := new(bytes.Buffer)
-	flashErr := new(bytes.Buffer)
-	// var err error
+	programmerOut := new(bytes.Buffer)
+	programmerErr := new(bytes.Buffer)
 	if feedback.GetFormat() == feedback.JSON {
-		err = programmer.Flash(commandLine, flashOut, flashErr)
+		err = programmer.Flash(commandLine, programmerOut, programmerErr)
 	} else {
 		err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
 	}
@@ -205,8 +204,32 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	defer f.Close()
 
-	if err := f.FlashFirmware(firmwareFile); err != nil {
+	// now flash the actual firmware
+	flasherOut := new(bytes.Buffer)
+	flasherErr := new(bytes.Buffer)
+	if feedback.GetFormat() == feedback.JSON {
+		err = f.FlashFirmware(firmwareFile, flasherOut)
+	} else {
+		err = f.FlashFirmware(firmwareFile, os.Stdout)
+	}
+	if err != nil {
 		feedback.Errorf("Error during firmware flashing: %s", err)
+		flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
+	}
+
+	// Print the results
+	feedback.PrintResult(&flasher.FlashResult{
+		Programmer: (&flasher.ExecOutput{
+			Stdout: programmerOut.String(),
+			Stderr: programmerErr.String(),
+		}),
+		Flasher: (&flasher.ExecOutput{
+			Stdout: flasherOut.String(),
+			Stderr: flasherErr.String(),
+		}),
+	})
+	// Exit if something went wrong but after printing
+	if err != nil {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

@@ -21,6 +21,7 @@ package flasher
 
 import (
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -45,8 +46,9 @@ type SaraFlasher struct {
 	payloadSize int
 }
 
-func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
+func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s\n", firmwareFile)))
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
 		logrus.Error(err)
@@ -101,10 +103,12 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path) error {
 	if err != nil {
 		logrus.Error(err)
 	}
-	return err
+	logrus.Infof("Flashed all the things")
+	flasherOut.Write([]byte("Flashed all the things\n"))
+	return nil
 }
 
-func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string) error {
+func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, _ io.Writer) error {
 	return fmt.Errorf("not supported by SaraFlasher")
 }
 
