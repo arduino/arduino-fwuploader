@@ -48,8 +48,7 @@ type SaraFlasher struct {
 
 func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
-	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s", firmwareFile)))
-	flasherOut.Write([]byte(fmt.Sprintln()))
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s\n", firmwareFile)))
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
 		logrus.Error(err)
@@ -105,9 +104,8 @@ func (f *SaraFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 		logrus.Error(err)
 	}
 	logrus.Infof("Flashed all the things")
-	flasherOut.Write([]byte("Flashed all the things"))
-	flasherOut.Write([]byte(fmt.Sprintln()))
-	return err //should be nil
+	flasherOut.Write([]byte("Flashed all the things\n"))
+	return nil
 }
 
 func (f *SaraFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, _ io.Writer) error {

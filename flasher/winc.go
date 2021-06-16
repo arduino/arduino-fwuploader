@@ -62,8 +62,7 @@ type WincFlasher struct {
 
 func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
 	logrus.Infof("Flashing firmware %s", firmwareFile)
-	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s", firmwareFile)))
-	flasherOut.Write([]byte(fmt.Sprintln()))
+	flasherOut.Write([]byte(fmt.Sprintf("Flashing firmware %s\n", firmwareFile)))
 	data, err := firmwareFile.ReadFile()
 	if err != nil {
 		logrus.Error(err)
@@ -75,9 +74,8 @@ func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 		return err
 	}
 	logrus.Infof("Flashed all the things")
-	flasherOut.Write([]byte("Flashed all the things"))
-	flasherOut.Write([]byte(fmt.Sprintln()))
-	return err //should be nil
+	flasherOut.Write([]byte("Flashed all the things\n"))
+	return nil
 }
 
 func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error {
@@ -85,8 +83,7 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	certificatesNumber := 0
 	for _, certPath := range *certificatePaths {
 		logrus.Infof("Converting and flashing certificate %s", certPath)
-		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s", certPath)))
-		flasherOut.Write([]byte(fmt.Sprintln()))
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
 
 		data, err := f.certificateFromFile(certPath)
 		if err != nil {
@@ -98,8 +95,7 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 
 	for _, URL := range URLs {
 		logrus.Infof("Converting and flashing certificate from %s", URL)
-		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s", URL)))
-		flasherOut.Write([]byte(fmt.Sprintln()))
+		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s\n", URL)))
 		data, err := f.certificateFromURL(URL)
 		if err != nil {
 			return err
@@ -114,8 +110,7 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 		return err
 	}
 	logrus.Infof("Flashed all the things")
-	flasherOut.Write([]byte("Flashed all the things"))
-	flasherOut.Write([]byte(fmt.Sprintln()))
+	flasherOut.Write([]byte("Flashed all the things\n"))
 	return nil
 }
 
