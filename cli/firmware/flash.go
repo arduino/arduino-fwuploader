@@ -44,6 +44,7 @@ var (
 	fqbn    string
 	address string
 	module  string
+	retries uint8
 )
 
 // NewCommand created a new `version` command
@@ -63,6 +64,7 @@ func NewFlashCommand() *cobra.Command {
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:samd:mkr1000, arduino:mbed_nano:nanorp2040connect")
 	command.Flags().StringVarP(&address, "address", "a", "", "Upload port, e.g.: COM10, /dev/ttyACM0")
 	command.Flags().StringVarP(&module, "module", "m", "", "Firmware module ID, e.g.: WINC1500, NINA")
+	command.Flags().Uint8Var(&retries, "retries", 9, "Number of retries in case of upload failure (default 9)")
 	return command
 }
 
@@ -159,82 +161,96 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	// Check if board needs a 1200bps touch for upload
-	uploadPort := address
-	if board.UploadTouch {
-		logrus.Info("Putting board into bootloader mode")
-		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
+	for retry := 0; retry <= int(retries); retry++ {
+
+		if retry == int(retries) {
+			logrus.Fatal("Operation failed. :-(")
+		}
+
+		if retry != 0 {
+			logrus.Infof("Retrying upload (%d of %d)", retry, retries)
+		}
+
+		// Check if board needs a 1200bps touch for upload
+		uploadPort := address
+		if board.UploadTouch {
+			logrus.Info("Putting board into bootloader mode")
+			newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
+			if err != nil {
+				feedback.Errorf("Error during firmware flashing: missing board address")
+				continue
+			}
+			if newUploadPort != "" {
+				logrus.Infof("Found port to upload Loader: %s", newUploadPort)
+				uploadPort = newUploadPort
+			}
+		}
+
+		// Flash loader Sketch
+		programmerOut := new(bytes.Buffer)
+		programmerErr := new(bytes.Buffer)
+		if feedback.GetFormat() == feedback.JSON {
+			err = programmer.Flash(commandLine, programmerOut, programmerErr)
+		} else {
+			err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
+		}
 		if err != nil {
-			feedback.Errorf("Error during firmware flashing: missing board address")
+			feedback.Errorf("Error during firmware flashing: %s", err)
+			continue
+		}
+
+		// Wait a bit after flashing the loader sketch for the board to become
+		// available again.
+		time.Sleep(2 * time.Second)
+
+		// Get flasher depending on which module to use
+		var f flasher.Flasher
+		switch moduleName {
+		case "NINA":
+			f, err = flasher.NewNinaFlasher(uploadPort)
+		case "SARA":
+			f, err = flasher.NewSaraFlasher(uploadPort)
+		case "WINC1500":
+			f, err = flasher.NewWincFlasher(uploadPort)
+		default:
+			err = fmt.Errorf("unknown module: %s", moduleName)
+			feedback.Errorf("Error during firmware flashing: %s", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
-		if newUploadPort != "" {
-			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
-			uploadPort = newUploadPort
+		if err != nil {
+			feedback.Errorf("Error during firmware flashing: %s", err)
+			continue
 		}
-	}
 
-	// Flash loader Sketch
-	programmerOut := new(bytes.Buffer)
-	programmerErr := new(bytes.Buffer)
-	if feedback.GetFormat() == feedback.JSON {
-		err = programmer.Flash(commandLine, programmerOut, programmerErr)
-	} else {
-		err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
-	}
-	if err != nil {
-		feedback.Errorf("Error during firmware flashing: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+		// now flash the actual firmware
+		flasherOut := new(bytes.Buffer)
+		flasherErr := new(bytes.Buffer)
+		if feedback.GetFormat() == feedback.JSON {
+			err = f.FlashFirmware(firmwareFile, flasherOut)
+		} else {
+			err = f.FlashFirmware(firmwareFile, os.Stdout)
+		}
+		if err != nil {
+			feedback.Errorf("Error during firmware flashing: %s", err)
+			flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
+		}
+		f.Close()
 
-	// Wait a bit after flashing the loader sketch for the board to become
-	// available again.
-	time.Sleep(2 * time.Second)
+		// Print the results
+		feedback.PrintResult(&flasher.FlashResult{
+			Programmer: (&flasher.ExecOutput{
+				Stdout: programmerOut.String(),
+				Stderr: programmerErr.String(),
+			}),
+			Flasher: (&flasher.ExecOutput{
+				Stdout: flasherOut.String(),
+				Stderr: flasherErr.String(),
+			}),
+		})
 
-	// Get flasher depending on which module to use
-	var f flasher.Flasher
-	switch moduleName {
-	case "NINA":
-		f, err = flasher.NewNinaFlasher(uploadPort)
-	case "SARA":
-		f, err = flasher.NewSaraFlasher(uploadPort)
-	case "WINC1500":
-		f, err = flasher.NewWincFlasher(uploadPort)
-	default:
-		err = fmt.Errorf("unknown module: %s", moduleName)
-	}
-	if err != nil {
-		feedback.Errorf("Error during firmware flashing: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	defer f.Close()
-
-	// now flash the actual firmware
-	flasherOut := new(bytes.Buffer)
-	flasherErr := new(bytes.Buffer)
-	if feedback.GetFormat() == feedback.JSON {
-		err = f.FlashFirmware(firmwareFile, flasherOut)
-	} else {
-		err = f.FlashFirmware(firmwareFile, os.Stdout)
-	}
-	if err != nil {
-		feedback.Errorf("Error during firmware flashing: %s", err)
-		flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
-	}
-
-	// Print the results
-	feedback.PrintResult(&flasher.FlashResult{
-		Programmer: (&flasher.ExecOutput{
-			Stdout: programmerOut.String(),
-			Stderr: programmerErr.String(),
-		}),
-		Flasher: (&flasher.ExecOutput{
-			Stdout: flasherOut.String(),
-			Stderr: flasherErr.String(),
-		}),
-	})
-	// Exit if something went wrong but after printing
-	if err != nil {
-		os.Exit(errorcodes.ErrGeneric)
+		if err == nil {
+			logrus.Info("Operation completed: success! :-)")
+			break
+		}
 	}
 }
