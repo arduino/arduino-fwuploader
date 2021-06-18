@@ -88,12 +88,12 @@ jobs:
         run: |
           # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
           # so we need to add execution permission back.
-          chmod +x dist/macos64/FirmwareUploader
+          chmod +x dist/macos64/arduino-fwuploader
           TAG=${GITHUB_REF/refs\/tags\//}
-          tar cjf dist/FirmwareUploader_${TAG}_macOS_64bit.tar.bz2 \
+          tar cjf dist/arduino-fwuploader_${TAG}_macOS_64bit.tar.bz2 \
           firmwares \
           LICENSE.txt \
-          -C dist/macos64/ FirmwareUploader
+          -C dist/macos64/ arduino-fwuploader
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -146,4 +146,4 @@ jobs:
           bodyFile: "dist/CHANGELOG.md"
           draft: false
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
-          artifacts: dist/FirmwareUploader*,dist/package_index.json
+          artifacts: dist/arduino-fwuploader*,dist/package_index.json

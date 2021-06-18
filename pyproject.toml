@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "FirmwareUploader"
+name = "arduino-fwuploader"
 version = "0.0.0"
-description = "FirmwareUploader"
+description = "arduino-fwuploader"
 authors = ["Arduino <info@arduino.cc>"]
 
 [tool.poetry.dependencies]

@@ -34,7 +34,7 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - go build -v {{.LDFLAGS}}
+      - go build -o {{.PROJECT_NAME}} -v {{.LDFLAGS}}
 
   test:
     desc: Run tests
@@ -91,7 +91,7 @@ tasks:
       - poetry run black .
 
 vars:
-  PROJECT_NAME: "FirmwareUploader"
+  PROJECT_NAME: "arduino-fwuploader"
   DIST_DIR: "dist"
   # build vars
   COMMIT:

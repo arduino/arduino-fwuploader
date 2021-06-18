@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -88,7 +88,7 @@ func GetPackageIndex() (*packageindex.Index, error) {
 	return in, err
 }
 
-// GetFirmwareIndex downloads and loads the FirmwareUploader module_firmware_index.json
+// GetFirmwareIndex downloads and loads the arduino-fwuploader module_firmware_index.json
 func GetFirmwareIndex() (*firmwareindex.Index, error) {
 	indexPath, err := download.DownloadIndex(globals.ModuleFirmwareIndexGZURL)
 	if err != nil {

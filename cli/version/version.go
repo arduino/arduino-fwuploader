@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -31,8 +31,8 @@ import (
 func NewCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
-		Short:   "Shows version number of FirmwareUploader.",
-		Long:    "Shows the version number of FirmwareUploader which is installed on your system.",
+		Short:   "Shows version number of arduino-fwuploader.",
+		Long:    "Shows the version number of arduino-fwuploader which is installed on your system.",
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,

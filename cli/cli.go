@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -47,11 +47,11 @@ var (
 )
 
 func NewCommand() *cobra.Command {
-	// FirmwareUploader is the root command
+	// arduino-fwuploader is the root command
 	rootCmd := &cobra.Command{
-		Use:              "FirmwareUploader",
-		Short:            "FirmwareUploader.",
-		Long:             "FirmwareUploader (FirmwareUploader).",
+		Use:              "arduino-fwuploader",
+		Short:            "arduino-fwuploader.",
+		Long:             "Arduino Firmware Uploader (arduino-fwuploader).",
 		Example:          "  " + os.Args[0] + " <command> [flags...]",
 		Args:             cobra.NoArgs,
 		PersistentPreRun: preRun,
