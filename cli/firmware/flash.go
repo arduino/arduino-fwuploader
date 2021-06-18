@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -44,6 +45,7 @@ var (
 	fqbn    string
 	address string
 	module  string
+	retries uint8
 )
 
 // NewCommand created a new `version` command
@@ -63,6 +65,7 @@ func NewFlashCommand() *cobra.Command {
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:samd:mkr1000, arduino:mbed_nano:nanorp2040connect")
 	command.Flags().StringVarP(&address, "address", "a", "", "Upload port, e.g.: COM10, /dev/ttyACM0")
 	command.Flags().StringVarP(&module, "module", "m", "", "Firmware module ID, e.g.: WINC1500, NINA")
+	command.Flags().Uint8Var(&retries, "retries", 9, "Number of retries in case of upload failure (default 9)")
 	return command
 }
 
@@ -159,14 +162,31 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
+	for retry := 1; retry <= int(retries); retry++ {
+		err = updateFirmware(board, commandLine, moduleName, firmwareFile)
+		if err == nil {
+			logrus.Info("Operation completed: success! :-)")
+			break
+		}
+		feedback.Error(err)
+		if retry == int(retries) {
+			logrus.Fatal("Operation failed. :-(")
+		}
+		logrus.Info("Waiting 1 second before retrying...")
+		time.Sleep(time.Second)
+		logrus.Infof("Retrying upload (%d of %d)", retry, retries)
+	}
+}
+
+func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, moduleName string, firmwareFile *paths.Path) error {
+	var err error
 	// Check if board needs a 1200bps touch for upload
 	uploadPort := address
 	if board.UploadTouch {
 		logrus.Info("Putting board into bootloader mode")
 		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
 		if err != nil {
-			feedback.Errorf("Error during firmware flashing: missing board address")
-			os.Exit(errorcodes.ErrGeneric)
+			return fmt.Errorf("error during firmware flashing: missing board address. %s", err)
 		}
 		if newUploadPort != "" {
 			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
@@ -183,8 +203,7 @@ func run(cmd *cobra.Command, args []string) {
 		err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
 	}
 	if err != nil {
-		feedback.Errorf("Error during firmware flashing: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+		return fmt.Errorf("error during loader sketch flashing: %s", err)
 	}
 
 	// Wait a bit after flashing the loader sketch for the board to become
@@ -202,10 +221,12 @@ func run(cmd *cobra.Command, args []string) {
 		f, err = flasher.NewWincFlasher(uploadPort)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
+		feedback.Errorf("Error during firmware flashing: %s", err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 	if err != nil {
 		feedback.Errorf("Error during firmware flashing: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+		return err
 	}
 	defer f.Close()
 
@@ -218,7 +239,6 @@ func run(cmd *cobra.Command, args []string) {
 		err = f.FlashFirmware(firmwareFile, os.Stdout)
 	}
 	if err != nil {
-		feedback.Errorf("Error during firmware flashing: %s", err)
 		flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
 	}
 
@@ -233,8 +253,8 @@ func run(cmd *cobra.Command, args []string) {
 			Stderr: flasherErr.String(),
 		}),
 	})
-	// Exit if something went wrong but after printing
 	if err != nil {
-		os.Exit(errorcodes.ErrGeneric)
+		return fmt.Errorf("error during firmware flashing: %s", err)
 	}
+	return nil
 }
