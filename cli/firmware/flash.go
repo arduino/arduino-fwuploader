@@ -167,9 +167,8 @@ func run(cmd *cobra.Command, args []string) {
 		if err == nil {
 			logrus.Info("Operation completed: success! :-)")
 			break
-		} else {
-			feedback.Error(err)
 		}
+		feedback.Error(err)
 		if retry == int(retries) {
 			logrus.Fatal("Operation failed. :-(")
 		}
@@ -241,7 +240,6 @@ func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, modul
 	}
 	if err != nil {
 		flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
-		return fmt.Errorf("error during firmware flashing: %s", err)
 	}
 
 	// Print the results
@@ -255,5 +253,8 @@ func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, modul
 			Stderr: flasherErr.String(),
 		}),
 	})
+	if err != nil {
+		return fmt.Errorf("error during firmware flashing: %s", err)
+	}
 	return nil
 }
