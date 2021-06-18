@@ -22,8 +22,8 @@ package version
 import (
 	"os"
 
-	v "github.com/arduino/FirmwareUploader/version"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	v "github.com/arduino/arduino-fwuploader/version"
 	"github.com/spf13/cobra"
 )
 

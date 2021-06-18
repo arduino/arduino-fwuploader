@@ -1,11 +1,11 @@
 # Project information
 site_name: Arduino Firmware Uploader
 site_description: A firmware uploader/updater for Arduino Boards.
-site_url: https://arduino.github.io/FirmwareUploader/
+site_url: https://arduino.github.io/arduino-fwuploader/
 
 # Repository
-repo_name: arduino/FirmwareUploader
-repo_url: https://github.com/arduino/FirmwareUploader
+repo_name: arduino/arduino-fwuploader
+repo_url: https://github.com/arduino/arduino-fwuploader
 edit_uri: ""
 
 # Copyright
@@ -43,7 +43,7 @@ markdown_extensions:
   - pymdownx.magiclink:
       repo_url_shorthand: true
       user: arduino
-      repo: FirmwareUploader
+      repo: arduino-fwuploader
   - pymdownx.mark
   - pymdownx.smartsymbols
   - pymdownx.superfences

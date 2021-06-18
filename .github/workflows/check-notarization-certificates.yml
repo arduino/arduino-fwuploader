@@ -16,7 +16,7 @@ env:
 jobs:
   check-certificates:
     # This workflow would fail in forks that don't have the certificate secrets defined
-    if: github.repository == 'arduino/FirmwareUploader'
+    if: github.repository == 'arduino/arduino-fwuploader'
     runs-on: ubuntu-latest
 
     strategy:

@@ -16,7 +16,7 @@ env:
 jobs:
   get-certificates-list:
     # This workflow would fail in forks that don't have the certificate secrets defined
-    if: github.repository == 'arduino/FirmwareUploader'
+    if: github.repository == 'arduino/arduino-fwuploader'
     runs-on: ubuntu-latest
     outputs:
       certificates: ${{ steps.get-files.outputs.certificates }}
@@ -38,7 +38,7 @@ jobs:
 
   check-certificates:
     # This workflow would fail in forks that don't have the certificate secrets defined
-    if: github.repository == 'arduino/FirmwareUploader'
+    if: github.repository == 'arduino/arduino-fwuploader'
     runs-on: ubuntu-latest
     needs: get-certificates-list
 

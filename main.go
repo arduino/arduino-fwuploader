@@ -22,7 +22,7 @@ package main
 import (
 	"os"
 
-	"github.com/arduino/FirmwareUploader/cli"
+	"github.com/arduino/arduino-fwuploader/cli"
 )
 
 func main() {

@@ -22,12 +22,12 @@ package indexes
 import (
 	"strings"
 
-	"github.com/arduino/FirmwareUploader/cli/globals"
-	"github.com/arduino/FirmwareUploader/indexes/download"
-	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
+	"github.com/arduino/arduino-fwuploader/indexes/download"
+	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
