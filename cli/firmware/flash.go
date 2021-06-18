@@ -233,6 +233,7 @@ func run(cmd *cobra.Command, args []string) {
 		if err != nil {
 			feedback.Errorf("Error during firmware flashing: %s", err)
 			flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
+			continue
 		}
 		f.Close()
 
