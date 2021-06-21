@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -22,12 +22,12 @@ package indexes
 import (
 	"strings"
 
-	"github.com/arduino/FirmwareUploader/cli/globals"
-	"github.com/arduino/FirmwareUploader/indexes/download"
-	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
+	"github.com/arduino/arduino-fwuploader/indexes/download"
+	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -88,7 +88,7 @@ func GetPackageIndex() (*packageindex.Index, error) {
 	return in, err
 }
 
-// GetFirmwareIndex downloads and loads the FirmwareUploader module_firmware_index.json
+// GetFirmwareIndex downloads and loads the arduino-fwuploader module_firmware_index.json
 func GetFirmwareIndex() (*firmwareindex.Index, error) {
 	indexPath, err := download.DownloadIndex(globals.ModuleFirmwareIndexGZURL)
 	if err != nil {

@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -31,12 +31,12 @@ import (
 	"path"
 	"strings"
 
-	"github.com/arduino/FirmwareUploader/cli/globals"
-	"github.com/arduino/FirmwareUploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
+	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/arduino/go-paths-helper"
 	rice "github.com/cmaglie/go.rice"
 	"github.com/sirupsen/logrus"

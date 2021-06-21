@@ -276,7 +276,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args(sys.argv[1:])
 
-    # raw_boards.json has been generated using --get_available_for FirmwareUploader flag.
+    # raw_boards.json has been generated using --get_available_for FirmwareUploader (version 0.1.8) flag.
     # It has been edited a bit to better handle parsing.
     with open("raw_boards.json", "r") as f:
         raw_boards = json.load(f)

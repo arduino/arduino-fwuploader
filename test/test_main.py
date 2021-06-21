@@ -1,4 +1,4 @@
-#   FirmwareUploader
+#   arduino-fwuploader
 #   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
 #   This library is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ def test_version(run_command):
     result = run_command(cmd=["version"])
     assert result.ok
     output_list = result.stdout.strip().split(sep=" ")
-    assert output_list[0] == "FirmwareUploader"
+    assert output_list[0] == "arduino-fwuploader"
     assert output_list[1] == "Version:"
     version = output_list[2]
     assert semver.VersionInfo.isvalid(version=version) or version == "git-snapshot" or "nightly" in version
@@ -37,7 +37,7 @@ def test_version(run_command):
     result = run_command(cmd=["version", "--format", "json"])
     assert result.ok
     parsed_out = json.loads(result.stdout)
-    assert parsed_out.get("Application", False) == "FirmwareUploader"
+    assert parsed_out.get("Application", False) == "arduino-fwuploader"
     version = parsed_out.get("VersionString", False)
     assert semver.VersionInfo.isvalid(version=version) or "git-snapshot" in version or "nightly" in version
     assert parsed_out.get("Commit", False) != ""

@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -22,9 +22,9 @@ package firmware
 import (
 	"os"
 
-	"github.com/arduino/FirmwareUploader/indexes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/table"
+	"github.com/arduino/arduino-fwuploader/indexes"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
 )

@@ -1,4 +1,4 @@
-#   FirmwareUploader
+#   arduino-fwuploader
 #   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
 #   This library is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@ def run_command(pytestconfig, working_dir) -> typing.Callable[..., invoke.runner
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Result
     """
 
-    fwuploader_path = pathlib.Path(pytestconfig.rootdir).parent / "FirmwareUploader"
+    fwuploader_path = pathlib.Path(pytestconfig.rootdir).parent / "arduino-fwuploader"
 
     def _run(
         cmd: list, custom_working_dir: typing.Optional[str] = None, custom_env: typing.Optional[dict] = None

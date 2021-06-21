@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -27,13 +27,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/FirmwareUploader/flasher"
-	"github.com/arduino/FirmwareUploader/indexes"
-	"github.com/arduino/FirmwareUploader/indexes/download"
-	programmer "github.com/arduino/FirmwareUploader/programmers"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/flasher"
+	"github.com/arduino/arduino-fwuploader/indexes"
+	"github.com/arduino/arduino-fwuploader/indexes/download"
+	programmer "github.com/arduino/arduino-fwuploader/programmers"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"

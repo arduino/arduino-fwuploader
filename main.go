@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@ package main
 import (
 	"os"
 
-	"github.com/arduino/FirmwareUploader/cli"
+	"github.com/arduino/arduino-fwuploader/cli"
 )
 
 func main() {

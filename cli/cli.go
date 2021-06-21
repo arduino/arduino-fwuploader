@@ -1,5 +1,5 @@
 /*
-  FirmwareUploader
+  arduino-fwuploader
   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -25,13 +25,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/FirmwareUploader/cli/certificates"
-	"github.com/arduino/FirmwareUploader/cli/firmware"
-	"github.com/arduino/FirmwareUploader/cli/version"
+	"github.com/arduino/arduino-fwuploader/cli/certificates"
+	"github.com/arduino/arduino-fwuploader/cli/firmware"
+	"github.com/arduino/arduino-fwuploader/cli/version"
 
-	v "github.com/arduino/FirmwareUploader/version"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	v "github.com/arduino/arduino-fwuploader/version"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
@@ -47,11 +47,11 @@ var (
 )
 
 func NewCommand() *cobra.Command {
-	// FirmwareUploader is the root command
+	// arduino-fwuploader is the root command
 	rootCmd := &cobra.Command{
-		Use:              "FirmwareUploader",
-		Short:            "FirmwareUploader.",
-		Long:             "FirmwareUploader (FirmwareUploader).",
+		Use:              "arduino-fwuploader",
+		Short:            "arduino-fwuploader.",
+		Long:             "Arduino Firmware Uploader (arduino-fwuploader).",
 		Example:          "  " + os.Args[0] + " <command> [flags...]",
 		Args:             cobra.NoArgs,
 		PersistentPreRun: preRun,

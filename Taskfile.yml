@@ -91,7 +91,7 @@ tasks:
       - poetry run black .
 
 vars:
-  PROJECT_NAME: "FirmwareUploader"
+  PROJECT_NAME: "arduino-fwuploader"
   DIST_DIR: "dist"
   # build vars
   COMMIT:
@@ -106,9 +106,9 @@ vars:
   LDFLAGS: >
     -ldflags
     '
-    -X github.com/arduino/FirmwareUploader/version.versionString={{.VERSION}}
-    -X github.com/arduino/FirmwareUploader/version.commit={{ .COMMIT }}
-    -X github.com/arduino/FirmwareUploader/version.date={{.TIMESTAMP}}
+    -X github.com/arduino/arduino-fwuploader/version.versionString={{.VERSION}}
+    -X github.com/arduino/arduino-fwuploader/version.commit={{ .COMMIT }}
+    -X github.com/arduino/arduino-fwuploader/version.date={{.TIMESTAMP}}
     '
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
@@ -117,9 +117,9 @@ vars:
   TEST_LDFLAGS: >
     -ldflags
     '
-    -X github.com/arduino/FirmwareUploader/version.versionString={{.TEST_VERSION}}
-    -X github.com/arduino/FirmwareUploader/version.commit={{.TEST_COMMIT}}
-    -X github.com/arduino/FirmwareUploader/version.date={{.TIMESTAMP}}
+    -X github.com/arduino/arduino-fwuploader/version.versionString={{.TEST_VERSION}}
+    -X github.com/arduino/arduino-fwuploader/version.commit={{.TEST_COMMIT}}
+    -X github.com/arduino/arduino-fwuploader/version.date={{.TIMESTAMP}}
     '
   # check-lint vars
   GOLINTBIN:
