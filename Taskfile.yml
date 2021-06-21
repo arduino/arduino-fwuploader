@@ -34,7 +34,7 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - go build -o {{.PROJECT_NAME}} -v {{.LDFLAGS}}
+      - go build -v {{.LDFLAGS}}
 
   test:
     desc: Run tests
