@@ -9,17 +9,10 @@ tasks:
     cmds:
       - poetry install --no-root
 
-  website:check:
-    desc: Check whether the MkDocs-based website will build
-    deps:
-      - task: poetry:install-deps
-    cmds:
-      - poetry run mkdocs build --strict
-
-  website:serve:
+  docs:serve:
     desc: Run website locally
     deps:
-      - task: poetry:install-deps
+      - task: docs:build
     cmds:
       - poetry run mkdocs serve
 
