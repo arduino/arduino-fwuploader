@@ -4,7 +4,6 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
-
   poetry:install-deps:
     desc: Install dependencies managed by Poetry
     cmds:
