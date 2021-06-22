@@ -4,6 +4,25 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
+  docs:publish:
+    desc: Use Mike to build and push versioned docs
+    deps:
+      - docs:gen:commands
+    cmds:
+      - poetry run mike deploy --update-aliases --push --remote {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
+
+  docs:gen:commands:
+    desc: Generate command reference files
+    dir: ./docsgen
+    cmds:
+      # docs will generate examples using os.Args[0] so we need to call
+      # the generator `arduino-cli`
+      - go build -o {{.PROJECT_NAME}}
+      # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
+      # the `./` chars from the examples
+      - PATH=. {{.PROJECT_NAME}} ../docs/commands
+      - task: docs:format
+
   docs:check:
     desc: Run documentation linting
     cmds:
@@ -126,3 +145,6 @@ vars:
     sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
   GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
   PRETTIER: prettier@2.0.5
+  DOCS_VERSION: dev
+  DOCS_ALIAS: ""
+  DOCS_REMOTE: "origin"

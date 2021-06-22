@@ -8,3 +8,8 @@ __pycache__/
 
 # Misc.
 .DS_Store
+
+# Mkdocs
+/site/
+/docsgen/arduino-fwuploader
+/docs/commands/*.md
