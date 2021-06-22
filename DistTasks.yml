@@ -22,7 +22,7 @@ tasks:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe
         zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe -j
-        zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} firmwares LICENSE.txt -r
+        zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} LICENSE.txt -r
     vars:
       PLATFORM_DIR: "windows32"
       PACKAGE_PLATFORM: "Windows_32bit"
@@ -37,7 +37,7 @@ tasks:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe
         zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe -j
-        zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} firmwares LICENSE.txt -r
+        zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} LICENSE.txt -r
     vars:
       PLATFORM_DIR: "windows64"
       PACKAGE_PLATFORM: "Windows_64bit"
@@ -52,7 +52,7 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
-        tar cj firmwares LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linux32"
       PACKAGE_PLATFORM: "Linux_32bit"
@@ -66,7 +66,7 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
-        tar cj firmwares LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linux64"
       PACKAGE_PLATFORM: "Linux_64bit"
@@ -80,7 +80,7 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
-        tar cj firmwares LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linuxarm"
       PACKAGE_PLATFORM: "Linux_ARM"
@@ -94,7 +94,7 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
-        tar cj firmwares LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linuxarm64"
       PACKAGE_PLATFORM: "Linux_ARM64"
@@ -108,7 +108,7 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
-        tar cj firmwares LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "macos64"
       PACKAGE_PLATFORM: "macOS_64bit"
