@@ -66,8 +66,11 @@ tasks:
 
   docs:build:
     desc: Build documentation website contents
+    deps:
+      - docs:gen:commands
+      - poetry:install-deps
     cmds:
-      - mkdocs build -s
+      - poetry run mkdocs build -s
 
   build:
     desc: Build the project
