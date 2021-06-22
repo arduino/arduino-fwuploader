@@ -4,6 +4,26 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
+
+  poetry:install-deps:
+    desc: Install dependencies managed by Poetry
+    cmds:
+      - poetry install --no-root
+
+  website:check:
+    desc: Check whether the MkDocs-based website will build
+    deps:
+      - task: poetry:install-deps
+    cmds:
+      - poetry run mkdocs build --strict
+
+  website:serve:
+    desc: Run website locally
+    deps:
+      - task: poetry:install-deps
+    cmds:
+      - poetry run mkdocs serve
+
   docs:publish:
     desc: Use Mike to build and push versioned docs
     deps:
@@ -16,9 +36,9 @@ tasks:
     dir: ./docsgen
     cmds:
       # docs will generate examples using os.Args[0] so we need to call
-      # the generator `arduino-cli`
-      - go build -o {{.PROJECT_NAME}}
-      # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
+      # the generator `arduino-fwuploader`
+      - go build -o {{.PROJECT_NAME}}{{exeExt}}
+      # we invoke `arduino-fwuploader` like this instead of `./arduino-fwuploader` to remove
       # the `./` chars from the examples
       - PATH=. {{.PROJECT_NAME}} ../docs/commands
       - task: docs:format

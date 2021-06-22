@@ -16,6 +16,8 @@ on:
       - "mkdocs.ya?ml"
       - "poetry.lock"
       - "pyproject.toml"
+      - "go.mod"
+      - "go.sum"
   # Run on branch or tag creation (will be filtered by the publish-determination job)
   create:
 
