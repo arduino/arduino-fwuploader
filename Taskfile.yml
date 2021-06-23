@@ -13,6 +13,7 @@ tasks:
     desc: Run website locally
     deps:
       - task: poetry:install-deps
+      - task: docs:gen:commands
     cmds:
       - poetry run mkdocs serve
 
