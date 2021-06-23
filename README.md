@@ -1,6 +1,6 @@
 # Firmware/Certificates updater for WINC and NINA Wifi module
 
-Use this tool to update the firmware and/or add SSL certificates for any WINC, NINA or SARA module.
+Use this tool to update the firmware and/or add SSL certificates for any WINC, NINA module.
 
 ## Install
 

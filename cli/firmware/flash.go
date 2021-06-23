@@ -215,8 +215,6 @@ func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, modul
 	switch moduleName {
 	case "NINA":
 		f, err = flasher.NewNinaFlasher(uploadPort)
-	case "SARA":
-		f, err = flasher.NewSaraFlasher(uploadPort)
 	case "WINC1500":
 		f, err = flasher.NewWincFlasher(uploadPort)
 	default:
