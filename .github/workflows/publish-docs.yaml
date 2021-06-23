@@ -69,7 +69,7 @@ jobs:
           python -m pip install poetry
 
       - name: Install Python dependencies
-          poetry install --no-root
+        run: poetry install --no-root
 
       - name: Publish docs
         # Determine docs version for the commit pushed and publish accordingly using Mike.

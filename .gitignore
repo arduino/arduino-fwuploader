@@ -12,4 +12,5 @@ __pycache__/
 # Mkdocs
 /site/
 /docsgen/arduino-fwuploader
+/docsgen/arduino-fwuploader.exe
 /docs/commands/*.md
