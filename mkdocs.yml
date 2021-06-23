@@ -54,6 +54,19 @@ markdown_extensions:
       nested_indent: 2
       truly_sane: true
 
+# Configure Material theme for versioning
+extra:
+  version:
+    provider: mike
+
 # Navigation
 nav:
   - Documentation Home: README.md
+  - Command reference:
+      - arduino-fwuploader: commands/arduino-fwuploader.md
+      - certificates: commands/arduino-fwuploader_certificates.md
+      - certificates flash: commands/arduino-fwuploader_certificates_flash.md
+      - firmware: commands/arduino-fwuploader_firmware.md
+      - firmware flash: commands/arduino-fwuploader_firmware_flash.md
+      - firmware list: commands/arduino-fwuploader_firmware_list.md
+      - version: commands/arduino-fwuploader_version.md

@@ -4,6 +4,38 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
+  poetry:install-deps:
+    desc: Install dependencies managed by Poetry
+    cmds:
+      - poetry install --no-root
+
+  docs:serve:
+    desc: Run website locally
+    deps:
+      - task: poetry:install-deps
+      - task: docs:gen:commands
+    cmds:
+      - poetry run mkdocs serve
+
+  docs:publish:
+    desc: Use Mike to build and push versioned docs
+    deps:
+      - docs:gen:commands
+    cmds:
+      - poetry run mike deploy --update-aliases --push --remote {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
+
+  docs:gen:commands:
+    desc: Generate command reference files
+    dir: ./docsgen
+    cmds:
+      # docs will generate examples using os.Args[0] so we need to call
+      # the generator `arduino-fwuploader`
+      - go build -o {{.PROJECT_NAME}}{{exeExt}}
+      # we invoke `arduino-fwuploader` like this instead of `./arduino-fwuploader` to remove
+      # the `./` chars from the examples
+      - PATH=. {{.PROJECT_NAME}} ../docs/commands
+      - task: docs:format
+
   docs:check:
     desc: Run documentation linting
     cmds:
@@ -28,8 +60,11 @@ tasks:
 
   docs:build:
     desc: Build documentation website contents
+    deps:
+      - docs:gen:commands
+      - poetry:install-deps
     cmds:
-      - mkdocs build -s
+      - poetry run mkdocs build -s
 
   build:
     desc: Build the project
@@ -126,3 +161,6 @@ vars:
     sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
   GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
   PRETTIER: prettier@2.0.5
+  DOCS_VERSION: dev
+  DOCS_ALIAS: ""
+  DOCS_REMOTE: "origin"
