@@ -465,46 +465,6 @@
     }
   },
   {
-    "fqbn": "arduino:samd:mkrnb1500",
-    "firmware": [
-      {
-        "version": "5.6A2.00-to-5.6A2.01",
-        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/SARA/5.6A2.00-to-5.6A2.01/5.6A2.00-to-5.6A2.01.pkg",
-        "checksum": "SHA-256:8f04bd7fa1833cf2d3762e086d79191e76bf66c6e108e852b5fe89ca4f2b72c9",
-        "size": "529880",
-        "module": "SARA"
-      },
-      {
-        "version": "5.6A2_01_to_99",
-        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/SARA/5.6A2_01_to_99/5.6A2_01_to_99.pkg",
-        "checksum": "SHA-256:abb947accdeb980d7aeafed45ac7ce797eb90445eeb8d0bd57ca5b3ad204dbf6",
-        "size": "1738",
-        "module": "SARA"
-      },
-      {
-        "version": "99_to_5.6A2_01",
-        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/SARA/99_to_5.6A2_01/99_to_5.6A2_01.pkg",
-        "checksum": "SHA-256:81618148c677d8c36df5089c931b46476f4a78fd9d9fd231fee0a9dbb38aa970",
-        "size": "1724",
-        "module": "SARA"
-      }
-    ],
-    "loader_sketch": {
-      "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/loader/arduino.samd.mkrnb1500/loader.bin",
-      "checksum": "SHA-256:a627ff76588626eacaaec2a2f5719e3fcf069fda2b32f8ace4f2703f1768f142",
-      "size": "11312"
-    },
-    "module": "SARA",
-    "name": "Arduino MKR NB 1500",
-    "uploader": "arduino:bossac@1.7.0-arduino3",
-    "upload.use_1200bps_touch": true,
-    "upload.wait_for_upload_port": true,
-    "uploader.command": {
-      "linux": "\"{tool_dir}/bossac\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R",
-      "windows": "\"{tool_dir}\\bossac.exe\" -i -d --port={serial.port.file} -U true -i -e -w -v \"{loader.sketch}.bin\" -R"
-    }
-  },
-  {
     "fqbn": "arduino:mbed_nano:nanorp2040connect",
     "firmware": [
       {
@@ -517,8 +477,8 @@
     ],
     "loader_sketch": {
       "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/loader/arduino.mbed_nano.nanorp2040connect/loader.elf",
-      "checksum": "SHA-256:263fe2389f9a4ee3ba5938f2115faad3bbb9c775821a598a66f0f1708e64fc01",
-      "size": "1649504"
+      "checksum": "SHA-256:4b67381122df67a210c29d01f01153f34cdeea77593f7e5e12259e3c85b472f0",
+      "size": "1639020"
     },
     "module": "NINA",
     "name": "Arduino Nano RP2040 Connect",
