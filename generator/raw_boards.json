@@ -473,40 +473,6 @@
       }
     ]
   },
-  "mkrnb1500": {
-    "firmwares/SARA": [
-      {
-        "version": "SARA",
-        "Path": "firmwares/SARA/SerialSARAPassthrough.ino.bin",
-        "Name": "firmwares SARA",
-        "IsLoader": true
-      }
-    ],
-    "firmwares/SARA/5.6A2.00-to-5.6A2.01": [
-      {
-        "version": "SARA/5.6A2.00-to-5.6A2.01",
-        "Path": "firmwares/SARA/5.6A2_01/5.6A2.00-to-5.6A2.01.pkg",
-        "Name": "SARA 5.6A2_01 (5.6A2.00-to-5.6A2.01.pkg)",
-        "IsLoader": false
-      }
-    ],
-    "firmwares/SARA/5.6A2_01_to_99": [
-      {
-        "version": "SARA/5.6A2_01_to_99",
-        "Path": "firmwares/SARA/5.6A2_01/5.6A2_01_to_99.pkg",
-        "Name": "SARA 5.6A2_01 (5.6A2_01_to_99.pkg)",
-        "IsLoader": false
-      }
-    ],
-    "firmwares/SARA/99_to_5.6A2_01": [
-      {
-        "version": "SARA/99_to_5.6A2_01",
-        "Path": "firmwares/SARA/5.6A2_01/99_to_5.6A2_01.pkg",
-        "Name": "SARA 5.6A2_01 (99_to_5.6A2_01.pkg)",
-        "IsLoader": false
-      }
-    ]
-  },
   "nanorp2040connect": {
     "firmwares/NINA": [
       {

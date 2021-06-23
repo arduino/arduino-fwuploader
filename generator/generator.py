@@ -13,7 +13,6 @@ FQBNS = {
     "nano_33_iot": "arduino:samd:nano_33_iot",
     "mkrvidor4000": "arduino:samd:mkrvidor4000",
     "uno2018": "arduino:megaavr:uno2018",
-    "mkrnb1500": "arduino:samd:mkrnb1500",
     "nanorp2040connect": "arduino:mbed_nano:nanorp2040connect",
 }
 
@@ -212,7 +211,6 @@ def generate_boards_json(input_data, arduino_cli_path):
             "firmware": [],
         },
         "arduino:megaavr:uno2018": {"fqbn": "arduino:megaavr:uno2018", "firmware": []},
-        "arduino:samd:mkrnb1500": {"fqbn": "arduino:samd:mkrnb1500", "firmware": []},
         "arduino:mbed_nano:nanorp2040connect": {
             "fqbn": "arduino:mbed_nano:nanorp2040connect",
             "firmware": [],
