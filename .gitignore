@@ -5,6 +5,8 @@
 coverage_*.txt
 /dist
 __pycache__/
+/generator/boards/
+/generator/firmwares/
 
 # Misc.
 .DS_Store
