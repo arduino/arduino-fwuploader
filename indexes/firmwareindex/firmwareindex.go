@@ -120,10 +120,6 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 
 	// Determine latest firmware for each board
 	for _, board := range index.Boards {
-		if board.Module == "SARA" {
-			// TODO implement?? by default you have to specify the version
-			continue
-		}
 		for _, firmware := range board.Firmwares {
 			if board.LatestFirmware == nil || firmware.Version.GreaterThan(board.LatestFirmware.Version) {
 				board.LatestFirmware = firmware

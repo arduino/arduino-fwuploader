@@ -170,8 +170,6 @@ func run(cmd *cobra.Command, args []string) {
 	switch moduleName {
 	case "NINA":
 		f, err = flasher.NewNinaFlasher(uploadPort)
-	case "SARA":
-		f, err = flasher.NewSaraFlasher(uploadPort)
 	case "WINC1500":
 		f, err = flasher.NewWincFlasher(uploadPort)
 	default:
