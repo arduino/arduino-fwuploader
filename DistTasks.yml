@@ -165,17 +165,3 @@ tasks:
         sed "s/%%WINDOWS64_SHA%%/{{ .WINDOWS64_SHA }}/" |
         sed "s/%%WINDOWS64_SIZE%%/{{ .WINDOWS64_SIZE }}/" \
         > {{ .DIST_DIR }}/package_index.json
-
-vars:
-  LDFLAGS: >
-    -ldflags
-    '
-    -X github.com/arduino/arduino-fwuploader/version.versionString={{.VERSION}}
-    -X github.com/arduino/arduino-fwuploader/version.commit={{ .COMMIT }}
-    -X github.com/arduino/arduino-fwuploader/version.date={{.TIMESTAMP}}
-    '
-  VERSION: "{{ if .NIGHTLY }}nightly-{{ .TIMESTAMP_SHORT }}{{ else if .TAG }}{{ .TAG }}{{ else }}{{ .PACKAGE_NAME_PREFIX }}git-snapshot{{ end }}"
-  COMMIT:
-    sh: echo "$(git log -n 1 --format=%h)"
-  TIMESTAMP:
-    sh: echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
