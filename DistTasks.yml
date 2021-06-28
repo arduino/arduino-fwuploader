@@ -20,7 +20,7 @@ tasks:
       GO386: "softfloat"
     cmds:
       - |
-        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe
+        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe {{.LDFLAGS}}
         zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe -j
         zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} LICENSE.txt -r
     vars:
@@ -35,7 +35,7 @@ tasks:
       GOARCH: "amd64"
     cmds:
       - |
-        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe
+        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe {{.LDFLAGS}}
         zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}.exe -j
         zip {{ .DIST_DIR}}/{{ .PACKAGE_NAME }} LICENSE.txt -r
     vars:
@@ -51,7 +51,7 @@ tasks:
       GO386: "softfloat"
     cmds:
       - |
-        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
+        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
         tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linux32"
@@ -65,7 +65,7 @@ tasks:
       GOARCH: "amd64"
     cmds:
       - |
-        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
+        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
         tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linux64"
@@ -79,7 +79,7 @@ tasks:
       GOARCH: "arm"
     cmds:
       - |
-        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
+        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
         tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linuxarm"
@@ -93,7 +93,7 @@ tasks:
       GOARCH: "arm64"
     cmds:
       - |
-        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
+        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
         tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linuxarm64"
@@ -107,7 +107,7 @@ tasks:
       GOARCH: "amd64"
     cmds:
       - |
-        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }}
+        go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
         tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "macos64"
