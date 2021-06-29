@@ -227,6 +227,7 @@ func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, modul
 		return err
 	}
 	defer f.Close()
+	f.SetProgressCallback(printProgress)
 
 	// now flash the actual firmware
 	flasherOut := new(bytes.Buffer)
@@ -255,4 +256,8 @@ func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, modul
 		return fmt.Errorf("error during firmware flashing: %s", err)
 	}
 	return nil
+}
+
+func printProgress(progress int) {
+	fmt.Printf("Flashing progress: %d%%\r", progress)
 }

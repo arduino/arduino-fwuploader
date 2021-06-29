@@ -28,7 +28,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
-	"strconv"
 	"time"
 
 	"github.com/arduino/go-paths-helper"
@@ -60,8 +59,9 @@ func NewNinaFlasher(portAddress string) (*NinaFlasher, error) {
 }
 
 type NinaFlasher struct {
-	port        serial.Port
-	payloadSize int
+	port             serial.Port
+	payloadSize      int
+	progressCallback func(int)
 }
 
 // FlashFirmware in board connected to port using data from firmwareFile
@@ -93,7 +93,7 @@ func (f *NinaFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 		return err
 	}
 	logrus.Infof("Flashed all the things")
-	flasherOut.Write([]byte("Flashed all the things\n"))
+	flasherOut.Write([]byte("Flashing progress: 100%\n"))
 	return nil
 }
 
@@ -246,7 +246,11 @@ func (f *NinaFlasher) flashChunk(offset int, buffer []byte) error {
 	}
 
 	for i := 0; i < bufferLength; i += chunkSize {
-		logrus.Debugf("Flashing chunk: %s%%", strconv.Itoa((i*100)/bufferLength))
+		progress := (i * 100) / bufferLength
+		logrus.Debugf("Flashing chunk: %d%%", progress)
+		if f.progressCallback != nil {
+			f.progressCallback(progress)
+		}
 		start := i
 		end := i + chunkSize
 		if end > bufferLength {
@@ -489,4 +493,8 @@ func (f *NinaFlasher) md5sum(data []byte) error {
 	}
 
 	return nil
+}
+
+func (f *NinaFlasher) SetProgressCallback(callback func(progress int)) {
+	f.progressCallback = callback
 }
