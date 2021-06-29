@@ -153,6 +153,22 @@
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
+    ],
+    "firmwares/NINA/1.4.6": [
+      {
+        "version": "NINA/1.4.6",
+        "Path": "firmwares/NINA/1.4.6/NINA_W102.bin",
+        "Name": "NINA 1.4.6",
+        "IsLoader": false
+      }
+    ],
+    "firmwares/NINA/1.4.7": [
+      {
+        "version": "NINA/1.4.7",
+        "Path": "firmwares/NINA/1.4.7/NINA_W102.bin",
+        "Name": "NINA 1.4.7",
+        "IsLoader": false
+      }
     ]
   },
   "nano_33_iot": {
@@ -267,6 +283,22 @@
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
+    ],
+    "firmwares/NINA/1.4.6": [
+      {
+        "version": "NINA/1.4.6",
+        "Path": "firmwares/NINA/1.4.6/NINA_W102.bin",
+        "Name": "NINA 1.4.6",
+        "IsLoader": false
+      }
+    ],
+    "firmwares/NINA/1.4.7": [
+      {
+        "version": "NINA/1.4.7",
+        "Path": "firmwares/NINA/1.4.7/NINA_W102.bin",
+        "Name": "NINA 1.4.7",
+        "IsLoader": false
+      }
     ]
   },
   "mkrvidor4000": {
@@ -373,6 +405,22 @@
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
+    ],
+    "firmwares/NINA/1.4.6": [
+      {
+        "version": "NINA/1.4.6",
+        "Path": "firmwares/NINA/1.4.6/NINA_W102.bin",
+        "Name": "NINA 1.4.6",
+        "IsLoader": false
+      }
+    ],
+    "firmwares/NINA/1.4.7": [
+      {
+        "version": "NINA/1.4.7",
+        "Path": "firmwares/NINA/1.4.7/NINA_W102.bin",
+        "Name": "NINA 1.4.7",
+        "IsLoader": false
+      }
     ]
   },
   "uno2018": {
@@ -471,6 +519,22 @@
         "Name": "NINA 1.4.5",
         "IsLoader": false
       }
+    ],
+    "firmwares/NINA/1.4.6": [
+      {
+        "version": "NINA/1.4.6",
+        "Path": "firmwares/NINA/1.4.6/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Name": "NINA 1.4.6",
+        "IsLoader": false
+      }
+    ],
+    "firmwares/NINA/1.4.7": [
+      {
+        "version": "NINA/1.4.7",
+        "Path": "firmwares/NINA/1.4.7/NINA_W102-Uno_WiFi_Rev2.bin",
+        "Name": "NINA 1.4.7",
+        "IsLoader": false
+      }
     ]
   },
   "nanorp2040connect": {
@@ -487,6 +551,22 @@
         "version": "NINA/1.4.5",
         "Path": "firmwares/NINA/1.4.5/NINA_W102-Nano_RP2040_Connect.bin",
         "Name": "NINA 1.4.5",
+        "IsLoader": false
+      }
+    ],
+    "firmwares/NINA/1.4.6": [
+      {
+        "version": "NINA/1.4.6",
+        "Path": "firmwares/NINA/1.4.6/NINA_W102-Nano_RP2040_Connect.bin",
+        "Name": "NINA 1.4.6",
+        "IsLoader": false
+      }
+    ],
+    "firmwares/NINA/1.4.7": [
+      {
+        "version": "NINA/1.4.7",
+        "Path": "firmwares/NINA/1.4.7/NINA_W102-Nano_RP2040_Connect.bin",
+        "Name": "NINA 1.4.7",
         "IsLoader": false
       }
     ]
