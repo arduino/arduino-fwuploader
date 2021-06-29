@@ -28,7 +28,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strconv"
 	"time"
 
 	"github.com/arduino/go-paths-helper"
@@ -56,8 +55,9 @@ func NewWincFlasher(portAddress string) (*WincFlasher, error) {
 }
 
 type WincFlasher struct {
-	port        serial.Port
-	payloadSize int
+	port             serial.Port
+	payloadSize      int
+	progressCallback func(int)
 }
 
 func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error {
@@ -74,7 +74,7 @@ func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 		return err
 	}
 	logrus.Infof("Flashed all the things")
-	flasherOut.Write([]byte("Flashed all the things\n"))
+	flasherOut.Write([]byte("Flashing progress: 100%\n"))
 	return nil
 }
 
@@ -277,7 +277,11 @@ func (f *WincFlasher) flashChunk(offset int, buffer []byte) error {
 	}
 
 	for i := 0; i < bufferLength; i += f.payloadSize {
-		logrus.Debugf("Flashing chunk: %s%%", strconv.Itoa((i*100)/bufferLength))
+		progress := ((i * 100) / bufferLength)
+		logrus.Debugf("Flashing chunk: %d%%", progress)
+		if f.progressCallback != nil {
+			f.progressCallback(progress)
+		}
 		start := i
 		end := i + f.payloadSize
 		if end > bufferLength {
@@ -460,4 +464,8 @@ func (f *WincFlasher) erase(address uint32, length uint32) error {
 		return err
 	}
 	return nil
+}
+
+func (f *WincFlasher) SetProgressCallback(callback func(progress int)) {
+	f.progressCallback = callback
 }

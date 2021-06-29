@@ -52,6 +52,7 @@ type Flasher interface {
 	FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error
 	FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error
 	Close() error
+	SetProgressCallback(func(progress int))
 
 	hello() error
 	write(address uint32, buffer []byte) error
