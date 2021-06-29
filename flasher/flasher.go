@@ -62,37 +62,24 @@ type Flasher interface {
 	sendCommand(data CommandData) error
 }
 
-// http://www.ni.com/product-documentation/54548/en/
-// Standard baud rates supported by most serial ports
-var baudRates = []int{
-	115200,
-	57600,
-	56000,
-	38400,
-}
+// This matches the baudrate used in the FirmwareUpdater.ino sketch
+// https://github.com/arduino-libraries/WiFiNINA/blob/master/examples/Tools/FirmwareUpdater/FirmwareUpdater.ino
+const baudRate = 1000000
 
 func openSerial(portAddress string) (serial.Port, error) {
-	var lastError error
 
-	for _, baudRate := range baudRates {
-		port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
-		if err != nil {
-			lastError = err
-			// Try another baudrate
-			continue
-		}
-		logrus.Infof("Opened port %s at %d", portAddress, baudRate)
-
-		if err := port.SetReadTimeout(30 * time.Second); err != nil {
-			err = fmt.Errorf("could not set timeout on serial port: %s", err)
-			logrus.Error(err)
-			return nil, err
-		}
-
-		return port, nil
+	port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
+	if err != nil {
+		return nil, err
 	}
+	logrus.Infof("Opened port %s at %d", portAddress, baudRate)
 
-	return nil, lastError
+	if err := port.SetReadTimeout(30 * time.Second); err != nil {
+		err = fmt.Errorf("could not set timeout on serial port: %s", err)
+		logrus.Error(err)
+		return nil, err
+	}
+	return port, nil
 }
 
 type FlashResult struct {
