@@ -2,9 +2,6 @@ module github.com/arduino/arduino-fwuploader
 
 go 1.14
 
-// branch with support for serial timeouts
-replace go.bug.st/serial => github.com/cmaglie/go-serial v0.0.0-20200923162623-b214c147e37e
-
 require (
 	github.com/arduino/arduino-cli v0.0.0-20210603144340-aef5a54882fa
 	github.com/arduino/go-paths-helper v1.6.0
@@ -17,5 +14,5 @@ require (
 	github.com/stretchr/testify v1.6.1
 	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
-	go.bug.st/serial v1.1.2
+	go.bug.st/serial v1.2.0
 )
