@@ -64,7 +64,8 @@ type Flasher interface {
 
 // This matches the baudrate used in the FirmwareUpdater.ino sketch
 // https://github.com/arduino-libraries/WiFiNINA/blob/master/examples/Tools/FirmwareUpdater/FirmwareUpdater.ino
-const baudRate = 1000000
+// We used 1000000 before but it was causing problems on macOS with boards using true serial (AKA UNO WiFi rev2).
+const baudRate = 57600
 
 func openSerial(portAddress string) (serial.Port, error) {
 
