@@ -93,7 +93,7 @@ tasks:
     desc: Run integration tests
     cmds:
       - task: build
-      - poetry install --no-root
+      - task: poetry:install-deps
       - poetry run pytest test
 
   check:
@@ -123,13 +123,13 @@ tasks:
   python:lint:
     desc: Lint Python code
     cmds:
-      - poetry install --no-root
+      - task: poetry:install-deps
       - poetry run flake8
 
   python:format:
     desc: Automatically formats Python files
     cmds:
-      - poetry install --no-root
+      - task: poetry:install-deps
       - poetry run black .
 
 vars:
