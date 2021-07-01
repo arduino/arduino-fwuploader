@@ -61,7 +61,9 @@ extra:
 
 # Navigation
 nav:
-  - Documentation Home: README.md
+  - Documentation Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
   - Command reference:
       - arduino-fwuploader: commands/arduino-fwuploader.md
       - certificates: commands/arduino-fwuploader_certificates.md
