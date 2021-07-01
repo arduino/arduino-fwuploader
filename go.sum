@@ -315,8 +315,8 @@ go.bug.st/downloader/v2 v2.1.1/go.mod h1:VZW2V1iGKV8rJL2ZEGIDzzBeKowYv34AedJz13R
 go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18 h1:F1qxtaFuewctYc/SsHRn+Q7Dtwi+yJGPgVq8YLtQz98=
 go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18/go.mod h1:Cx1VqMtEhE9pIkEyUj3LVVVPkv89dgW8aCKrRPDR/uE=
 go.bug.st/serial v1.1.2/go.mod h1:VmYBeyJWp5BnJ0tw2NUJHZdJTGl2ecBGABHlzRK1knY=
-go.bug.st/serial v1.2.0 h1:FsULZW0CMzBp4sb8Cec2AfrAVSF4UorFy7XO3gxLx60=
-go.bug.st/serial v1.2.0/go.mod h1:8TT7u/SwwNIpJ8QaG4s+HTjFt9ReXs2cdOU7ZEk50Dk=
+go.bug.st/serial v1.3.0 h1:liPN6f/Xk0qaUByg0H2LOSns+2RuAuNXmXZyQOLVwVE=
+go.bug.st/serial v1.3.0/go.mod h1:8TT7u/SwwNIpJ8QaG4s+HTjFt9ReXs2cdOU7ZEk50Dk=
 go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45/go.mod h1:dRSl/CVCTf56CkXgJMDOdSwNfo2g1orOGE/gBGdvjZw=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=

@@ -14,5 +14,5 @@ require (
 	github.com/stretchr/testify v1.6.1
 	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
-	go.bug.st/serial v1.2.0
+	go.bug.st/serial v1.3.0
 )
