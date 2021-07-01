@@ -1,6 +1,6 @@
 ## Install
 
-You can download the `arduino-fwuploader` directly from the GitHub release page:
+You can download the Arduino Firmware Uploader directly from the GitHub release page:
 
 https://github.com/arduino/arduino-fwuploader/releases/latest
 

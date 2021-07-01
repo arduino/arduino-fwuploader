@@ -1,10 +1,10 @@
-# arduino-fwuploader
+# Arduino Firmware Uploader
 
-The Arduino Firmware Uploader is a tool made to update the firmware and/or add SSL certificates for any arduino board
-equipped with WINC or NINA module.
+The Arduino Firmware Uploader is a tool made to update the firmware and/or add SSL certificates for any Arduino board
+equipped with WINC or NINA Wi-Fi module.
 
-[![tests-badge]](https://github.com/Arduino/arduino-fwuploader/actions?workflow=test)
-[![docs-badge]](https://github.com/Arduino/arduino-fwuploader/actions?workflow=publish-docs)
+[![tests-badge]](https://github.com/arduino/arduino-fwuploader/actions?workflows/test.yaml)
+[![docs-badge]](https://github.com/arduino/arduino-fwuploader/actions?workflows/publish-docs.yaml)
 
 ## Docs
 
@@ -23,9 +23,9 @@ and report the bug to our Security Team 🛡️ Thank you!
 
 e-mail contact: security@arduino.cc
 
-[tests-badge]: https://github.com/Arduino/arduino-fwuploader/workflows/test/badge.svg
-[docs-badge]: https://github.com/Arduino/arduino-fwuploader/workflows/publish-docs/badge.svg
-[security-policy]: https://github.com/arduino/arduino-fwuploader/security/policy
+[tests-badge]: https://github.com/arduino/arduino-fwuploader/actions/workflows/test.yaml/badge.svg
+[docs-badge]: https://github.com/arduino/arduino-fwuploader/actions/workflows/publish-docs.yaml/badge.svg
+[security policy]: https://github.com/arduino/arduino-fwuploader/security/policy
 [user documentation]: https://arduino.github.io/arduino-fwuploader/
 [install]: https://arduino.github.io/arduino-fwuploader/dev/installation
 [usage]: https://arduino.github.io/arduino-fwuploader/dev/usage
