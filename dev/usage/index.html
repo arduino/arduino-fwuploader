@@ -11,21 +11,21 @@
       
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_firmware_flash/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-fwuploader/dev/usage/">
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.8">
     
     
       
-        <title>firmware flash - Arduino Firmware Uploader</title>
+        <title>Usage - Arduino Firmware Uploader</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ca7ac06f.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.f1a3b89f.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
         
           
           
@@ -61,7 +61,7 @@
     <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="orange">
   
     
-    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#arduino-fwuploader-firmware-flash" class="md-skip">
+        <a href="#usage" class="md-skip">
           Skip to content
         </a>
       
@@ -80,9 +80,9 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Arduino Firmware Uploader" class="md-header__button md-logo" aria-label="Arduino Firmware Uploader" data-md-component="logo">
+    <a href=".." title="Arduino Firmware Uploader" class="md-header__button md-logo" aria-label="Arduino Firmware Uploader" data-md-component="logo">
       
-  <img src="../../img/icon_mac_light.png" alt="logo">
+  <img src="../img/icon_mac_light.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              firmware flash
+              Usage
             
           </span>
         </div>
@@ -172,9 +172,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Arduino Firmware Uploader" class="md-nav__button md-logo" aria-label="Arduino Firmware Uploader" data-md-component="logo">
+    <a href=".." title="Arduino Firmware Uploader" class="md-nav__button md-logo" aria-label="Arduino Firmware Uploader" data-md-component="logo">
       
-  <img src="../../img/icon_mac_light.png" alt="logo">
+  <img src="../img/icon_mac_light.png" alt="logo">
 
     </a>
     Arduino Firmware Uploader
@@ -203,7 +203,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         Documentation Home
       </a>
     </li>
@@ -218,7 +218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../installation/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         Installation
       </a>
     </li>
@@ -231,11 +231,74 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../usage/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Usage
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#firmware-flashing" class="md-nav__link">
+    Firmware Flashing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#certificates" class="md-nav__link">
+    Certificates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-line-options" class="md-nav__link">
+    Command line options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -246,14 +309,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
       
       <label class="md-nav__link" for="__nav_4">
         Command reference
@@ -271,7 +332,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-fwuploader/" class="md-nav__link">
+      <a href="../commands/arduino-fwuploader/" class="md-nav__link">
         arduino-fwuploader
       </a>
     </li>
@@ -283,7 +344,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-fwuploader_certificates/" class="md-nav__link">
+      <a href="../commands/arduino-fwuploader_certificates/" class="md-nav__link">
         certificates
       </a>
     </li>
@@ -295,7 +356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-fwuploader_certificates_flash/" class="md-nav__link">
+      <a href="../commands/arduino-fwuploader_certificates_flash/" class="md-nav__link">
         certificates flash
       </a>
     </li>
@@ -307,7 +368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-fwuploader_firmware/" class="md-nav__link">
+      <a href="../commands/arduino-fwuploader_firmware/" class="md-nav__link">
         firmware
       </a>
     </li>
@@ -317,88 +378,11 @@
             
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          firmware flash
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../commands/arduino-fwuploader_firmware_flash/" class="md-nav__link">
         firmware flash
       </a>
-      
-        
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#arduino-fwuploader-firmware-flash" class="md-nav__link">
-    arduino-fwuploader firmware flash
-  </a>
-  
-    <nav class="md-nav" aria-label="arduino-fwuploader firmware flash">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options-inherited-from-parent-commands" class="md-nav__link">
-    Options inherited from parent commands
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    SEE ALSO
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -408,7 +392,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-fwuploader_firmware_list/" class="md-nav__link">
+      <a href="../commands/arduino-fwuploader_firmware_list/" class="md-nav__link">
         firmware list
       </a>
     </li>
@@ -420,7 +404,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-fwuploader_version/" class="md-nav__link">
+      <a href="../commands/arduino-fwuploader_version/" class="md-nav__link">
         version
       </a>
     </li>
@@ -457,44 +441,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-fwuploader-firmware-flash" class="md-nav__link">
-    arduino-fwuploader firmware flash
+  <a href="#usage" class="md-nav__link">
+    Usage
   </a>
   
-    <nav class="md-nav" aria-label="arduino-fwuploader firmware flash">
+    <nav class="md-nav" aria-label="Usage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
+  <a href="#firmware-flashing" class="md-nav__link">
+    Firmware Flashing
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    Examples
+  <a href="#certificates" class="md-nav__link">
+    Certificates
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options-inherited-from-parent-commands" class="md-nav__link">
-    Options inherited from parent commands
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    SEE ALSO
+  <a href="#command-line-options" class="md-nav__link">
+    Command line options
   </a>
   
 </li>
@@ -517,38 +487,40 @@
               
                 
                 
-                  <h1>firmware flash</h1>
+                  <h1>Usage</h1>
                 
-                <h2 id="arduino-fwuploader-firmware-flash">arduino-fwuploader firmware flash<a class="headerlink" href="#arduino-fwuploader-firmware-flash" title="Permanent link">&para;</a></h2>
-<p>Flashes firmwares to board.</p>
-<h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Flashes specified module firmware to board at specified address. Module name and version can be omitted to install
-latest version.</p>
-<div class="highlight"><pre><span></span><code>arduino-fwuploader firmware flash [flags]
+                <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<h3 id="firmware-flashing">Firmware Flashing<a class="headerlink" href="#firmware-flashing" title="Permanent link">&para;</a></h3>
+<p>First <a href="../installation/">install</a> the Arduino Firmware Uploader. Extract the zip file and, for example, to update the NINA module present
+on the Arduino MKR WiFi 1010, run:</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -b arduino:samd:mkrwifi1010 -a /dev/ttyACM0
 </code></pre></div>
-<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-fwuploader flash --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2
-  arduino-fwuploader flash -b arduino:samd:mkr1000 -a COM10 -m WINC15000
-  arduino-fwuploader flash -b arduino:samd:mkr1000 -a COM10
+<p>You just have to specify the FQBN (<code>-b</code> or <code>--fqbn</code>) of the board and the serial port (<code>-a</code> or <code>--address</code>). The
+firmware uploader will take care of fetching everything is required to perform the update process. If no module and
+version are specified <strong>the latest version of the firmware</strong> will be used.</p>
+<p>If you want to flash a specific version of a firmware you can use the <code>-m</code> or <code>--module</code> flag</p>
+<p>For example to flash the WINC module present on the MKR 1000 with version 19.6.1 of the firmware you can run something
+like:</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1
 </code></pre></div>
-<h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  -a, --address string   Upload port, e.g.: COM10, /dev/ttyACM0
-  -b, --fqbn string      Fully Qualified Board Name, e.g.: arduino:samd:mkr1000, arduino:mbed_nano:nanorp2040connect
-  -h, --help             help for flash
-  -m, --module string    Firmware module ID, e.g.: WINC1500, NINA
-      --retries uint8    Number of retries in case of upload failure (default 9) (default 9)
+<p>There is a retry mechanism because the flashing process uses serial communication, which sometimes can be a bit
+unreliable. The retry flag is set by default to 9 retries, but it's possible to overwrite it for whatever reason. For
+example to update a Nano RP2040 Connect with the retry set to 2 you can use:</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash --fqbn arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0 --retries 2
 </code></pre></div>
-<h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>      --format string       The output format, can be {text|json}. (default &quot;text&quot;)
-      --log-file string     Path to the file where logs will be written
-      --log-format string   The output format for the logs, can be {text|json}.
-      --log-level string    Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic (default &quot;info&quot;)
-  -v, --verbose             Print the logs on the standard output.
+<p>It's possible to list the available firmwares for every board/module with:</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware list
 </code></pre></div>
-<h3 id="see-also">SEE ALSO<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h3>
-<ul>
-<li><a href="../arduino-fwuploader_firmware/">arduino-fwuploader firmware</a> - Commands to operate on firmwares.</li>
-</ul>
+<p>but you can also filter the results by specifying the <code>-b</code> or <code>--fqbn</code> flag</p>
+<p>The tool offers the ability to print output in JSON, with the <code>--format json</code> flag</p>
+<h3 id="certificates">Certificates<a class="headerlink" href="#certificates" title="Permanent link">&para;</a></h3>
+<p>The tool offers also the ability to flash SSL certificates to a module:</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot&quot; -a COM10 -u arduino.cc:443 -u google.cc:443
+</code></pre></div>
+<p>or you can specify a path to a file with <code>-f</code> instead of the URL of the certificate</p>
+<h3 id="command-line-options">Command line options<a class="headerlink" href="#command-line-options" title="Permanent link">&para;</a></h3>
+<p>The full list of command line options can be obtained with the <code>-h</code> option: <code>./arduino-fwuploader -h</code></p>
+<p>For further information you can use the <a href="../commands/arduino-fwuploader/">command reference</a></p>
                 
               
               
@@ -568,7 +540,7 @@ latest version.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../arduino-fwuploader_firmware/" class="md-footer__link md-footer__link--prev" aria-label="Previous: firmware" rel="prev">
+        <a href="../installation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Installation" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -577,20 +549,20 @@ latest version.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              firmware
+              Installation
             </div>
           </div>
         </a>
       
       
         
-        <a href="../arduino-fwuploader_firmware_list/" class="md-footer__link md-footer__link--next" aria-label="Next: firmware list" rel="next">
+        <a href="../commands/arduino-fwuploader/" class="md-footer__link md-footer__link--next" aria-label="Next: arduino-fwuploader" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              firmware list
+              arduino-fwuploader
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -623,10 +595,10 @@ latest version.</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.b0710199.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.b0710199.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.76f349be.min.js"></script>
+      <script src="../assets/javascripts/bundle.76f349be.min.js"></script>
       
     
   </body>
