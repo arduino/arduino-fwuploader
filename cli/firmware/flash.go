@@ -170,22 +170,22 @@ func run(cmd *cobra.Command, args []string) {
 func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName string, uploadToolDir, firmwareFile *paths.Path) error {
 	var err error
 	// Check if board needs a 1200bps touch for upload
-	uploadPort := address
+	bootloaderPort := address
 	if board.UploadTouch {
 		logrus.Info("Putting board into bootloader mode")
-		newUploadPort, err := serialutils.Reset(uploadPort, board.UploadWait, nil)
+		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
 		if err != nil {
 			return fmt.Errorf("error during firmware flashing: missing board address. %s", err)
 		}
 		if newUploadPort != "" {
 			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
-			uploadPort = newUploadPort
+			bootloaderPort = newUploadPort
 		}
 	}
 
 	uploaderCommand := board.GetUploaderCommand()
 	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{tool_dir}", filepath.FromSlash(uploadToolDir.String()))
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", uploadPort)
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", bootloaderPort)
 	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
 
 	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
@@ -208,15 +208,16 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
-	time.Sleep(2 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
 	switch moduleName {
 	case "NINA":
-		f, err = flasher.NewNinaFlasher(uploadPort)
+		// we use address and not bootloaderPort because the board should not be in bootloader mode
+		f, err = flasher.NewNinaFlasher(address)
 	case "WINC1500":
-		f, err = flasher.NewWincFlasher(uploadPort)
+		f, err = flasher.NewWincFlasher(address)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
 		feedback.Errorf("Error during firmware flashing: %s", err)
