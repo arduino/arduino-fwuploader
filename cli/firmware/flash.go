@@ -151,19 +151,8 @@ func run(cmd *cobra.Command, args []string) {
 
 	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
 
-	uploaderCommand := board.GetUploaderCommand()
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{tool_dir}", filepath.FromSlash(uploadToolDir.String()))
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", address)
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
-
-	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
-	if err != nil {
-		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
 	for retry := 1; retry <= int(retries); retry++ {
-		err = updateFirmware(board, commandLine, moduleName, firmwareFile)
+		err = updateFirmware(board, loaderSketch, moduleName, uploadToolDir, firmwareFile)
 		if err == nil {
 			logrus.Info("Operation completed: success! :-)")
 			break
@@ -178,13 +167,13 @@ func run(cmd *cobra.Command, args []string) {
 	}
 }
 
-func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, moduleName string, firmwareFile *paths.Path) error {
+func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName string, uploadToolDir, firmwareFile *paths.Path) error {
 	var err error
 	// Check if board needs a 1200bps touch for upload
 	uploadPort := address
 	if board.UploadTouch {
 		logrus.Info("Putting board into bootloader mode")
-		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
+		newUploadPort, err := serialutils.Reset(uploadPort, board.UploadWait, nil)
 		if err != nil {
 			return fmt.Errorf("error during firmware flashing: missing board address. %s", err)
 		}
@@ -192,6 +181,17 @@ func updateFirmware(board *firmwareindex.IndexBoard, commandLine []string, modul
 			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
 			uploadPort = newUploadPort
 		}
+	}
+
+	uploaderCommand := board.GetUploaderCommand()
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{tool_dir}", filepath.FromSlash(uploadToolDir.String()))
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", uploadPort)
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
+
+	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
+	if err != nil {
+		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	// Flash loader Sketch
