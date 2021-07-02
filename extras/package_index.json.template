@@ -1,5 +1,5 @@
         {
-          "name": "fwuploader",
+          "name": "arduino-fwuploader",
           "version": "%%VERSION%%",
           "systems": [
             {
