@@ -131,19 +131,19 @@ tasks:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.bz2 | cut -f1 -d " "
       OSX_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.bz2 | cut -f1 -d " "
-      LINUX64_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_32bit.zip | cut -f5 -d " "
-      LINUX32_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_64bit.zip | cut -f5 -d " "
-      LINUXARM_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_32bit.tar.bz2 | cut -f5 -d " "
-      LINUXARM64_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.bz2 | cut -f5 -d " "
-      OSX_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.bz2 | cut -f5 -d " "
       WINDOWS32_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.bz2 | cut -f5 -d " "
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_32bit.zip | cut -f5 -d " "
       WINDOWS64_SIZE:
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_64bit.zip | cut -f5 -d " "
+      LINUX32_SIZE:
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_32bit.tar.bz2 | cut -f5 -d " "
+      LINUX64_SIZE:
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.bz2 | cut -f5 -d " "
+      LINUXARM_SIZE:
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.bz2 | cut -f5 -d " "
+      LINUXARM64_SIZE:
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.bz2 | cut -f5 -d " "
+      OSX_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.bz2 | cut -f5 -d " "
     cmds:
       - |
