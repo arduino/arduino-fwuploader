@@ -24,6 +24,11 @@ tasks:
     cmds:
       - poetry run mike deploy --update-aliases --push --remote {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
 
+  docs:generate:
+    desc: Create all generated documentation content
+    deps:
+      - task: docs:gen:commands
+
   docs:gen:commands:
     desc: Generate command reference files
     dir: ./docsgen
@@ -43,6 +48,8 @@ tasks:
 
   docs:check-links:
     desc: Verifies there are no dead links in documentation
+    deps:
+      - task: docs:generate
     cmds:
       - |
         npx -p markdown-link-check -c '
