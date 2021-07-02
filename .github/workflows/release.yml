@@ -145,3 +145,13 @@ jobs:
           draft: false
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
           artifacts: dist/arduino-fwuploader*,dist/package_index.json
+
+      - name: Upload release files on Arduino downloads servers
+        uses: docker://plugins/s3
+        env:
+          PLUGIN_SOURCE: "dist/arduino-fwuploader*"
+          PLUGIN_TARGET: "/arduino-fwuploader/"
+          PLUGIN_STRIP_PREFIX: "dist/"
+          PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
