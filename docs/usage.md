@@ -57,4 +57,4 @@ The full list of command line options can be obtained with the `-h` option: `./a
 For further information you can use the [command reference]
 
 [install]: installation.md
-[command reference]: https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader/
+[command reference]: commands/arduino-fwuploader.md
