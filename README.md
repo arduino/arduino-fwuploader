@@ -27,6 +27,6 @@ e-mail contact: security@arduino.cc
 [docs-badge]: https://github.com/arduino/arduino-fwuploader/actions/workflows/publish-docs.yaml/badge.svg
 [security policy]: https://github.com/arduino/arduino-fwuploader/security/policy
 [user documentation]: https://arduino.github.io/arduino-fwuploader/
-[install]: https://arduino.github.io/arduino-fwuploader/dev/installation
-[usage]: https://arduino.github.io/arduino-fwuploader/dev/usage
-[commands reference]: https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader/
+[install]: https://arduino.github.io/arduino-fwuploader/latest/installation
+[usage]: https://arduino.github.io/arduino-fwuploader/latest/usage
+[commands reference]: https://arduino.github.io/arduino-fwuploader/latest/commands/arduino-fwuploader/
