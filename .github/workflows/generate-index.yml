@@ -2,15 +2,14 @@ name: Generate Index
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
-  pull_request:
-    branches:
-      - umbynos/index_generation
   push:
+    branches:
     paths:
       - "generator/**"
       - "firmwares/**"
       - "poetry.lock"
       - "pyproject.toml"
+      - ".github/workflows/generate-index.yml"
   workflow_dispatch:
   repository_dispatch:
 
@@ -31,7 +30,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - name: Install Poetry
         run: pip install poetry
@@ -45,28 +44,39 @@ jobs:
           arduino-cli version
           arduino-cli core install arduino:samd@${{ env.SAMD_V }} -v
           arduino-cli core install arduino:megaavr@${{ env.MEGAAVR_V }} -v
-          arduino-cli core install arduino:mebd_nano@${{ env.MBED_NANO_V }} -v
+          arduino-cli core install arduino:mbed_nano@${{ env.MBED_NANO_V }} -v
         env:
-          SAMD_V: 1.18.11
+          SAMD_V: 1.8.11
           MEGAAVR_V: 1.8.7
           MBED_NANO_V: 2.2.0
 
       - name: Install dependencies
-        run: task poetry:install-deps
+        run: |
+          cd $GITHUB_WORKSPACE
+          task poetry:install-deps
 
       - name: Generate index
-        run: ./generator.py -a $(which arduino-cli)
-
+        run: poetry run ./generator.py -a $(which arduino-cli)
+        
+        # fix `gpg: signing failed: Inappropriate ioctl for device`
+        # https://github.com/keybase/keybase-issues/issues/2798
       - name: Import GPG key
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
-          gpg --import --batch --passphrase ${{ secrets.PASSPHRASE }} private.key
-
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -di > private.key
+          gpg --batch --import --passphrase "${{ secrets.PASSPHRASE }}" private.key
+          echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
+        
+        # disable gpg pass prompt  
+        # https://stackoverflow.com/questions/49072403/suppress-the-passphrase-prompt-in-gpg-command
       - name: sign the json
-        run: gpg --output boards/module_firmware_index.json.sig --detach-sign boards/module_firmware_index.json
+        run: gpg --pinentry-mode=loopback --passphrase "${{ secrets.PASSPHRASE }}" --output boards/module_firmware_index.json.sig --detach-sign boards/module_firmware_index.json
 
       - name: create the gzip
         run: gzip --keep boards/module_firmware_index.json
 
       - name: s3 sync
         run: ./s3Copy.sh . s3://arduino-downloads-prod-beagle/arduino-fwuploader
+        env:
+          AWS_REGION: "us-east-1" # or https://github.com/aws/aws-cli/issues/5623
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
