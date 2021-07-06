@@ -57,7 +57,7 @@ jobs:
 
       - name: Generate index
         run: poetry run ./generator.py -a $(which arduino-cli)
-        
+
         # fix `gpg: signing failed: Inappropriate ioctl for device`
         # https://github.com/keybase/keybase-issues/issues/2798
       - name: Import GPG key
@@ -65,8 +65,8 @@ jobs:
           echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -di > private.key
           gpg --batch --import --passphrase "${{ secrets.PASSPHRASE }}" private.key
           echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
-        
-        # disable gpg pass prompt  
+
+        # disable gpg pass prompt
         # https://stackoverflow.com/questions/49072403/suppress-the-passphrase-prompt-in-gpg-command
       - name: sign the json
         run: gpg --pinentry-mode=loopback --passphrase "${{ secrets.PASSPHRASE }}" --output boards/module_firmware_index.json.sig --detach-sign boards/module_firmware_index.json
