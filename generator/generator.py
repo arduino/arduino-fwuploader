@@ -227,12 +227,14 @@ def generate_boards_json(input_data, arduino_cli_path):
         simple_fqbn = fqbn.replace(":", ".")
 
         binary_path = f"../firmwares/loader/{simple_fqbn}/"
-        binary = Path(__file__).parent / binary_path / os.listdir(binary_path)[0] # there's only one loader bin in every fqbn dir
+        binary = (
+            Path(__file__).parent / binary_path / os.listdir(binary_path)[0]
+        )  # there's only one loader bin in every fqbn dir
         boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)
 
         for firmware_version in data["versions"]:
-            
-            #handle firmware name 
+
+            # handle firmware name
             if fqbn == "arduino:megaavr:uno2018":
                 firmware = "NINA_W102-arduino.megaavr.uno2018.bin"
             elif fqbn == "arduino:mbed_nano:nanorp2040connect":
@@ -241,7 +243,7 @@ def generate_boards_json(input_data, arduino_cli_path):
                 firmware = "m2m_aio_3a0-arduino.samd.mkr1000.bin"
             else:
                 firmware = "NINA_W102.bin"
-            module =  data["moduleName"]
+            module = data["moduleName"]
             firmware_path = f"firmwares/{module}/{firmware_version}/{firmware}"
             binary = Path(__file__).parent / ".." / firmware_path
             boards[fqbn]["firmware"].append(create_firmware_data(binary, module, firmware_version))
