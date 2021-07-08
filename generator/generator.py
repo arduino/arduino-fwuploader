@@ -6,18 +6,10 @@ import sys
 import json
 import hashlib
 import shutil
+import os
 from pathlib import Path
 
 DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
-FQBNS = {
-    "mkr1000": "arduino:samd:mkr1000",
-    "mkrwifi1010": "arduino:samd:mkrwifi1010",
-    "nano_33_iot": "arduino:samd:nano_33_iot",
-    "mkrvidor4000": "arduino:samd:mkrvidor4000",
-    "uno2018": "arduino:megaavr:uno2018",
-    "nanorp2040connect": "arduino:mbed_nano:nanorp2040connect",
-}
-
 
 # Runs arduino-cli, doesn't handle errors at all because am lazy
 def arduino_cli(cli_path, args=[]):
@@ -231,20 +223,29 @@ def generate_boards_json(input_data, arduino_cli_path):
             print(f"Board {fqbn} is not installed, install its core {core_id}")
             sys.exit(1)
 
-    for pseudo_fqbn, data in input_data.items():
-        fqbn = FQBNS[pseudo_fqbn]
+    for fqbn, data in input_data.items():
         simple_fqbn = fqbn.replace(":", ".")
 
-        for _, v in data.items():
-            item = v[0]
-            binary = Path(__file__).parent / ".." / item["Path"]
+        binary_path = f"../firmwares/loader/{simple_fqbn}/"
+        binary = Path(__file__).parent / binary_path / os.listdir(binary_path)[0] # there's only one loader bin in every fqbn dir
+        boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)
 
-            if item["IsLoader"]:
-                boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)
+        for firmware_version in data["versions"]:
+            
+            #handle firmware name 
+            if fqbn == "arduino:megaavr:uno2018":
+                firmware = "NINA_W102-arduino.megaavr.uno2018.bin"
+            elif fqbn == "arduino:mbed_nano:nanorp2040connect":
+                firmware = "NINA_W102-arduino.mbed_nano.nanorp2040connect.bin"
+            elif fqbn == "arduino:samd:mkr1000":
+                firmware = "m2m_aio_3a0-arduino.samd.mkr1000.bin"
             else:
-                module, version = item["version"].split("/")
-                boards[fqbn]["firmware"].append(create_firmware_data(binary, module, version))
-                boards[fqbn]["module"] = module
+                firmware = "NINA_W102.bin"
+            module =  data["moduleName"]
+            firmware_path = f"firmwares/{module}/{firmware_version}/{firmware}"
+            binary = Path(__file__).parent / ".." / firmware_path
+            boards[fqbn]["firmware"].append(create_firmware_data(binary, module, firmware_version))
+            boards[fqbn]["module"] = module
 
         res = arduino_cli(
             cli_path=arduino_cli_path,
@@ -278,10 +279,10 @@ if __name__ == "__main__":
 
     # raw_boards.json has been generated using --get_available_for FirmwareUploader (version 0.1.8) flag.
     # It has been edited a bit to better handle parsing.
-    with open("raw_boards.json", "r") as f:
-        raw_boards = json.load(f)
+    with open("boards.json", "r") as f:
+        boards = json.load(f)
 
-    boards_json = generate_boards_json(raw_boards, args.arduino_cli)
+    boards_json = generate_boards_json(boards, args.arduino_cli)
 
     Path("boards").mkdir()
 
