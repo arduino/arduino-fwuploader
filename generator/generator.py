@@ -11,6 +11,18 @@ from pathlib import Path
 
 DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 
+
+# handle firmware name
+def get_firmware_name(fqbn):
+    if fqbn == "arduino:megaavr:uno2018":
+        return "NINA_W102-arduino.megaavr.uno2018.bin"
+    elif fqbn == "arduino:mbed_nano:nanorp2040connect":
+        return "NINA_W102-arduino.mbed_nano.nanorp2040connect.bin"
+    elif fqbn == "arduino:samd:mkr1000":
+        return "m2m_aio_3a0-arduino.samd.mkr1000.bin"
+    return "NINA_W102.bin"
+
+
 # Runs arduino-cli, doesn't handle errors at all because am lazy
 def arduino_cli(cli_path, args=[]):
     res = subprocess.run([cli_path, *args], capture_output=True, text=True)
@@ -233,16 +245,7 @@ def generate_boards_json(input_data, arduino_cli_path):
         boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)
 
         for firmware_version in data["versions"]:
-
-            # handle firmware name
-            if fqbn == "arduino:megaavr:uno2018":
-                firmware = "NINA_W102-arduino.megaavr.uno2018.bin"
-            elif fqbn == "arduino:mbed_nano:nanorp2040connect":
-                firmware = "NINA_W102-arduino.mbed_nano.nanorp2040connect.bin"
-            elif fqbn == "arduino:samd:mkr1000":
-                firmware = "m2m_aio_3a0-arduino.samd.mkr1000.bin"
-            else:
-                firmware = "NINA_W102.bin"
+            firmware = get_firmware_name(fqbn)
             module = data["moduleName"]
             firmware_path = f"firmwares/{module}/{firmware_version}/{firmware}"
             binary = Path(__file__).parent / ".." / firmware_path
