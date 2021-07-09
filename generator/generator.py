@@ -13,14 +13,14 @@ DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 
 
 # handle firmware name
-def get_firmware_name(fqbn):
-    if fqbn == "arduino:megaavr:uno2018":
-        return "NINA_W102-arduino.megaavr.uno2018.bin"
-    elif fqbn == "arduino:mbed_nano:nanorp2040connect":
-        return "NINA_W102-arduino.mbed_nano.nanorp2040connect.bin"
-    elif fqbn == "arduino:samd:mkr1000":
-        return "m2m_aio_3a0-arduino.samd.mkr1000.bin"
-    return "NINA_W102.bin"
+def get_firmware_file(module, simple_fqbn, version):
+    file = Path(f'{module}-{simple_fqbn}.bin')
+    default_file = Path(f'{module}.bin')
+    firmware_path = f"firmwares/{module}/{version}/{file}"
+    firmware_full_path = Path(__file__).parent / ".." / firmware_path
+    if firmware_full_path.exists():
+        return firmware_full_path
+    return Path(str(firmware_full_path).replace(str(file), str(default_file)))
 
 
 # Runs arduino-cli, doesn't handle errors at all because am lazy
@@ -238,18 +238,16 @@ def generate_boards_json(input_data, arduino_cli_path):
     for fqbn, data in input_data.items():
         simple_fqbn = fqbn.replace(":", ".")
 
-        binary_path = f"../firmwares/loader/{simple_fqbn}/"
-        binary = (
-            Path(__file__).parent / binary_path / os.listdir(binary_path)[0]
+        loader_dir = f"../firmwares/loader/{simple_fqbn}/"
+        loader_path = (
+            Path(__file__).parent / loader_dir / os.listdir(loader_dir)[0]
         )  # there's only one loader bin in every fqbn dir
-        boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)
+        boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, loader_path)
 
         for firmware_version in data["versions"]:
-            firmware = get_firmware_name(fqbn)
             module = data["moduleName"]
-            firmware_path = f"firmwares/{module}/{firmware_version}/{firmware}"
-            binary = Path(__file__).parent / ".." / firmware_path
-            boards[fqbn]["firmware"].append(create_firmware_data(binary, module, firmware_version))
+            firmware_file = get_firmware_file(module, simple_fqbn, firmware_version)
+            boards[fqbn]["firmware"].append(create_firmware_data(firmware_file, module, firmware_version))
             boards[fqbn]["module"] = module
 
         res = arduino_cli(
