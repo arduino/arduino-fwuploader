@@ -6,7 +6,6 @@ import sys
 import json
 import hashlib
 import shutil
-import os
 from pathlib import Path
 
 DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
@@ -14,13 +13,11 @@ DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 
 # handle firmware name
 def get_firmware_file(module, simple_fqbn, version):
-    file = Path(f'{module}-{simple_fqbn}.bin')
-    default_file = Path(f'{module}.bin')
-    firmware_path = f"firmwares/{module}/{version}/{file}"
-    firmware_full_path = Path(__file__).parent / ".." / firmware_path
-    if firmware_full_path.exists():
-        return firmware_full_path
-    return Path(str(firmware_full_path).replace(str(file), str(default_file)))
+    firmware_full_path = Path(__file__).parent.parent / "firmwares" / module / version
+    fqbn_specific_file_name = f"{module}-{simple_fqbn}.bin"
+    if (firmware_file := firmware_full_path / fqbn_specific_file_name).exists():
+        return firmware_file
+    return firmware_full_path / f"{module}.bin"
 
 
 # Runs arduino-cli, doesn't handle errors at all because am lazy
@@ -238,11 +235,19 @@ def generate_boards_json(input_data, arduino_cli_path):
     for fqbn, data in input_data.items():
         simple_fqbn = fqbn.replace(":", ".")
 
-        loader_dir = f"../firmwares/loader/{simple_fqbn}/"
-        loader_path = (
-            Path(__file__).parent / loader_dir / os.listdir(loader_dir)[0]
-        )  # there's only one loader bin in every fqbn dir
-        boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, loader_path)
+        loader_dir = Path(
+            "..",
+            "firmwares",
+            "loader",
+            simple_fqbn,
+        )
+        loader_path = Path(__file__).parent / loader_dir
+        loader_files = list(x for x in loader_path.iterdir() if x.is_file())
+        if len(loader_files) != 1:
+            print(f"Invalid loader files found in {loader_path}")
+            sys.exit(1)
+
+        boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, loader_files[0])
 
         for firmware_version in data["versions"]:
             module = data["moduleName"]
