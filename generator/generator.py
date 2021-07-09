@@ -9,14 +9,15 @@ import shutil
 from pathlib import Path
 
 DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
-FQBNS = {
-    "mkr1000": "arduino:samd:mkr1000",
-    "mkrwifi1010": "arduino:samd:mkrwifi1010",
-    "nano_33_iot": "arduino:samd:nano_33_iot",
-    "mkrvidor4000": "arduino:samd:mkrvidor4000",
-    "uno2018": "arduino:megaavr:uno2018",
-    "nanorp2040connect": "arduino:mbed_nano:nanorp2040connect",
-}
+
+
+# handle firmware name
+def get_firmware_file(module, simple_fqbn, version):
+    firmware_full_path = Path(__file__).parent.parent / "firmwares" / module / version
+    fqbn_specific_file_name = f"{module}-{simple_fqbn}.bin"
+    if (firmware_file := firmware_full_path / fqbn_specific_file_name).exists():
+        return firmware_file
+    return firmware_full_path / f"{module}.bin"
 
 
 # Runs arduino-cli, doesn't handle errors at all because am lazy
@@ -231,20 +232,28 @@ def generate_boards_json(input_data, arduino_cli_path):
             print(f"Board {fqbn} is not installed, install its core {core_id}")
             sys.exit(1)
 
-    for pseudo_fqbn, data in input_data.items():
-        fqbn = FQBNS[pseudo_fqbn]
+    for fqbn, data in input_data.items():
         simple_fqbn = fqbn.replace(":", ".")
 
-        for _, v in data.items():
-            item = v[0]
-            binary = Path(__file__).parent / ".." / item["Path"]
+        loader_dir = Path(
+            "..",
+            "firmwares",
+            "loader",
+            simple_fqbn,
+        )
+        loader_path = Path(__file__).parent / loader_dir
+        loader_files = list(x for x in loader_path.iterdir() if x.is_file())
+        if len(loader_files) != 1:
+            print(f"Invalid loader files found in {loader_path}")
+            sys.exit(1)
 
-            if item["IsLoader"]:
-                boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, binary)
-            else:
-                module, version = item["version"].split("/")
-                boards[fqbn]["firmware"].append(create_firmware_data(binary, module, version))
-                boards[fqbn]["module"] = module
+        boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, loader_files[0])
+
+        for firmware_version in data["versions"]:
+            module = data["moduleName"]
+            firmware_file = get_firmware_file(module, simple_fqbn, firmware_version)
+            boards[fqbn]["firmware"].append(create_firmware_data(firmware_file, module, firmware_version))
+            boards[fqbn]["module"] = module
 
         res = arduino_cli(
             cli_path=arduino_cli_path,
@@ -278,10 +287,10 @@ if __name__ == "__main__":
 
     # raw_boards.json has been generated using --get_available_for FirmwareUploader (version 0.1.8) flag.
     # It has been edited a bit to better handle parsing.
-    with open("raw_boards.json", "r") as f:
-        raw_boards = json.load(f)
+    with open("boards.json", "r") as f:
+        boards = json.load(f)
 
-    boards_json = generate_boards_json(raw_boards, args.arduino_cli)
+    boards_json = generate_boards_json(boards, args.arduino_cli)
 
     Path("boards").mkdir()
 
