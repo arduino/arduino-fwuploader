@@ -4,7 +4,7 @@ name: Generate Index
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - "generator/**"
       - "firmwares/**"
