@@ -121,19 +121,8 @@ func run(cmd *cobra.Command, args []string) {
 
 	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
 
-	uploaderCommand := board.GetUploaderCommand()
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{tool_dir}", filepath.FromSlash(uploadToolDir.String()))
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", address)
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
-
-	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
-	if err != nil {
-		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
 	// Check if board needs a 1200bps touch for upload
-	uploadPort := address
+	bootloaderPort := address
 	if board.UploadTouch {
 		logrus.Info("Putting board into bootloader mode")
 		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
@@ -143,8 +132,19 @@ func run(cmd *cobra.Command, args []string) {
 		}
 		if newUploadPort != "" {
 			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
-			uploadPort = newUploadPort
+			bootloaderPort = newUploadPort
 		}
+	}
+
+	uploaderCommand := board.GetUploaderCommand()
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{tool_dir}", filepath.FromSlash(uploadToolDir.String()))
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", bootloaderPort)
+	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
+
+	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
+	if err != nil {
+		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	// Flash loader Sketch
@@ -162,16 +162,17 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
-	time.Sleep(2 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
 	moduleName := board.Module
 	switch moduleName {
 	case "NINA":
-		f, err = flasher.NewNinaFlasher(uploadPort)
+		// we use address and not bootloaderPort because the board should not be in bootloader mode
+		f, err = flasher.NewNinaFlasher(address)
 	case "WINC1500":
-		f, err = flasher.NewWincFlasher(uploadPort)
+		f, err = flasher.NewWincFlasher(address)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
 	}
