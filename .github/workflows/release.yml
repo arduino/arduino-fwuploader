@@ -90,8 +90,7 @@ jobs:
           # so we need to add execution permission back.
           chmod +x dist/macos64/arduino-fwuploader
           TAG=${GITHUB_REF/refs\/tags\//}
-          tar cjf dist/arduino-fwuploader_${TAG}_macOS_64bit.tar.bz2 \
-          firmwares \
+          tar czf dist/arduino-fwuploader_${TAG}_macOS_64bit.tar.gz \
           LICENSE.txt \
           -C dist/macos64/ arduino-fwuploader
 
