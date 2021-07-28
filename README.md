@@ -6,6 +6,11 @@ equipped with WINC or NINA Wi-Fi module.
 [![tests-badge]](https://github.com/arduino/arduino-fwuploader/actions/workflows/test.yaml)
 [![docs-badge]](https://github.com/arduino/arduino-fwuploader/actions/workflows/publish-docs.yaml)
 
+## ❗❗❗Notice regarding versions before 2.0.0 ❗❗❗
+
+**ATTENTION** old versions (e.g 1.0.x) will not work anymore, further details in this [issue]. Please use the [latest]
+release
+
 ## Docs
 
 For guidance on installation and development, see the [User documentation]
@@ -30,3 +35,5 @@ e-mail contact: security@arduino.cc
 [install]: https://arduino.github.io/arduino-fwuploader/latest/installation
 [usage]: https://arduino.github.io/arduino-fwuploader/latest/usage
 [commands reference]: https://arduino.github.io/arduino-fwuploader/latest/commands/arduino-fwuploader/
+[issue]: https://github.com/arduino/arduino-fwuploader/issues/93
+[latest]: https://github.com/arduino/arduino-fwuploader/releases
