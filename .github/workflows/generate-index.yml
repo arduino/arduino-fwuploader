@@ -63,8 +63,8 @@ jobs:
         # https://github.com/keybase/keybase-issues/issues/2798
       - name: Import GPG key
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -di > private.key
-          gpg --batch --import --passphrase "${{ secrets.PASSPHRASE }}" private.key
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -di > /tmp/private.key
+          gpg --batch --import --passphrase "${{ secrets.PASSPHRASE }}" /tmp/private.key
           echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
 
         # disable gpg pass prompt
