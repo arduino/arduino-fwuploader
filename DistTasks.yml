@@ -52,11 +52,11 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
-        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cz LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linux32"
       PACKAGE_PLATFORM: "Linux_32bit"
-      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.bz2"
+      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
   Linux_64bit:
     desc: Builds Linux 64 bit binaries
@@ -66,11 +66,11 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
-        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cz LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linux64"
       PACKAGE_PLATFORM: "Linux_64bit"
-      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.bz2"
+      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
   Linux_ARM:
     desc: Builds Linux ARM binaries
@@ -80,11 +80,11 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
-        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cz LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linuxarm"
       PACKAGE_PLATFORM: "Linux_ARM"
-      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.bz2"
+      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
   Linux_ARM64:
     desc: Builds Linux ARM64 binaries
@@ -94,11 +94,11 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
-        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cz LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "linuxarm64"
       PACKAGE_PLATFORM: "Linux_ARM64"
-      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.bz2"
+      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
   macOS_64bit:
     desc: Builds Mac OS X 64 bit binaries
@@ -108,11 +108,11 @@ tasks:
     cmds:
       - |
         go build -o {{ .DIST_DIR}}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{.LDFLAGS}}
-        tar cj LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
+        tar cz LICENSE.txt -C {{ .DIST_DIR}}/{{ .PLATFORM_DIR }} {{ .PROJECT_NAME }} -f {{ .DIST_DIR }}/{{ .PACKAGE_NAME }}
     vars:
       PLATFORM_DIR: "macos64"
       PACKAGE_PLATFORM: "macOS_64bit"
-      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.bz2"
+      PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
   generate-index-data:
     desc: Generates json for platform index
@@ -122,29 +122,29 @@ tasks:
       WINDOWS64_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_64bit.zip | cut -f1 -d " "
       LINUX32_SHA:
-        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_32bit.tar.bz2 | cut -f1 -d " "
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_32bit.tar.gz | cut -f1 -d " "
       LINUX64_SHA:
-        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.bz2 | cut -f1 -d " "
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.gz | cut -f1 -d " "
       LINUXARM_SHA:
-        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.bz2 | cut -f1 -d " "
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.gz | cut -f1 -d " "
       LINUXARM64_SHA:
-        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.bz2 | cut -f1 -d " "
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f1 -d " "
       OSX_SHA:
-        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.bz2 | cut -f1 -d " "
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.gz | cut -f1 -d " "
       WINDOWS32_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_32bit.zip | cut -f5 -d " "
       WINDOWS64_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_64bit.zip | cut -f5 -d " "
       LINUX32_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_32bit.tar.bz2 | cut -f5 -d " "
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_32bit.tar.gz | cut -f5 -d " "
       LINUX64_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.bz2 | cut -f5 -d " "
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.gz | cut -f5 -d " "
       LINUXARM_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.bz2 | cut -f5 -d " "
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.gz | cut -f5 -d " "
       LINUXARM64_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.bz2 | cut -f5 -d " "
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f5 -d " "
       OSX_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.bz2 | cut -f5 -d " "
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.gz | cut -f5 -d " "
     cmds:
       - |
         cat extras/package_index.json.template |
