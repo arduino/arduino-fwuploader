@@ -55,9 +55,9 @@ func NewFlashCommand() *cobra.Command {
 		Short: "Flashes firmwares to board.",
 		Long:  "Flashes specified module firmware to board at specified address. Module name and version can be omitted to install latest version.",
 		Example: "" +
-			"  " + os.Args[0] + " flash --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2\n" +
-			"  " + os.Args[0] + " flash -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
-			"  " + os.Args[0] + " flash -b arduino:samd:mkr1000 -a COM10\n",
+			"  " + os.Args[0] + " firmware flash --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2\n" +
+			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
+			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10\n",
 		Args: cobra.NoArgs,
 		Run:  run,
 	}
