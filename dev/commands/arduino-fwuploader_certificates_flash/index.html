@@ -526,9 +526,9 @@
 <div class="highlight"><pre><span></span><code>arduino-fwuploader certificates flash [flags]
 </code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-fwuploader flash --fqbn arduino:samd:mkr1000 --address COM10 --url arduino.cc:443 --file /home/me/Digicert.cer
-  arduino-fwuploader flash -b arduino:samd:mkr1000 -a COM10 -u arduino.cc:443 -u google.cc:443
-  arduino-fwuploader flash -b arduino:samd:mkr1000 -a COM10 -f /home/me/VeriSign.cer -f /home/me/Digicert.cer
+<div class="highlight"><pre><span></span><code>  arduino-fwuploader certificates flash --fqbn arduino:samd:mkr1000 --address COM10 --url arduino.cc:443 --file /home/me/Digicert.cer
+  arduino-fwuploader certificates flash -b arduino:samd:mkr1000 -a COM10 -u arduino.cc:443 -u google.cc:443
+  arduino-fwuploader certificates flash -b arduino:samd:mkr1000 -a COM10 -f /home/me/VeriSign.cer -f /home/me/Digicert.cer
 </code></pre></div>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>  -a, --address string   Upload port, e.g.: COM10, /dev/ttyACM0
