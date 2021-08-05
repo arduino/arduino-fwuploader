@@ -228,7 +228,6 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 		return err
 	}
 	defer f.Close()
-	f.SetProgressCallback(printProgress)
 
 	// now flash the actual firmware
 	flasherOut := new(bytes.Buffer)
@@ -236,6 +235,7 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 	if feedback.GetFormat() == feedback.JSON {
 		err = f.FlashFirmware(firmwareFile, flasherOut)
 	} else {
+		f.SetProgressCallback(printProgress)
 		err = f.FlashFirmware(firmwareFile, os.Stdout)
 	}
 	if err != nil {
