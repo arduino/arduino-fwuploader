@@ -1,5 +1,5 @@
 # Source:
-# https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-mkdocs-versioned/build/build.py
+# https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-mkdocs-versioned/siteversion/siteversion.py
 
 # Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 
@@ -13,11 +13,9 @@
 # Arduino software without disclosing the source code of your own applications.
 # To purchase a commercial license, send an email to license@arduino.cc.
 import os
-import sys
 import re
-import subprocess
+import json
 
-import click
 from git import Repo
 
 # In order to provide support for multiple project releases, Documentation is versioned so that visitors can select
@@ -41,19 +39,20 @@ DEV_BRANCHES = ["main"]  # Name of the branch used for the "dev" website source 
 
 def get_docs_version(ref_name, release_branches):
     if ref_name in DEV_BRANCHES:
-        return "dev", ""
+        return {"version": "dev", "alias": ""}
 
     if ref_name in release_branches:
         # if version is latest, add an alias
         alias = "latest" if ref_name == release_branches[0] else ""
         # strip `.x` suffix from the branch name to get the version: 0.3.x -> 0.3
-        return ref_name[:-2], alias
+        return {"version": ref_name[:-2], "alias": alias}
 
-    return None, None
+    return {"version": None, "alias": None}
 
 
 def get_rel_branch_names(blist):
     """Get the names of the release branches, sorted from newest to older.
+
     Only process remote refs so we're sure to get all of them and clean up the
     name so that we have a list of strings like 0.6.x, 0.7.x, ...
     """
@@ -70,10 +69,7 @@ def get_rel_branch_names(blist):
     return sorted(names, key=lambda x: int(x.split(".")[1]), reverse=True)
 
 
-@click.command()
-@click.option("--dry", is_flag=True)
-@click.option("--remote", default="origin", help="The git remote where to push.")
-def main(dry, remote):
+def main():
     # Detect repo root folder
     here = os.path.dirname(os.path.realpath(__file__))
     repo_dir = os.path.join(here, "..", "..")
@@ -84,26 +80,16 @@ def main(dry, remote):
     # Get the list of release branch names
     rel_br_names = get_rel_branch_names(repo.refs)
 
-    # Deduce docs version from current branch. Use the 'latest' alias if
-    # version is the most recent
-    docs_version, alias = get_docs_version(repo.active_branch.name, rel_br_names)
-    if docs_version is None:
-        print(f"Can't get version from current branch '{repo.active_branch}', skip docs generation")
-        return 0
+    # Deduce docs version from current branch.
+    versioning_data = get_docs_version(repo.active_branch.name, rel_br_names)
 
-    # Taskfile args aren't regular args so we put everything in one string
-    cmd = (f"task docs:publish DOCS_REMOTE={remote} DOCS_VERSION={docs_version} DOCS_ALIAS={alias}",)
-
-    if dry:
-        print(cmd)
-        return 0
-
-    subprocess.run(cmd, shell=True, check=True, cwd=repo_dir)
+    # Return the data as JSON on stdout
+    print(json.dumps(versioning_data))
 
 
 # Usage:
 #     To run the script (must be run from within the repo tree):
-#         $python build.py
+#         $python siteversion.py
 #
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

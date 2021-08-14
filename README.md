@@ -4,7 +4,7 @@ The Arduino Firmware Uploader is a tool made to update the firmware and/or add S
 equipped with WINC or NINA Wi-Fi module.
 
 [![tests-badge]](https://github.com/arduino/arduino-fwuploader/actions/workflows/test.yaml)
-[![docs-badge]](https://github.com/arduino/arduino-fwuploader/actions/workflows/publish-docs.yaml)
+[![Deploy Website status](https://github.com/arduino/arduino-fwuploader/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml/badge.svg)](https://github.com/arduino/arduino-fwuploader/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml)
 
 ## ❗❗❗Notice regarding versions before 2.0.0 ❗❗❗
 
@@ -29,7 +29,6 @@ and report the bug to our Security Team 🛡️ Thank you!
 e-mail contact: security@arduino.cc
 
 [tests-badge]: https://github.com/arduino/arduino-fwuploader/actions/workflows/test.yaml/badge.svg
-[docs-badge]: https://github.com/arduino/arduino-fwuploader/actions/workflows/publish-docs.yaml/badge.svg
 [security policy]: https://github.com/arduino/arduino-fwuploader/security/policy
 [user documentation]: https://arduino.github.io/arduino-fwuploader/
 [install]: https://arduino.github.io/arduino-fwuploader/latest/installation
