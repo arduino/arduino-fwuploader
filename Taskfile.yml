@@ -10,14 +10,6 @@ tasks:
     cmds:
       - poetry install --no-root
 
-  docs:serve:
-    desc: Run website locally
-    deps:
-      - task: poetry:install-deps
-      - task: docs:generate
-    cmds:
-      - poetry run mkdocs serve
-
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
   docs:generate:
     desc: Create all generated documentation content
@@ -36,14 +28,6 @@ tasks:
     desc: Automatically formats documentation
     cmds:
       - npx {{ .PRETTIER }} --write "**/*.md"
-
-  docs:build:
-    desc: Build documentation website contents
-    deps:
-      - docs:generate
-      - poetry:install-deps
-    cmds:
-      - poetry run mkdocs build -s
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
   general:format-prettier:
@@ -227,6 +211,24 @@ tasks:
       - task: poetry:install-deps
     cmds:
       - poetry run black .
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
+  website:check:
+    desc: Check whether the MkDocs-based website will build
+    deps:
+      - task: docs:generate
+      - task: poetry:install-deps
+    cmds:
+      - poetry run mkdocs build --strict
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
+  website:serve:
+    desc: Run website locally
+    deps:
+      - task: docs:generate
+      - task: poetry:install-deps
+    cmds:
+      - poetry run mkdocs serve
 
 vars:
   PROJECT_NAME: "arduino-fwuploader"
