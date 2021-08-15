@@ -3,3 +3,8 @@
 .vscode/
 .vs/
 .ionide/
+
+indexes/download/testdata/module_firmware_index.json
+indexes/download/testdata/package_index.json
+indexes/firmwareindex/testdata/module_firmware_index.json
+indexes/testdata/package_index.json
