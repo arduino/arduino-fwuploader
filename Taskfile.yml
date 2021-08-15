@@ -131,27 +131,47 @@ tasks:
     cmds:
       - npx markdownlint-cli "**/*.md"
 
-  build:
-    desc: Build the project
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/go-task/Taskfile.yml
+  go:build:
+    desc: Build the Go code
+    dir: "{{.DEFAULT_GO_MODULE_PATH}}"
     cmds:
       - go build -v {{.LDFLAGS}}
+
+  build:
+    desc: Build the project
+    deps:
+      - task: go:build
 
   test:
     desc: Run tests
     cmds:
       - task: test-unit
-      - task: test-integration
+      - task: go:test-integration
 
-  test-unit:
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-task/Taskfile.yml
+  go:test:
     desc: Run unit tests
+    dir: "{{default .DEFAULT_GO_MODULE_PATH .GO_MODULE_PATH}}"
     cmds:
-      - go test -short -race -run '.*' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt ./... {{.TEST_LDFLAGS}}
+      - |
+        go test \
+          -v \
+          -short \
+          -race \
+          -run '{{default ".*" .GO_TEST_REGEX}}' \
+          {{default "-timeout 10m -coverpkg=./... -covermode=atomic" .GO_TEST_FLAGS}} \
+          -coverprofile=coverage_unit.txt \
+          {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}} \
+          {{.TEST_LDFLAGS}}
 
-  test-integration:
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-integration-task/Taskfile.yml
+  go:test-integration:
     desc: Run integration tests
-    cmds:
-      - task: build
+    deps:
+      - task: go:build
       - task: poetry:install-deps
+    cmds:
       - poetry run pytest test
 
   check:
@@ -235,7 +255,6 @@ vars:
     -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
   # test vars
-  GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSION: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
   TEST_LDFLAGS: >
