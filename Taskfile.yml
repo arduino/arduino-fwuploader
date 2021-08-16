@@ -104,6 +104,7 @@ tasks:
       - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} ./..."
       - task: docs:check
       - task: config:check
+      - task: general:check-formatting
       - task: python:check
 
   config:check:
@@ -115,6 +116,17 @@ tasks:
     desc: Automatically formats configuration and supporting files
     cmds:
       - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-general-formatting-task/Taskfile.yml
+  general:check-formatting:
+    desc: Check basic formatting style of all files
+    cmds:
+      - |
+        if ! which ec &>/dev/null; then
+          echo "ec not found or not in PATH. Please install: https://github.com/editorconfig-checker/editorconfig-checker#installation"
+          exit 1
+        fi
+      - ec
 
   python:check:
     cmds:
