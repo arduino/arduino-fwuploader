@@ -59,6 +59,21 @@ tasks:
     cmds:
       - poetry run mkdocs build -s
 
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:lint:
+    desc: Lint Go code
+    dir: "{{default .DEFAULT_GO_MODULE_PATH .GO_MODULE_PATH}}"
+    cmds:
+      - |
+        if ! which golint &>/dev/null; then
+          echo "golint not installed or not in PATH. Please install: https://github.com/golang/lint#installation"
+          exit 1
+        fi
+      - |
+        golint \
+          {{default "-min_confidence 0.8 -set_exit_status" .GO_LINT_FLAGS}} \
+          {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
+
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
   markdown:check-links:
     desc: Check for broken links
@@ -142,7 +157,7 @@ tasks:
     cmds:
       - test -z $(go fmt ./...)
       - go vet ./...
-      - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} ./..."
+      - task: go:lint
       - task: docs:check
       - task: config:check
       - task: general:check-formatting
@@ -190,6 +205,11 @@ tasks:
 vars:
   PROJECT_NAME: "arduino-fwuploader"
   DIST_DIR: "dist"
+  # Path of the project's primary Go module:
+  DEFAULT_GO_MODULE_PATH: ./
+  DEFAULT_GO_PACKAGES:
+    sh: |
+      echo $(cd {{default .DEFAULT_GO_MODULE_PATH .GO_MODULE_PATH}} && go list ./... | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
   # build vars
   COMMIT:
     sh: echo "$(git log -n 1 --format=%h)"
@@ -219,9 +239,6 @@ vars:
     -X github.com/arduino/arduino-fwuploader/version.date={{.TIMESTAMP}}
     '
   # check-lint vars
-  GOLINTBIN:
-    sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
-  GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
   PRETTIER: prettier@2.0.5
   DOCS_VERSION: dev
   DOCS_ALIAS: ""
