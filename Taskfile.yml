@@ -14,33 +14,18 @@ tasks:
     desc: Run website locally
     deps:
       - task: poetry:install-deps
-      - task: docs:gen:commands
+      - task: docs:generate
     cmds:
       - poetry run mkdocs serve
 
-  docs:publish:
-    desc: Use Mike to build and push versioned docs
-    deps:
-      - docs:gen:commands
-    cmds:
-      - poetry run mike deploy --update-aliases --push --remote {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
-
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
   docs:generate:
     desc: Create all generated documentation content
     deps:
-      - task: docs:gen:commands
-
-  docs:gen:commands:
-    desc: Generate command reference files
-    dir: ./docsgen
+      - task: go:cli-docs
     cmds:
-      # docs will generate examples using os.Args[0] so we need to call
-      # the generator `arduino-fwuploader`
-      - go build -o {{.PROJECT_NAME}}{{exeExt}}
-      # we invoke `arduino-fwuploader` like this instead of `./arduino-fwuploader` to remove
-      # the `./` chars from the examples
-      - PATH=. {{.PROJECT_NAME}} ../docs/commands
-      - task: docs:format
+      # Make the formatting consistent with the non-generated Markdown
+      - task: general:format-prettier
 
   docs:check:
     desc: Run documentation linting
@@ -55,10 +40,26 @@ tasks:
   docs:build:
     desc: Build documentation website contents
     deps:
-      - docs:gen:commands
+      - docs:generate
       - poetry:install-deps
     cmds:
       - poetry run mkdocs build -s
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
+  general:format-prettier:
+    desc: Format all supported files with Prettier
+    cmds:
+      - npx prettier --write .
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
+  go:cli-docs:
+    desc: Generate command line interface reference documentation
+    dir: ./docsgen
+    cmds:
+      # Command examples use os.Args[0] so the docs generation binary must have the same filename as the project
+      - go build -o {{.PROJECT_NAME}}{{exeExt}}
+      # The binary is invoked like this instead of `./{{.PROJECT_NAME}}` to remove the `./` chars from the examples
+      - PATH=. {{.PROJECT_NAME}} ../docs/commands
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:lint:
@@ -245,6 +246,3 @@ vars:
     '
   # check-lint vars
   PRETTIER: prettier@2.0.5
-  DOCS_VERSION: dev
-  DOCS_ALIAS: ""
-  DOCS_REMOTE: "origin"

@@ -15,4 +15,4 @@ __pycache__/
 /site/
 /docsgen/arduino-fwuploader
 /docsgen/arduino-fwuploader.exe
-/docs/commands/*.md
+/docs/commands/
