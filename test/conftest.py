@@ -1,4 +1,6 @@
-#   arduino-fwuploader
+# Source:
+# https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-integration/test_all.py
+
 #   Copyright (c) 2021 Arduino LLC.  All right reserved.
 
 #   This library is free software; you can redistribute it and/or
@@ -15,8 +17,10 @@
 #   License along with this library; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+import os
 import pathlib
 import platform
+import shutil
 import typing
 import invoke.context
 import pytest
@@ -30,10 +34,12 @@ def run_command(pytestconfig, working_dir) -> typing.Callable[..., invoke.runner
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Result
     """
 
-    fwuploader_path = pathlib.Path(pytestconfig.rootdir).parent / "arduino-fwuploader"
+    executable_path = pathlib.Path(pytestconfig.rootdir).parent / "arduino-fwuploader"
 
     def _run(
-        cmd: list, custom_working_dir: typing.Optional[str] = None, custom_env: typing.Optional[dict] = None
+        cmd: list,
+        custom_working_dir: typing.Optional[str] = None,
+        custom_env: typing.Optional[dict] = None,
     ) -> invoke.runners.Result:
         if cmd is None:
             cmd = []
@@ -42,7 +48,7 @@ def run_command(pytestconfig, working_dir) -> typing.Callable[..., invoke.runner
         quoted_cmd = []
         for token in cmd:
             quoted_cmd.append(f'"{token}"')
-        cli_full_line = '"{}" {}'.format(fwuploader_path, " ".join(quoted_cmd))
+        cli_full_line = '"{}" {}'.format(executable_path, " ".join(quoted_cmd))
         run_context = invoke.context.Context()
         # It might happen that we need to change directories between drives on Windows,
         # in that case the "/d" flag must be used otherwise directory wouldn't change
@@ -54,16 +60,22 @@ def run_command(pytestconfig, working_dir) -> typing.Callable[..., invoke.runner
         # wrapping the path in quotation marks is the safest approach
         with run_context.prefix(f'{cd_command} "{custom_working_dir}"'):
             return run_context.run(
-                command=cli_full_line, echo=False, hide=True, warn=True, env=custom_env, encoding="utf-8"
+                command=cli_full_line,
+                echo=False,
+                hide=True,
+                warn=True,
+                env=custom_env,
+                encoding="utf-8",
             )
 
     return _run
 
 
 @pytest.fixture(scope="function")
-def working_dir(tmpdir_factory):
+def working_dir(tmpdir_factory) -> str:
     """Create a temporary folder for the test to run in. It will be created before running each test and deleted at the
     end. This way all the tests work in isolation.
     """
-    work_dir = tmpdir_factory.mktemp(basename="FirmwareUploaderTestWork")
-    yield str(work_dir)
+    work_dir = tmpdir_factory.mktemp(basename="IntegrationTestWorkingDir")
+    yield os.path.realpath(work_dir)
+    shutil.rmtree(work_dir, ignore_errors=True)
