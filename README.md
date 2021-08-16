@@ -18,8 +18,8 @@ For guidance on installation and development, see the [User documentation]
 ## Quickstart
 
 1. [Install] the Arduino Firmware Uploader
-2. Follow the [Usage] guide to check out what the tool can do
-3. Browse the [Commands reference] to see all the available commands
+1. Follow the [Usage] guide to check out what the tool can do
+1. Browse the [Commands reference] to see all the available commands
 
 ## Security
 
