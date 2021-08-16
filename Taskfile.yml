@@ -4,6 +4,7 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/poetry-task/Taskfile.yml
   poetry:install-deps:
     desc: Install dependencies managed by Poetry
     cmds:
@@ -190,16 +191,20 @@ tasks:
     cmds:
       - task: python:lint
 
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
   python:lint:
     desc: Lint Python code
-    cmds:
+    deps:
       - task: poetry:install-deps
-      - poetry run flake8
+    cmds:
+      - poetry run flake8 --show-source
 
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
   python:format:
-    desc: Automatically formats Python files
-    cmds:
+    desc: Format Python files
+    deps:
       - task: poetry:install-deps
+    cmds:
       - poetry run black .
 
 vars:
