@@ -171,16 +171,6 @@ tasks:
       - task: markdown:lint
       - task: python:check
 
-  config:check:
-    desc: Check linting of configuration and supporting files
-    cmds:
-      - npx {{ .PRETTIER }} --check "**/*.{yml,yaml}"
-
-  config:format:
-    desc: Automatically formats configuration and supporting files
-    cmds:
-      - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
-
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-general-formatting-task/Taskfile.yml
   general:check-formatting:
     desc: Check basic formatting style of all files
@@ -266,5 +256,3 @@ vars:
     -X {{.CONFIGURATION_PACKAGE}}.commit={{.TEST_COMMIT}}
     -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
-  # check-lint vars
-  PRETTIER: prettier@2.0.5

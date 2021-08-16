@@ -1,16 +1,11 @@
 {
-  "arduino:samd:mkr1000":{
-    "moduleName":"WINC1500",
-    "versions":[
-      "19.4.4",
-      "19.5.2",
-      "19.5.4",
-      "19.6.1"
-    ]
+  "arduino:samd:mkr1000": {
+    "moduleName": "WINC1500",
+    "versions": ["19.4.4", "19.5.2", "19.5.4", "19.6.1"]
   },
-  "arduino:samd:mkrwifi1010":{
-    "moduleName":"NINA",
-    "versions":[
+  "arduino:samd:mkrwifi1010": {
+    "moduleName": "NINA",
+    "versions": [
       "1.0.0",
       "1.1.0",
       "1.2.1",
@@ -29,9 +24,9 @@
       "1.4.8"
     ]
   },
-  "arduino:samd:nano_33_iot":{
-    "moduleName":"NINA",
-    "versions":[
+  "arduino:samd:nano_33_iot": {
+    "moduleName": "NINA",
+    "versions": [
       "1.0.0",
       "1.1.0",
       "1.2.1",
@@ -50,16 +45,13 @@
       "1.4.8"
     ]
   },
-  "arduino:samd:mkrvidor4000":{
-    "moduleName":"NINA",
-    "versions":[
-      "1.0.0",
-      "1.1.0"
-    ]
+  "arduino:samd:mkrvidor4000": {
+    "moduleName": "NINA",
+    "versions": ["1.0.0", "1.1.0"]
   },
-  "arduino:megaavr:uno2018":{
-    "moduleName":"NINA",
-    "versions":[
+  "arduino:megaavr:uno2018": {
+    "moduleName": "NINA",
+    "versions": [
       "1.2.1",
       "1.2.2",
       "1.2.3",
@@ -76,13 +68,8 @@
       "1.4.8"
     ]
   },
-  "arduino:mbed_nano:nanorp2040connect":{
-    "moduleName":"NINA",
-    "versions":[
-      "1.4.5",
-      "1.4.6",
-      "1.4.7",
-      "1.4.8"
-    ]
+  "arduino:mbed_nano:nanorp2040connect": {
+    "moduleName": "NINA",
+    "versions": ["1.4.5", "1.4.6", "1.4.7", "1.4.8"]
   }
 }
