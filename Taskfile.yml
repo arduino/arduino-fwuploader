@@ -218,20 +218,21 @@ vars:
       echo $(cd {{default .DEFAULT_GO_MODULE_PATH .GO_MODULE_PATH}} && go list ./... | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
   # build vars
   COMMIT:
-    sh: echo "$(git log -n 1 --format=%h)"
+    sh: echo "$(git log --no-show-signature -n 1 --format=%h)"
   TIMESTAMP:
     sh: echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   TIMESTAMP_SHORT:
     sh: echo "{{now | date "20060102"}}"
   TAG:
-    sh: echo "`git tag --points-at=HEAD 2> /dev/null | head -n1`"
-  VERSION: "{{ if .NIGHTLY }}nightly-{{ .TIMESTAMP_SHORT }}{{ else if .TAG }}{{ .TAG }}{{ else }}{{ .PACKAGE_NAME_PREFIX }}git-snapshot{{ end }}"
+    sh: echo "$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
+  VERSION: "{{if .NIGHTLY}}nightly-{{.TIMESTAMP_SHORT}}{{else if .TAG}}{{.TAG}}{{else}}{{.PACKAGE_NAME_PREFIX}}git-snapshot{{end}}"
+  CONFIGURATION_PACKAGE: github.com/arduino/arduino-fwuploader/version
   LDFLAGS: >
     -ldflags
     '
-    -X github.com/arduino/arduino-fwuploader/version.versionString={{.VERSION}}
-    -X github.com/arduino/arduino-fwuploader/version.commit={{ .COMMIT }}
-    -X github.com/arduino/arduino-fwuploader/version.date={{.TIMESTAMP}}
+    -X {{.CONFIGURATION_PACKAGE}}.versionString={{.VERSION}}
+    -X {{.CONFIGURATION_PACKAGE}}.commit={{ .COMMIT }}
+    -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
@@ -240,9 +241,9 @@ vars:
   TEST_LDFLAGS: >
     -ldflags
     '
-    -X github.com/arduino/arduino-fwuploader/version.versionString={{.TEST_VERSION}}
-    -X github.com/arduino/arduino-fwuploader/version.commit={{.TEST_COMMIT}}
-    -X github.com/arduino/arduino-fwuploader/version.date={{.TIMESTAMP}}
+    -X {{.CONFIGURATION_PACKAGE}}.versionString={{.TEST_VERSION}}
+    -X {{.CONFIGURATION_PACKAGE}}.commit={{.TEST_COMMIT}}
+    -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
   # check-lint vars
   PRETTIER: prettier@2.0.5
