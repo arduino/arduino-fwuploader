@@ -77,8 +77,8 @@ jobs:
 
       - name: s3 sync
         run: |
-          s3 sync boards/ s3://${{ secrets.DOWNLOADS_BUCKET }}/arduino-fwuploader/boards
-          s3 sync firmwares/ s3://${{ secrets.DOWNLOADS_BUCKET }}/arduino-fwuploader/firmwares
+          aws s3 sync boards/ s3://${{ secrets.DOWNLOADS_BUCKET }}/arduino-fwuploader/boards
+          aws s3 sync firmwares/ s3://${{ secrets.DOWNLOADS_BUCKET }}/arduino-fwuploader/firmwares
         env:
           AWS_REGION: "us-east-1" # or https://github.com/aws/aws-cli/issues/5623
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
