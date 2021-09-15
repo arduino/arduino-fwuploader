@@ -6,6 +6,7 @@
     "^indexes/testdata/package_index\\.json$",
     "^LICENSE\\.txt$",
     "^poetry\\.lock$",
+    "^\\.licenses/",
     ".+\\.cer$",
     ".+\\.elf$",
     ".+\\.key$",
