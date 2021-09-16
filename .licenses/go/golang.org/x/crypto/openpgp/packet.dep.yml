@@ -5,7 +5,7 @@ type: go
 summary: Package packet implements parsing and serialization of OpenPGP packets, as
   specified in RFC 4880.
 homepage: https://pkg.go.dev/golang.org/x/crypto/openpgp/packet
-license: other
+license: bsd-3-clause
 licenses:
 - sources: crypto@v0.0.0-20200406173513-056763e48d71/LICENSE
   text: |
