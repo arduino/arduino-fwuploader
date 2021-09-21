@@ -38,21 +38,22 @@ def split_property_and_drop_first_level(s):
     return (k, v)
 
 
-# Generate and copy precompiled Sketch binary data for specified board (sketch type could be either "loader" or "getversion")
+# Generate and copy precompiled Sketch binary data for specified board
+# (sketch type could be either "loader" or "getversion")
 def create_precomp_sketch_data(simple_fqbn, sketch_type):
 
     loader_dir = Path(
-            "..",
-            "firmwares",
-            sketch_type,
-            simple_fqbn,
+        "..",
+        "firmwares",
+        sketch_type,
+        simple_fqbn,
     )
     sketch_source = Path(__file__).parent / loader_dir
     sketch_files = list(x for x in sketch_source.iterdir() if x.is_file())
     if len(sketch_files) != 1:
         print(f"Invalid loader files found in {sketch_source}")
         sys.exit(1)
-    sketch_file = sketch_files[0] # lets assume there's only a single file
+    sketch_file = sketch_files[0]  # lets assume there's only a single file
 
     sketch_dest = f"firmwares/{sketch_type}/{simple_fqbn}/{sketch_type}{sketch_file.suffix}"
     sketch_dest_path = Path(__file__).parent / sketch_dest
