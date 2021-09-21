@@ -38,19 +38,33 @@ def split_property_and_drop_first_level(s):
     return (k, v)
 
 
-# Generate and copy loader Sketch binary data for specified board
-def create_loader_data(simple_fqbn, binary):
-    loader_path = f"firmwares/loader/{simple_fqbn}/loader{binary.suffix}"
-    loader = Path(__file__).parent / loader_path
-    loader.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(binary, loader)
+# Generate and copy precompiled Sketch binary data for specified board (sketch type could be either "loader" or "getversion")
+def create_precomp_sketch_data(simple_fqbn, sketch_type):
 
-    file_hash = sha2(loader)
+    loader_dir = Path(
+            "..",
+            "firmwares",
+            sketch_type,
+            simple_fqbn,
+    )
+    sketch_source = Path(__file__).parent / loader_dir
+    sketch_files = list(x for x in sketch_source.iterdir() if x.is_file())
+    if len(sketch_files) != 1:
+        print(f"Invalid loader files found in {sketch_source}")
+        sys.exit(1)
+    sketch_file = sketch_files[0] # lets assume there's only a single file
+
+    sketch_dest = f"firmwares/{sketch_type}/{simple_fqbn}/{sketch_type}{sketch_file.suffix}"
+    sketch_dest_path = Path(__file__).parent / sketch_dest
+    sketch_dest_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(sketch_file, sketch_dest_path)
+
+    file_hash = sha2(sketch_dest_path)
 
     return {
-        "url": f"{DOWNLOAD_URL}/{loader_path}",
+        "url": f"{DOWNLOAD_URL}/{sketch_dest}",
         "checksum": f"SHA-256:{file_hash}",
-        "size": f"{loader.stat().st_size}",
+        "size": f"{sketch_dest_path.stat().st_size}",
     }
 
 
@@ -235,20 +249,8 @@ def generate_boards_json(input_data, arduino_cli_path):
     for fqbn, data in input_data.items():
         simple_fqbn = fqbn.replace(":", ".")
 
-        loader_dir = Path(
-            "..",
-            "firmwares",
-            "loader",
-            simple_fqbn,
-        )
-        loader_path = Path(__file__).parent / loader_dir
-        loader_files = list(x for x in loader_path.iterdir() if x.is_file())
-        if len(loader_files) != 1:
-            print(f"Invalid loader files found in {loader_path}")
-            sys.exit(1)
-
-        boards[fqbn]["loader_sketch"] = create_loader_data(simple_fqbn, loader_files[0])
-
+        boards[fqbn]["loader_sketch"] = create_precomp_sketch_data(simple_fqbn, "loader")
+        
         for firmware_version in data["versions"]:
             module = data["moduleName"]
             firmware_file = get_firmware_file(module, simple_fqbn, firmware_version)
