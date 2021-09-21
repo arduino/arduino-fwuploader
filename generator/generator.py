@@ -250,7 +250,8 @@ def generate_boards_json(input_data, arduino_cli_path):
         simple_fqbn = fqbn.replace(":", ".")
 
         boards[fqbn]["loader_sketch"] = create_precomp_sketch_data(simple_fqbn, "loader")
-        
+        boards[fqbn]["version_sketch"] = create_precomp_sketch_data(simple_fqbn, "getversion")
+
         for firmware_version in data["versions"]:
             module = data["moduleName"]
             firmware_file = get_firmware_file(module, simple_fqbn, firmware_version)
