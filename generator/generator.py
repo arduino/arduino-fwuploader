@@ -42,14 +42,10 @@ def split_property_and_drop_first_level(s):
 # (sketch type could be either "loader" or "getversion")
 def create_precomp_sketch_data(simple_fqbn, sketch_type):
 
-    sketch_dir = Path(__file__).parent /
-        ".." /
-        "firmwares" /
-        sketch_type /
-        simple_fqbn
+    sketch_dir = Path(__file__).parent / ".." / "firmwares" / sketch_type / simple_fqbn
     sketch_files = list(sketch_dir.iterdir())
     if len(sketch_files) != 1:
-        print(f"Invalid loader files found in {sketch_source}")
+        print(f"Invalid loader files found in {sketch_dir}")
         sys.exit(1)
     sketch_file = sketch_files[0]  # lets assume there's only a single file
 
