@@ -36,7 +36,7 @@ import (
 )
 
 func NewWincFlasher(portAddress string) (*WincFlasher, error) {
-	port, err := openSerial(portAddress)
+	port, err := OpenSerial(portAddress)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err

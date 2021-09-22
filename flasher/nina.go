@@ -37,7 +37,7 @@ import (
 
 // NewNinaFlasher creates an new instance of NinaFlasher
 func NewNinaFlasher(portAddress string) (*NinaFlasher, error) {
-	port, err := openSerial(portAddress)
+	port, err := OpenSerial(portAddress)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err

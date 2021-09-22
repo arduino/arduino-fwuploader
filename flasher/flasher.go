@@ -66,7 +66,7 @@ type Flasher interface {
 // https://github.com/arduino-libraries/WiFiNINA/blob/master/examples/Tools/FirmwareUpdater/FirmwareUpdater.ino
 const baudRate = 1000000
 
-func openSerial(portAddress string) (serial.Port, error) {
+func OpenSerial(portAddress string) (serial.Port, error) {
 
 	port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
 	if err != nil {
