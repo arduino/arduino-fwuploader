@@ -105,16 +105,16 @@ func DownloadFirmware(firmware *firmwareindex.IndexFirmware) (*paths.Path, error
 	return firmwarePath, nil
 }
 
-func DownloadLoaderSketch(loader *firmwareindex.IndexLoaderSketch) (*paths.Path, error) {
-	loaderPath := globals.FwUploaderPath.Join(
-		"loader",
+func DownloadSketch(loader *firmwareindex.IndexSketch) (*paths.Path, error) {
+	sketchPath := globals.FwUploaderPath.Join(
+		"sketch",
 		path.Base(loader.URL))
-	loaderPath.Parent().MkdirAll()
-	if err := loaderPath.WriteFile(nil); err != nil {
+	sketchPath.Parent().MkdirAll()
+	if err := sketchPath.WriteFile(nil); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	d, err := downloader.Download(loaderPath.String(), loader.URL)
+	d, err := downloader.Download(sketchPath.String(), loader.URL)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -123,16 +123,16 @@ func DownloadLoaderSketch(loader *firmwareindex.IndexLoaderSketch) (*paths.Path,
 		logrus.Error(err)
 		return nil, err
 	}
-	if err := VerifyFileChecksum(loader.Checksum, loaderPath); err != nil {
+	if err := VerifyFileChecksum(loader.Checksum, sketchPath); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
 	size, _ := loader.Size.Int64()
-	if err := VerifyFileSize(size, loaderPath); err != nil {
+	if err := VerifyFileSize(size, sketchPath); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	return loaderPath, nil
+	return sketchPath, nil
 }
 
 // Download will take a downloader.Downloader as parameter. It will Download the file specified in the downloader

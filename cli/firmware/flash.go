@@ -143,7 +143,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	loaderSketchPath, err := download.DownloadLoaderSketch(board.LoaderSketch)
+	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
 	if err != nil {
 		feedback.Errorf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err)
 		os.Exit(errorcodes.ErrGeneric)
