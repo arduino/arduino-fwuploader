@@ -40,7 +40,8 @@ type Index struct {
 type IndexBoard struct {
 	Fqbn            string                `json:"fqbn,required"`
 	Firmwares       []*IndexFirmware      `json:"firmware,required"`
-	LoaderSketch    *IndexLoaderSketch    `json:"loader_sketch,required"`
+	LoaderSketch    *IndexSketch          `json:"loader_sketch,required"`
+	VersionSketch   *IndexSketch          `json:"version_sketch"`
 	Module          string                `json:"module,required"`
 	Name            string                `json:"name,required"`
 	Uploader        string                `json:"uploader,required"`
@@ -65,8 +66,8 @@ type IndexFirmware struct {
 	Module   string                 `json:"module,required"`
 }
 
-// IndexLoaderSketch represents the sketch used to upload the new firmware on a board.
-type IndexLoaderSketch struct {
+// IndexSketch represents the sketch used to upload the new firmware on a board.
+type IndexSketch struct {
 	URL      string      `json:"url,required"`
 	Checksum string      `json:"checksum,required"`
 	Size     json.Number `json:"size,required"`
