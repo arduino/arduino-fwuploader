@@ -62,11 +62,7 @@ type Flasher interface {
 	sendCommand(data CommandData) error
 }
 
-// This matches the baudrate used in the FirmwareUpdater.ino sketch
-// https://github.com/arduino-libraries/WiFiNINA/blob/master/examples/Tools/FirmwareUpdater/FirmwareUpdater.ino
-const baudRate = 1000000
-
-func OpenSerial(portAddress string) (serial.Port, error) {
+func OpenSerial(portAddress string, baudRate int) (serial.Port, error) {
 
 	port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
 	if err != nil {

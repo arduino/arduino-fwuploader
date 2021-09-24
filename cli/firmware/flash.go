@@ -139,12 +139,16 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 
 	// Get flasher depending on which module to use
 	var f flasher.Flasher
+
+	// This matches the baudrate used in the FirmwareUpdater.ino sketch
+	// https://github.com/arduino-libraries/WiFiNINA/blob/master/examples/Tools/FirmwareUpdater/FirmwareUpdater.ino
+	const baudRate = 1000000
 	switch moduleName {
 	case "NINA":
 		// we use address and not bootloaderPort because the board should not be in bootloader mode
-		f, err = flasher.NewNinaFlasher(address)
+		f, err = flasher.NewNinaFlasher(commonFlags.Address, baudRate)
 	case "WINC1500":
-		f, err = flasher.NewWincFlasher(address)
+		f, err = flasher.NewWincFlasher(commonFlags.Address, baudRate)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
 		feedback.Errorf("Error during firmware flashing: %s", err)

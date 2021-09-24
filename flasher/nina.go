@@ -36,8 +36,8 @@ import (
 )
 
 // NewNinaFlasher creates an new instance of NinaFlasher
-func NewNinaFlasher(portAddress string) (*NinaFlasher, error) {
-	port, err := OpenSerial(portAddress)
+func NewNinaFlasher(portAddress string, baudRate int) (*NinaFlasher, error) {
+	port, err := OpenSerial(portAddress, baudRate)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
