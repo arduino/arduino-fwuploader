@@ -23,29 +23,25 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/arguments"
+	"github.com/arduino/arduino-fwuploader/cli/common"
 	"github.com/arduino/arduino-fwuploader/flasher"
-	"github.com/arduino/arduino-fwuploader/indexes"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
-	programmer "github.com/arduino/arduino-fwuploader/programmers"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	fqbn    string
-	address string
-	module  string
-	retries uint8
+	commonFlags arguments.Flags // contains fqbn and address
+	module      string
+	retries     uint8
 )
 
 // NewCommand created a new `version` command
@@ -59,44 +55,20 @@ func NewFlashCommand() *cobra.Command {
 			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
 			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10\n",
 		Args: cobra.NoArgs,
-		Run:  run,
+		Run:  runFlash,
 	}
-
-	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:samd:mkr1000, arduino:mbed_nano:nanorp2040connect")
-	command.Flags().StringVarP(&address, "address", "a", "", "Upload port, e.g.: COM10, /dev/ttyACM0")
+	commonFlags.AddToCommand(command)
 	command.Flags().StringVarP(&module, "module", "m", "", "Firmware module ID, e.g.: WINC1500, NINA")
 	command.Flags().Uint8Var(&retries, "retries", 9, "Number of retries in case of upload failure (default 9)")
 	return command
 }
 
-func run(cmd *cobra.Command, args []string) {
-	packageIndex, err := indexes.GetPackageIndex()
-	if err != nil {
-		feedback.Errorf("Can't load package index: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+func runFlash(cmd *cobra.Command, args []string) {
 
-	firmwareIndex, err := indexes.GetFirmwareIndex()
-	if err != nil {
-		feedback.Errorf("Can't load firmware index: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	if fqbn == "" {
-		feedback.Errorf("Error during firmware flashing: missing board fqbn")
-		os.Exit(errorcodes.ErrBadArgument)
-	}
-
-	if address == "" {
-		feedback.Errorf("Error during firmware flashing: missing board address")
-		os.Exit(errorcodes.ErrBadArgument)
-	}
-
-	board := firmwareIndex.GetBoard(fqbn)
-	if board == nil {
-		feedback.Errorf("Can't find board with %s fqbn", fqbn)
-		os.Exit(errorcodes.ErrBadArgument)
-	}
+	packageIndex, firmwareIndex := common.InitIndexes()
+	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
+	board := common.GetBoard(firmwareIndex, commonFlags.Fqbn)
+	uploadToolDir := common.GetUploadToolDir(packageIndex, board)
 
 	// Get module name if not specified
 	moduleName := ""
@@ -122,24 +94,13 @@ func run(cmd *cobra.Command, args []string) {
 		firmware = board.GetFirmware(moduleVersion)
 	}
 	if firmware == nil {
-		feedback.Errorf("Error getting firmware for board: %s", fqbn)
+		feedback.Errorf("Error getting firmware for board: %s", commonFlags.Fqbn)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	firmwareFile, err := download.DownloadFirmware(firmware)
 	if err != nil {
 		feedback.Errorf("Error downloading firmware from %s: %s", firmware.URL, err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	toolRelease := indexes.GetToolRelease(packageIndex, board.Uploader)
-	if toolRelease == nil {
-		feedback.Errorf("Error getting upload tool %s for board %s", board.Uploader, board.Fqbn)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	uploadToolDir, err := download.DownloadTool(toolRelease)
-	if err != nil {
-		feedback.Errorf("Error downloading tool %s: %s", board.Uploader, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -168,44 +129,10 @@ func run(cmd *cobra.Command, args []string) {
 }
 
 func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName string, uploadToolDir, firmwareFile *paths.Path) error {
-	var err error
-	// Check if board needs a 1200bps touch for upload
-	bootloaderPort := address
-	if board.UploadTouch {
-		logrus.Info("Putting board into bootloader mode")
-		newUploadPort, err := serialutils.Reset(address, board.UploadWait, nil)
-		if err != nil {
-			return fmt.Errorf("error during firmware flashing: missing board address. %s", err)
-		}
-		if newUploadPort != "" {
-			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
-			bootloaderPort = newUploadPort
-		}
-	}
-
-	uploaderCommand := board.GetUploaderCommand()
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{tool_dir}", filepath.FromSlash(uploadToolDir.String()))
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", bootloaderPort)
-	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", loaderSketch)
-
-	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
+	programmerOut, programmerErr, err := common.FlashSketch(board, loaderSketch, uploadToolDir, commonFlags.Address)
 	if err != nil {
-		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
-		os.Exit(errorcodes.ErrGeneric)
+		return err
 	}
-
-	// Flash loader Sketch
-	programmerOut := new(bytes.Buffer)
-	programmerErr := new(bytes.Buffer)
-	if feedback.GetFormat() == feedback.JSON {
-		err = programmer.Flash(commandLine, programmerOut, programmerErr)
-	} else {
-		err = programmer.Flash(commandLine, os.Stdout, os.Stderr)
-	}
-	if err != nil {
-		return fmt.Errorf("error during loader sketch flashing: %s", err)
-	}
-
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
 	time.Sleep(3 * time.Second)
@@ -240,6 +167,7 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 	}
 	if err != nil {
 		flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
+		return err
 	}
 
 	// Print the results
@@ -253,12 +181,10 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 			Stderr: flasherErr.String(),
 		}),
 	})
-	if err != nil {
-		return fmt.Errorf("error during firmware flashing: %s", err)
-	}
 	return nil
 }
 
+// callback used to print the progress
 func printProgress(progress int) {
 	fmt.Printf("Flashing progress: %d%%\r", progress)
 }
