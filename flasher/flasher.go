@@ -80,7 +80,8 @@ func OpenSerial(portAddress string, baudRate int, readTimeout int) (serial.Port,
 
 type FlashResult struct {
 	Programmer *ExecOutput `json:"programmer"`
-	Flasher    *ExecOutput `json:"flasher"`
+	Flasher    *ExecOutput `json:"flasher,omitempty"`
+	Version    string      `json:"version,omitempty"`
 }
 
 type ExecOutput struct {

@@ -35,5 +35,6 @@ func NewCommand() *cobra.Command {
 
 	firmwareCmd.AddCommand(NewFlashCommand())
 	firmwareCmd.AddCommand(newListCommand())
+	firmwareCmd.AddCommand(NewGetVersionCommand())
 	return firmwareCmd
 }
