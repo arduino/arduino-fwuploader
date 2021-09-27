@@ -47,6 +47,7 @@ func CheckFlags(fqbn, address string) {
 		feedback.Errorf("Error during firmware flashing: missing board address")
 		os.Exit(errorcodes.ErrBadArgument)
 	}
+	logrus.Debugf("fqbn: %s, address: %s", fqbn, address)
 }
 
 // GetBoard is an helper function useful to get the IndexBoard,
@@ -57,6 +58,7 @@ func GetBoard(firmwareIndex *firmwareindex.Index, fqbn string) *firmwareindex.In
 		feedback.Errorf("Can't find board with %s fqbn", fqbn)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
+	logrus.Debugf("got board: %s", board.Fqbn)
 	return board
 }
 
@@ -73,6 +75,7 @@ func GetUploadToolDir(packageIndex *packageindex.Index, board *firmwareindex.Ind
 		feedback.Errorf("Error downloading tool %s: %s", board.Uploader, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	logrus.Debugf("upload tool downloaded in %s", uploadToolDir.String())
 	return uploadToolDir
 }
 
@@ -89,6 +92,7 @@ func FlashSketch(board *firmwareindex.IndexBoard, sketch string, uploadToolDir *
 	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{serial.port.file}", bootloaderPort)
 	uploaderCommand = strings.ReplaceAll(uploaderCommand, "{loader.sketch}", sketch) // we leave that name here because it's only a template,
 
+	logrus.Debugf("uploading with command: %s", uploaderCommand)
 	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
 	if err != nil {
 		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
@@ -122,7 +126,7 @@ func GetNewAddress(board *firmwareindex.IndexBoard, oldAddress string) (string, 
 			return "", fmt.Errorf("error during sketch flashing: missing board address. %s", err)
 		}
 		if newUploadPort != "" {
-			logrus.Infof("Found port to upload Loader: %s", newUploadPort)
+			logrus.Infof("Found port to upload: %s", newUploadPort)
 			bootloaderPort = newUploadPort
 		}
 	}

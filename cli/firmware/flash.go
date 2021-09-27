@@ -93,6 +93,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	} else {
 		firmware = board.GetFirmware(moduleVersion)
 	}
+	logrus.Debugf("module name: %s, firmware version: %s", firmware.Module, firmware.Version.String())
 	if firmware == nil {
 		feedback.Errorf("Error getting firmware for board: %s", commonFlags.Fqbn)
 		os.Exit(errorcodes.ErrGeneric)
@@ -103,12 +104,14 @@ func runFlash(cmd *cobra.Command, args []string) {
 		feedback.Errorf("Error downloading firmware from %s: %s", firmware.URL, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	logrus.Debugf("firmware file downloaded in %s", firmwareFile.String())
 
 	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
 	if err != nil {
 		feedback.Errorf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
 
 	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
 
@@ -135,6 +138,7 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 	}
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
+	logrus.Debug("sleeping for 3 sec")
 	time.Sleep(3 * time.Second)
 
 	// Get flasher depending on which module to use

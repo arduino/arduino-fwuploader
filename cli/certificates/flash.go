@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -78,6 +79,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 		feedback.Errorf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
 
 	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
 
@@ -89,6 +91,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
+	logrus.Debug("sleeping for 3 sec")
 	time.Sleep(3 * time.Second)
 
 	// Get flasher depending on which module to use
