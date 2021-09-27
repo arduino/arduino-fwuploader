@@ -62,6 +62,7 @@ type Flasher interface {
 	sendCommand(data CommandData) error
 }
 
+// OpenSerial opens a new serial connection with the specified portAddress
 func OpenSerial(portAddress string, baudRate int, readTimeout int) (serial.Port, error) {
 
 	port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
@@ -78,12 +79,14 @@ func OpenSerial(portAddress string, baudRate int, readTimeout int) (serial.Port,
 	return port, nil
 }
 
+// FlashResult contains the result of the flashing procedure
 type FlashResult struct {
 	Programmer *ExecOutput `json:"programmer"`
 	Flasher    *ExecOutput `json:"flasher,omitempty"`
 	Version    string      `json:"version,omitempty"`
 }
 
+// ExecOutput contais the stdout and stderr output, they are used to store the output of the flashing and upload
 type ExecOutput struct {
 	Stdout string `json:"stdout"`
 	Stderr string `json:"stderr"`

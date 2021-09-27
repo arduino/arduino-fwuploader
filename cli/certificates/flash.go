@@ -43,7 +43,7 @@ var (
 	certificatePaths []string
 )
 
-// NewCommand created a new `version` command
+// NewFlashCommand creates a new `flash` command
 func NewFlashCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "flash",

@@ -37,7 +37,7 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-// NewCommand created a new `version` command
+// NewGetVersionCommand creates a new `get-version` command
 func NewGetVersionCommand() *cobra.Command {
 
 	command := &cobra.Command{

@@ -79,7 +79,7 @@ func GetUploadToolDir(packageIndex *packageindex.Index, board *firmwareindex.Ind
 	return uploadToolDir
 }
 
-// flashSketch is the business logic that handles the flashing procedure,
+// FlashSketch is the business logic that handles the flashing procedure,
 // it returns using a buffer the out and the err of the programmer
 func FlashSketch(board *firmwareindex.IndexBoard, sketch string, uploadToolDir *paths.Path, address string) (programmerOut, programmerErr *bytes.Buffer, err error) {
 	bootloaderPort, err := GetNewAddress(board, address)
@@ -113,7 +113,7 @@ func FlashSketch(board *firmwareindex.IndexBoard, sketch string, uploadToolDir *
 	return programmerOut, programmerErr, err
 }
 
-// getNewAddress is a function used to reset a board and put it in bootloader mode
+// GetNewAddress is a function used to reset a board and put it in bootloader mode
 // it could happen that the board is assigned to a different serial port, after the reset,
 // this fuction handles also this possibility
 func GetNewAddress(board *firmwareindex.IndexBoard, oldAddress string) (string, error) {
