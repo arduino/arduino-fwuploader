@@ -62,7 +62,7 @@ type Flasher interface {
 	sendCommand(data CommandData) error
 }
 
-func OpenSerial(portAddress string, baudRate int) (serial.Port, error) {
+func OpenSerial(portAddress string, baudRate int, readTimeout int) (serial.Port, error) {
 
 	port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
 	if err != nil {
@@ -70,7 +70,7 @@ func OpenSerial(portAddress string, baudRate int) (serial.Port, error) {
 	}
 	logrus.Infof("Opened port %s at %d", portAddress, baudRate)
 
-	if err := port.SetReadTimeout(30 * time.Second); err != nil {
+	if err := port.SetReadTimeout(time.Duration(readTimeout) * time.Second); err != nil {
 		err = fmt.Errorf("could not set timeout on serial port: %s", err)
 		logrus.Error(err)
 		return nil, err

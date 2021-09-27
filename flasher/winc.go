@@ -35,8 +35,8 @@ import (
 	"go.bug.st/serial"
 )
 
-func NewWincFlasher(portAddress string, baudRate int) (*WincFlasher, error) {
-	port, err := OpenSerial(portAddress, baudRate)
+func NewWincFlasher(portAddress string, baudRate, readTimeout int) (*WincFlasher, error) {
+	port, err := OpenSerial(portAddress, baudRate, readTimeout)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
