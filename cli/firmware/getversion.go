@@ -127,6 +127,9 @@ func getVersion(board *firmwareindex.IndexBoard) (fwVersion string, err error) {
 			semver := semver.ParseRelaxed(version)
 			return semver.String(), nil
 		}
+		if strings.HasPrefix(line, "Communication with WiFi module failed!") {
+			return "", fmt.Errorf("communication with WiFi module failed")
+		}
 	}
 	return "", fmt.Errorf("could not find the version string to parse")
 }
