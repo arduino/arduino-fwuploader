@@ -22,6 +22,13 @@ like:
 ./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1
 ```
 
+Or if you want upload a loacal firmware you can use the `-i` or `-input-file` flag followed by the path of that
+firmware.
+
+```
+./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:samd:mkr1000 -a /dev/ttyACM0
+```
+
 There is a retry mechanism because the flashing process uses serial communication, which sometimes can be a bit
 unreliable. The retry flag is set by default to 9 retries, but it's possible to overwrite it for whatever reason. For
 example to update a Nano RP2040 Connect with the retry set to 2 you can use:
