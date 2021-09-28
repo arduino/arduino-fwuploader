@@ -80,7 +80,7 @@ func GetUploadToolDir(packageIndex *packageindex.Index, board *firmwareindex.Ind
 }
 
 // FlashSketch is the business logic that handles the flashing procedure,
-// it returns using a buffer the out and the err of the programmer
+// it returns using a buffer the stdout and the stderr of the programmer
 func FlashSketch(board *firmwareindex.IndexBoard, sketch string, uploadToolDir *paths.Path, address string) (programmerOut, programmerErr *bytes.Buffer, err error) {
 	bootloaderPort, err := GetNewAddress(board, address)
 	if err != nil {

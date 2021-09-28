@@ -67,7 +67,7 @@ type IndexFirmware struct {
 	Module   string                 `json:"module,required"`
 }
 
-// IndexSketch represents the sketch used to upload the new firmware on a board.
+// IndexSketch represents a sketch used to manage firmware on a board.
 type IndexSketch struct {
 	URL      string      `json:"url,required"`
 	Checksum string      `json:"checksum,required"`

@@ -57,7 +57,7 @@ connection:
 Firmware version installed: 1.4.8
 ```
 
-You can also use the `--format json` to parse the output with more ease.
+You can also use the `--format json` flag to parse the output with more ease.
 
 ### Certificates
 

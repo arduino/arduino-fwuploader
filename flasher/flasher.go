@@ -86,7 +86,7 @@ type FlashResult struct {
 	Version    string      `json:"version,omitempty"`
 }
 
-// ExecOutput contais the stdout and stderr output, they are used to store the output of the flashing and upload
+// ExecOutput contains the stdout and stderr output, they are used to store the output of the flashing and upload
 type ExecOutput struct {
 	Stdout string `json:"stdout"`
 	Stderr string `json:"stderr"`
