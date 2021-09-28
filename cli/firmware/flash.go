@@ -42,6 +42,7 @@ var (
 	commonFlags arguments.Flags // contains fqbn and address
 	module      string
 	retries     uint8
+	fwFile      string
 )
 
 // NewFlashCommand creates a new `flash` command
@@ -53,13 +54,15 @@ func NewFlashCommand() *cobra.Command {
 		Example: "" +
 			"  " + os.Args[0] + " firmware flash --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2\n" +
 			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
-			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10\n",
+			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10\n" +
+			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10 -i firmware.bin\n",
 		Args: cobra.NoArgs,
 		Run:  runFlash,
 	}
 	commonFlags.AddToCommand(command)
 	command.Flags().StringVarP(&module, "module", "m", "", "Firmware module ID, e.g.: WINC1500, NINA")
 	command.Flags().Uint8Var(&retries, "retries", 9, "Number of retries in case of upload failure (default 9)")
+	command.Flags().StringVarP(&fwFile, "input-file", "i", "", "Path of the firmware to upload")
 	return command
 }
 
@@ -87,24 +90,35 @@ func runFlash(cmd *cobra.Command, args []string) {
 	// Normalize module name
 	moduleName = strings.ToUpper(moduleName)
 
-	var firmware *firmwareindex.IndexFirmware
-	if moduleVersion == "" {
-		firmware = board.LatestFirmware
+	var firmwareFilePath *paths.Path
+	var err error
+	// If a local firmware file has been specified
+	if fwFile != "" {
+		firmwareFilePath = paths.New(fwFile)
+		if !firmwareFilePath.Exist() {
+			feedback.Errorf("firmware file not found in %s", firmwareFilePath)
+			os.Exit(errorcodes.ErrGeneric)
+		}
 	} else {
-		firmware = board.GetFirmware(moduleVersion)
+		// Download the firmware
+		var firmware *firmwareindex.IndexFirmware
+		if moduleVersion == "" {
+			firmware = board.LatestFirmware
+		} else {
+			firmware = board.GetFirmware(moduleVersion)
+		}
+		logrus.Debugf("module name: %s, firmware version: %s", firmware.Module, firmware.Version.String())
+		if firmware == nil {
+			feedback.Errorf("Error getting firmware for board: %s", commonFlags.Fqbn)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		firmwareFilePath, err = download.DownloadFirmware(firmware)
+		if err != nil {
+			feedback.Errorf("Error downloading firmware from %s: %s", firmware.URL, err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		logrus.Debugf("firmware file downloaded in %s", firmwareFilePath.String())
 	}
-	logrus.Debugf("module name: %s, firmware version: %s", firmware.Module, firmware.Version.String())
-	if firmware == nil {
-		feedback.Errorf("Error getting firmware for board: %s", commonFlags.Fqbn)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	firmwareFile, err := download.DownloadFirmware(firmware)
-	if err != nil {
-		feedback.Errorf("Error downloading firmware from %s: %s", firmware.URL, err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	logrus.Debugf("firmware file downloaded in %s", firmwareFile.String())
 
 	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
 	if err != nil {
@@ -116,7 +130,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
 
 	for retry := 1; retry <= int(retries); retry++ {
-		err = updateFirmware(board, loaderSketch, moduleName, uploadToolDir, firmwareFile)
+		err = updateFirmware(board, loaderSketch, moduleName, uploadToolDir, firmwareFilePath)
 		if err == nil {
 			logrus.Info("Operation completed: success! :-)")
 			break
