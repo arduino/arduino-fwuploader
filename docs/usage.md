@@ -22,7 +22,7 @@ like:
 ./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1
 ```
 
-Or if you want upload a loacal firmware you can use the `-i` or `-input-file` flag followed by the path of that
+Or if you want upload a local firmware you can use the `-i` or `--input-file` flag followed by the path of that
 firmware.
 
 ```
