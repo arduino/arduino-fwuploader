@@ -85,8 +85,9 @@ func runGetVersion(cmd *cobra.Command, args []string) {
 		feedback.Error(err)
 		os.Exit(1)
 	}
-	feedback.Printf("Firmware version installed: %s", currentVersion)
-
+	if feedback.GetFormat() == feedback.Text {
+		feedback.Printf("Firmware version installed: %s", currentVersion)
+	}
 	// Print the results
 	feedback.PrintResult(&flasher.FlashResult{
 		Programmer: (&flasher.ExecOutput{
