@@ -124,9 +124,9 @@ func getVersion(board *firmwareindex.IndexBoard) (fwVersion string, err error) {
 	lines := strings.Split(string(serialResult), "\n")
 	for _, line := range lines {
 		if strings.HasPrefix(line, "Firmware version installed: ") {
-			version := strings.Replace(line, "Firmware version installed: ", "", 1)
+			version := strings.TrimSpace(strings.Replace(line, "Firmware version installed: ", "", 1))
 			semver := semver.ParseRelaxed(version)
-			return strings.Replace(semver.String(), "\r", "", 1), nil
+			return semver.String(), nil
 		}
 		if strings.HasPrefix(line, "Communication with WiFi module failed!") {
 			return "", fmt.Errorf("communication with WiFi module failed")
