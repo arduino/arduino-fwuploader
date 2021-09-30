@@ -40,6 +40,25 @@ but you can also filter the results by specifying the `-b` or `--fqbn` flag
 
 The tool offers the ability to print output in JSON, with the `--format json` flag
 
+### Get Version
+
+You can also obtain the version of the firmware the board is currently running with:
+
+```
+./arduino-fwuploader firmware get-version -b arduino:samd:mkrwifi1010 -a /dev/ttyACM0
+```
+
+The `get-version` subcommand flashes a special sketch in order to be able to read that information using the serial
+connection:
+
+```
+...
+
+Firmware version installed: 1.4.8
+```
+
+You can also use the `--format json` flag to parse the output with more ease.
+
 ### Certificates
 
 The tool offers also the ability to flash SSL certificates to a module:

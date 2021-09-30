@@ -36,11 +36,12 @@ type Index struct {
 	IsTrusted bool
 }
 
-// indexPackage represents a single entry from module_firmware_index.json file.
+// IndexBoard represents a single entry from module_firmware_index.json file.
 type IndexBoard struct {
 	Fqbn            string                `json:"fqbn,required"`
 	Firmwares       []*IndexFirmware      `json:"firmware,required"`
-	LoaderSketch    *IndexLoaderSketch    `json:"loader_sketch,required"`
+	LoaderSketch    *IndexSketch          `json:"loader_sketch,required"`
+	VersionSketch   *IndexSketch          `json:"version_sketch"`
 	Module          string                `json:"module,required"`
 	Name            string                `json:"name,required"`
 	Uploader        string                `json:"uploader,required"`
@@ -50,6 +51,7 @@ type IndexBoard struct {
 	LatestFirmware  *IndexFirmware        `json:"-"`
 }
 
+// IndexUploaderCommand represents the command-line to use for different OS
 type IndexUploaderCommand struct {
 	Linux   string `json:"linux,required"`
 	Windows string `json:"windows"`
@@ -65,8 +67,8 @@ type IndexFirmware struct {
 	Module   string                 `json:"module,required"`
 }
 
-// IndexLoaderSketch represents the sketch used to upload the new firmware on a board.
-type IndexLoaderSketch struct {
+// IndexSketch represents a sketch used to manage firmware on a board.
+type IndexSketch struct {
 	URL      string      `json:"url,required"`
 	Checksum string      `json:"checksum,required"`
 	Size     json.Number `json:"size,required"`
@@ -140,7 +142,7 @@ func (i *Index) GetBoard(fqbn string) *IndexBoard {
 	return nil
 }
 
-// GetLatestFirmware returns the specified IndexFirmware version for this board.
+// GetFirmware returns the specified IndexFirmware version for this board.
 // Returns nil if version is not found.
 func (b *IndexBoard) GetFirmware(version string) *IndexFirmware {
 	v := semver.ParseRelaxed(version)
@@ -152,6 +154,7 @@ func (b *IndexBoard) GetFirmware(version string) *IndexFirmware {
 	return nil
 }
 
+// GetUploaderCommand returns the command to use for the upload
 func (b *IndexBoard) GetUploaderCommand() string {
 	if runtime.GOOS == "windows" && b.UploaderCommand.Windows != "" {
 		return b.UploaderCommand.Linux

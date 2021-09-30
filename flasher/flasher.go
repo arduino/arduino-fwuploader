@@ -62,11 +62,8 @@ type Flasher interface {
 	sendCommand(data CommandData) error
 }
 
-// This matches the baudrate used in the FirmwareUpdater.ino sketch
-// https://github.com/arduino-libraries/WiFiNINA/blob/master/examples/Tools/FirmwareUpdater/FirmwareUpdater.ino
-const baudRate = 1000000
-
-func openSerial(portAddress string) (serial.Port, error) {
+// OpenSerial opens a new serial connection with the specified portAddress
+func OpenSerial(portAddress string, baudRate int, readTimeout int) (serial.Port, error) {
 
 	port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
 	if err != nil {
@@ -74,7 +71,7 @@ func openSerial(portAddress string) (serial.Port, error) {
 	}
 	logrus.Infof("Opened port %s at %d", portAddress, baudRate)
 
-	if err := port.SetReadTimeout(30 * time.Second); err != nil {
+	if err := port.SetReadTimeout(time.Duration(readTimeout) * time.Second); err != nil {
 		err = fmt.Errorf("could not set timeout on serial port: %s", err)
 		logrus.Error(err)
 		return nil, err
@@ -82,11 +79,14 @@ func openSerial(portAddress string) (serial.Port, error) {
 	return port, nil
 }
 
+// FlashResult contains the result of the flashing procedure
 type FlashResult struct {
 	Programmer *ExecOutput `json:"programmer"`
-	Flasher    *ExecOutput `json:"flasher"`
+	Flasher    *ExecOutput `json:"flasher,omitempty"`
+	Version    string      `json:"version,omitempty"`
 }
 
+// ExecOutput contains the stdout and stderr output, they are used to store the output of the flashing and upload
 type ExecOutput struct {
 	Stdout string `json:"stdout"`
 	Stderr string `json:"stderr"`

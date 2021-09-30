@@ -149,7 +149,7 @@ func TestDownloadLoaderSketch(t *testing.T) {
 	index, e := firmwareindex.LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
-	loaderPath, err := DownloadLoaderSketch(index.Boards[0].LoaderSketch)
+	loaderPath, err := DownloadSketch(index.Boards[0].LoaderSketch)
 	require.NoError(t, err)
 	require.NotEmpty(t, loaderPath)
 	require.FileExists(t, loaderPath.String())

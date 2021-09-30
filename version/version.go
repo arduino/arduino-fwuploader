@@ -26,7 +26,8 @@ var (
 	versionString        = ""
 	commit               = ""
 	date                 = ""
-	VersionInfo          *info
+	// VersionInfo contains info regarding the version
+	VersionInfo *info
 )
 
 type info struct {

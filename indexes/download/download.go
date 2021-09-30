@@ -43,6 +43,7 @@ import (
 	"go.bug.st/downloader/v2"
 )
 
+// DownloadTool downloads and returns the path on the local filesystem of a tool
 func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 	resource := toolRelease.GetCompatibleFlavour()
 	installDir := globals.FwUploaderPath.Join(
@@ -73,6 +74,7 @@ func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 	return installDir, nil
 }
 
+// DownloadFirmware downloads and returns the path on the local filesystem of a firmware
 func DownloadFirmware(firmware *firmwareindex.IndexFirmware) (*paths.Path, error) {
 	firmwarePath := globals.FwUploaderPath.Join(
 		"firmwares",
@@ -105,16 +107,17 @@ func DownloadFirmware(firmware *firmwareindex.IndexFirmware) (*paths.Path, error
 	return firmwarePath, nil
 }
 
-func DownloadLoaderSketch(loader *firmwareindex.IndexLoaderSketch) (*paths.Path, error) {
-	loaderPath := globals.FwUploaderPath.Join(
-		"loader",
+// DownloadSketch downloads and returns the path on the local filesystem of a sketch
+func DownloadSketch(loader *firmwareindex.IndexSketch) (*paths.Path, error) {
+	sketchPath := globals.FwUploaderPath.Join(
+		"sketch",
 		path.Base(loader.URL))
-	loaderPath.Parent().MkdirAll()
-	if err := loaderPath.WriteFile(nil); err != nil {
+	sketchPath.Parent().MkdirAll()
+	if err := sketchPath.WriteFile(nil); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	d, err := downloader.Download(loaderPath.String(), loader.URL)
+	d, err := downloader.Download(sketchPath.String(), loader.URL)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -123,16 +126,16 @@ func DownloadLoaderSketch(loader *firmwareindex.IndexLoaderSketch) (*paths.Path,
 		logrus.Error(err)
 		return nil, err
 	}
-	if err := VerifyFileChecksum(loader.Checksum, loaderPath); err != nil {
+	if err := VerifyFileChecksum(loader.Checksum, sketchPath); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
 	size, _ := loader.Size.Int64()
-	if err := VerifyFileSize(size, loaderPath); err != nil {
+	if err := VerifyFileSize(size, sketchPath); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	return loaderPath, nil
+	return sketchPath, nil
 }
 
 // Download will take a downloader.Downloader as parameter. It will Download the file specified in the downloader
@@ -151,7 +154,7 @@ func Download(d *downloader.Downloader) error {
 	return nil
 }
 
-// taken and adapted from https://github.com/arduino/arduino-cli/blob/59b6277a4d6731a1c1579d43aef6df2a46a771d5/arduino/resources/checksums.go
+// VerifyFileChecksum is taken and adapted from https://github.com/arduino/arduino-cli/blob/59b6277a4d6731a1c1579d43aef6df2a46a771d5/arduino/resources/checksums.go
 func VerifyFileChecksum(checksum string, filePath *paths.Path) error {
 	if checksum == "" {
 		return fmt.Errorf("missing checksum for: %s", filePath)
@@ -193,7 +196,7 @@ func VerifyFileChecksum(checksum string, filePath *paths.Path) error {
 	return nil
 }
 
-// taken and adapted from https://github.com/arduino/arduino-cli/blob/59b6277a4d6731a1c1579d43aef6df2a46a771d5/arduino/resources/checksums.go
+// VerifyFileSize is taken and adapted from https://github.com/arduino/arduino-cli/blob/59b6277a4d6731a1c1579d43aef6df2a46a771d5/arduino/resources/checksums.go
 func VerifyFileSize(size int64, filePath *paths.Path) error {
 	info, err := filePath.Stat()
 	if err != nil {
@@ -290,6 +293,7 @@ func verifyIndex(indexPath *paths.Path, URL *url.URL) error {
 	return nil
 }
 
+// verifyPackageIndex verify if the signature is valid for the provided package index
 func verifyPackageIndex(indexPath, signaturePath *paths.Path) (bool, error) {
 	valid, _, err := security.VerifyArduinoDetachedSignature(indexPath, signaturePath)
 	if err != nil {
@@ -302,6 +306,7 @@ func verifyPackageIndex(indexPath, signaturePath *paths.Path) (bool, error) {
 	return valid, nil
 }
 
+// verifyModuleFirmwareIndex verify if the signature is valid for the provided module firmware index
 func verifyModuleFirmwareIndex(indexPath, signaturePath *paths.Path) (bool, error) {
 	keysBox, err := rice.FindBox("gpg_keys")
 	if err != nil {
