@@ -281,6 +281,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#get-version" class="md-nav__link">
+    Get Version
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#certificates" class="md-nav__link">
     Certificates
   </a>
@@ -460,6 +467,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#get-version" class="md-nav__link">
+    Get Version
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#certificates" class="md-nav__link">
     Certificates
   </a>
@@ -521,6 +535,17 @@ example to update a Nano RP2040 Connect with the retry set to 2 you can use:</p>
 </code></pre></div>
 <p>but you can also filter the results by specifying the <code>-b</code> or <code>--fqbn</code> flag</p>
 <p>The tool offers the ability to print output in JSON, with the <code>--format json</code> flag</p>
+<h3 id="get-version">Get Version<a class="headerlink" href="#get-version" title="Permanent link">&para;</a></h3>
+<p>You can also obtain the version of the firmware the board is currently running with:</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware get-version -b arduino:samd:mkrwifi1010 -a /dev/ttyACM0
+</code></pre></div>
+<p>The <code>get-version</code> subcommand flashes a special sketch in order to be able to read that information using the serial
+connection:</p>
+<div class="highlight"><pre><span></span><code>...
+
+Firmware version installed: 1.4.8
+</code></pre></div>
+<p>You can also use the <code>--format json</code> flag to parse the output with more ease.</p>
 <h3 id="certificates">Certificates<a class="headerlink" href="#certificates" title="Permanent link">&para;</a></h3>
 <p>The tool offers also the ability to flash SSL certificates to a module:</p>
 <div class="highlight"><pre><span></span><code>./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot&quot; -a COM10 -u arduino.cc:443 -u google.cc:443
