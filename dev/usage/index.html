@@ -525,6 +525,10 @@ version are specified <strong>the latest version of the firmware</strong> will b
 like:</p>
 <div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1
 </code></pre></div>
+<p>Or if you want upload a local firmware you can use the <code>-i</code> or <code>--input-file</code> flag followed by the path of that
+firmware.</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:samd:mkr1000 -a /dev/ttyACM0
+</code></pre></div>
 <p>There is a retry mechanism because the flashing process uses serial communication, which sometimes can be a bit
 unreliable. The retry flag is set by default to 9 retries, but it's possible to overwrite it for whatever reason. For
 example to update a Nano RP2040 Connect with the retry set to 2 you can use:</p>
