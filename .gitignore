@@ -1,5 +1,6 @@
 /debug
 /arduino-fwuploader*
+!/arduino-fwuploader*/
 /.vscode/
 .idea
 coverage_*.txt
