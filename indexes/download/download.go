@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"crypto"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -153,10 +154,10 @@ func Download(d *downloader.Downloader) error {
 	return nil
 }
 
-// VerifyFileChecksum is taken and adapted from https://github.com/arduino/arduino-cli/blob/59b6277a4d6731a1c1579d43aef6df2a46a771d5/arduino/resources/checksums.go
-func VerifyFileChecksum(checksum string, filePath *paths.Path) error {
+// VerifyChecksum is taken and adapted from https://github.com/arduino/arduino-cli/blob/59b6277a4d6731a1c1579d43aef6df2a46a771d5/arduino/resources/checksums.go
+func VerifyChecksum(checksum string, file io.Reader) error {
 	if checksum == "" {
-		return fmt.Errorf("missing checksum for: %s", filePath)
+		return errors.New("missing checksum")
 	}
 	split := strings.SplitN(checksum, ":", 2)
 	if len(split) != 2 {
@@ -180,18 +181,26 @@ func VerifyFileChecksum(checksum string, filePath *paths.Path) error {
 		return fmt.Errorf("unsupported hash algorithm: %s", split[0])
 	}
 
+	if _, err := io.Copy(algo, file); err != nil {
+		return fmt.Errorf("computing hash: %s", err)
+	}
+	if !bytes.Equal(algo.Sum(nil), digest) {
+		return fmt.Errorf("archive hash differs from hash in index")
+	}
+
+	return nil
+}
+
+// VerifyFileChecksum checks if the passed checksum matches the passed file checksum
+func VerifyFileChecksum(checksum string, filePath *paths.Path) error {
 	file, err := filePath.Open()
 	if err != nil {
 		return fmt.Errorf("opening file: %s", err)
 	}
 	defer file.Close()
-	if _, err := io.Copy(algo, file); err != nil {
-		return fmt.Errorf("computing hash: %s", err)
+	if err = VerifyChecksum(checksum, file); err != nil {
+		return fmt.Errorf("verifying checksum of file %s: %w", filePath, err)
 	}
-	if bytes.Compare(algo.Sum(nil), digest) != 0 {
-		return fmt.Errorf("archive hash differs from hash in index")
-	}
-
 	return nil
 }
 
