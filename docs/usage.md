@@ -71,7 +71,7 @@ You can also use the `--format json` flag to parse the output with more ease.
 The tool offers also the ability to flash SSL certificates to a module:
 
 ```
-./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot" -a COM10 -u arduino.cc:443 -u google.cc:443
+./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot" -a COM10 -u arduino.cc:443 -u google.com:443
 ```
 
 or you can specify a path to a file with `-f` instead of the URL of the certificate
