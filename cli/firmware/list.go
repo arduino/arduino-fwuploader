@@ -21,6 +21,7 @@ package firmware
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/arduino-fwuploader/indexes"
@@ -59,6 +60,7 @@ func list(fqbn string) {
 	firmwareIndex, err := indexes.GetFirmwareIndex()
 	if err != nil {
 		feedback.Error(err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	res := FirmwareListResult{}
