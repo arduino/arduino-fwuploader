@@ -19,16 +19,6 @@ tasks:
       # Make the formatting consistent with the non-generated Markdown
       - task: general:format-prettier
 
-  docs:check:
-    desc: Run documentation linting
-    cmds:
-      - npx {{ .PRETTIER }} --check "**/*.md"
-
-  docs:format:
-    desc: Automatically formats documentation
-    cmds:
-      - npx {{ .PRETTIER }} --write "**/*.md"
-
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies-task/Taskfile.yml
   general:cache-dep-licenses:
     desc: Cache dependency license metadata
