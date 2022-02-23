@@ -76,8 +76,8 @@ The tool offers also the ability to flash SSL certificates to a module:
 
 or you can specify a path to a file in `.der` format with `-f` instead of the URL of the certificate
 
-Due to a limitation on the handling of certs in the Nina modules, when `certificates flash` command is launched, all the
-previous certificates are going to be erased. To overcome this it's recommended to upload them all together:
+Due to a limitation on the handling of certs in the NINA modules, when `certificates flash` command is launched, all the
+previous certificates are going to be erased. To overcome this it's required to upload them all together:
 
 ```
 ./arduino-fwuploader certificates flash --url arduino.cc:443,google.com:443 --file ~/Downloads/my_self_signed_.der -b arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0
