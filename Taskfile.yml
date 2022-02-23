@@ -178,7 +178,6 @@ tasks:
       - test -z $(go fmt ./...)
       - go vet ./...
       - task: go:lint
-      - task: docs:check
       - task: config:check
       - task: general:check-formatting
       - task: markdown:check-links
