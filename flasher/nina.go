@@ -147,14 +147,21 @@ func (f *NinaFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, 
 		logrus.Error(err)
 		return nil, err
 	}
-
-	cert, err := x509.ParseCertificate(data)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
+	switch certificateFile.Ext() {
+	case ".cer":
+		// the data needs to be formatted in PEM format
+		cert, err := x509.ParseCertificate(data)
+		if err != nil {
+			logrus.Error(err)
+			return nil, err
+		}
+		return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw}), nil
+	case ".pem":
+		// the data is already encoded in pem format and we do not need to parse it.
+		return data, nil
+	default:
+		return nil, fmt.Errorf("cert format %s not supported, please use .pem or .cer", certificateFile.Ext())
 	}
-
-	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw}), nil
 }
 
 func (f *NinaFlasher) certificateFromURL(URL string) ([]byte, error) {
