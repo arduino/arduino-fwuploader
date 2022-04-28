@@ -83,6 +83,9 @@ previous certificates are going to be erased. To overcome this it's required to 
 ./arduino-fwuploader certificates flash --url arduino.cc:443,google.com:443 --file ~/Downloads/my_self_signed_.der -b arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0
 ```
 
+You can find the certificates that are preflashed on the NINA module
+[here](https://github.com/arduino/nina-fw/blob/master/data/roots.pem).
+
 ### Command line options
 
 The full list of command line options can be obtained with the `-h` option: `./arduino-fwuploader -h`
