@@ -566,11 +566,14 @@ Firmware version installed: 1.4.8
 <p>The tool offers also the ability to flash SSL certificates to a module:</p>
 <div class="highlight"><pre><span></span><code>./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot&quot; -a COM10 -u arduino.cc:443 -u google.com:443
 </code></pre></div>
-<p>or you can specify a path to a file in <code>.der</code> format with <code>-f</code> instead of the URL of the certificate</p>
+<p>or you can specify a path to a file in <code>.der</code> format or in <code>.pem</code> format with <code>-f</code> or <code>--file</code> instead of the URL of the
+certificate</p>
 <p>Due to a limitation on the handling of certs in the NINA modules, when <code>certificates flash</code> command is launched, all the
 previous certificates are going to be erased. To overcome this it's required to upload them all together:</p>
 <div class="highlight"><pre><span></span><code>./arduino-fwuploader certificates flash --url arduino.cc:443,google.com:443 --file ~/Downloads/my_self_signed_.der -b arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0
 </code></pre></div>
+<p>You can find the certificates that are preflashed on the NINA module
+<a href="https://github.com/arduino/nina-fw/blob/master/data/roots.pem">here</a>.</p>
 <h3 id="command-line-options">Command line options<a class="headerlink" href="#command-line-options" title="Permanent link">&para;</a></h3>
 <p>The full list of command line options can be obtained with the <code>-h</code> option: <code>./arduino-fwuploader -h</code></p>
 <p>For further information you can use the <a href="../commands/arduino-fwuploader/">command reference</a></p>
