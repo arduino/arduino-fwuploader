@@ -119,14 +119,20 @@ func (f *WincFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, 
 		logrus.Error(err)
 		return nil, err
 	}
-
-	cert, err := x509.ParseCertificate(data)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
+	switch certificateFile.Ext() {
+	case ".cer":
+		cert, err := x509.ParseCertificate(data)
+		if err != nil {
+			logrus.Error(err)
+			return nil, err
+		}
+		return f.getCertificateData(cert)
+	case ".pem":
+		// the data is already encoded in pem format and we do not need to parse it.
+		return data, nil
+	default:
+		return nil, fmt.Errorf("cert format %s not supported, please use .pem or .cer", certificateFile.Ext())
 	}
-
-	return f.getCertificateData(cert)
 }
 
 func (f *WincFlasher) certificateFromURL(URL string) ([]byte, error) {

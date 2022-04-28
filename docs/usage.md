@@ -74,7 +74,8 @@ The tool offers also the ability to flash SSL certificates to a module:
 ./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot" -a COM10 -u arduino.cc:443 -u google.com:443
 ```
 
-or you can specify a path to a file in `.der` format with `-f` instead of the URL of the certificate
+or you can specify a path to a file in `.der` format or in `.pem` format with `-f` or `--file` instead of the URL of the
+certificate
 
 Due to a limitation on the handling of certs in the NINA modules, when `certificates flash` command is launched, all the
 previous certificates are going to be erased. To overcome this it's required to upload them all together:
