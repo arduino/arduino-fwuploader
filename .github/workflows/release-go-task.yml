@@ -36,7 +36,7 @@ jobs:
           changelog-file-path: "${{ env.DIST_DIR }}/CHANGELOG.md"
 
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
 
