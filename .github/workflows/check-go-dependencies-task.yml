@@ -2,7 +2,7 @@
 name: Check Go Dependencies
 
 env:
-  # See: https://github.com/actions/setup-go/tree/v2#readme
+  # See: https://github.com/actions/setup-go/tree/v3#readme
   GO_VERSION: "1.16"
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
@@ -47,7 +47,7 @@ jobs:
           version: 3.x
 
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
 
@@ -73,7 +73,7 @@ jobs:
       # Some might find it convenient to have CI generate the cache rather than setting up for it locally
       - name: Upload cache to workflow artifact
         if: failure() && steps.diff.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: dep-licenses-cache
@@ -84,7 +84,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
@@ -95,7 +95,7 @@ jobs:
           version: 3.x
 
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
 
