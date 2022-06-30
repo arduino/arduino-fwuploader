@@ -199,6 +199,8 @@ tasks:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f1 -d " "
       OSX64_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.gz | cut -f1 -d " "
+      OSXARM64_SHA:
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_ARM64.tar.gz | cut -f1 -d " "
       WINDOWS32_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_32bit.zip | cut -f5 -d " "
       WINDOWS64_SIZE:
@@ -213,6 +215,8 @@ tasks:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f5 -d " "
       OSX64_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.gz | cut -f5 -d " "
+      OSXARM64_SIZE:
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_ARM64.tar.gz | cut -f5 -d " "
     cmds:
       - |
         cat extras/package_index.json.template |
@@ -228,6 +232,8 @@ tasks:
         sed "s/%%LINUXARM64_SIZE%%/{{ .LINUXARM64_SIZE }}/" |
         sed "s/%%OSX64_SHA%%/{{ .OSX64_SHA }}/" |
         sed "s/%%OSX64_SIZE%%/{{ .OSX64_SIZE }}/" |
+        sed "s/%%OSXARM64_SHA%%/{{ .OSXARM64_SHA }}/" |
+        sed "s/%%OSXARM64_SIZE%%/{{ .OSXARM64_SIZE }}/" |
         sed "s/%%WINDOWS32_SHA%%/{{ .WINDOWS32_SHA }}/" |
         sed "s/%%WINDOWS32_SIZE%%/{{ .WINDOWS32_SIZE }}/" |
         sed "s/%%WINDOWS64_SHA%%/{{ .WINDOWS64_SHA }}/" |
