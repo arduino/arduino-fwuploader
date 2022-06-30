@@ -126,10 +126,10 @@ tasks:
       LINUX64_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.gz | cut -f1 -d " "
       LINUXARM_SHA:
-        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.gz | cut -f1 -d " "
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARMv6.tar.gz | cut -f1 -d " "
       LINUXARM64_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f1 -d " "
-      OSX_SHA:
+      OSX64_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.gz | cut -f1 -d " "
       WINDOWS32_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Windows_32bit.zip | cut -f5 -d " "
@@ -140,10 +140,10 @@ tasks:
       LINUX64_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.gz | cut -f5 -d " "
       LINUXARM_SIZE:
-        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM.tar.gz | cut -f5 -d " "
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARMv6.tar.gz | cut -f5 -d " "
       LINUXARM64_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f5 -d " "
-      OSX_SIZE:
+      OSX64_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_macOS_64bit.tar.gz | cut -f5 -d " "
     cmds:
       - |
@@ -158,8 +158,8 @@ tasks:
         sed "s/%%LINUXARM_SIZE%%/{{ .LINUXARM_SIZE }}/" |
         sed "s/%%LINUXARM64_SHA%%/{{ .LINUXARM64_SHA }}/" |
         sed "s/%%LINUXARM64_SIZE%%/{{ .LINUXARM64_SIZE }}/" |
-        sed "s/%%OSX_SHA%%/{{ .OSX_SHA }}/" |
-        sed "s/%%OSX_SIZE%%/{{ .OSX_SIZE }}/" |
+        sed "s/%%OSX64_SHA%%/{{ .OSX64_SHA }}/" |
+        sed "s/%%OSX64_SIZE%%/{{ .OSX64_SIZE }}/" |
         sed "s/%%WINDOWS32_SHA%%/{{ .WINDOWS32_SHA }}/" |
         sed "s/%%WINDOWS32_SIZE%%/{{ .WINDOWS32_SIZE }}/" |
         sed "s/%%WINDOWS64_SHA%%/{{ .WINDOWS64_SHA }}/" |
