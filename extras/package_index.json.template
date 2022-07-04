@@ -10,7 +10,7 @@
               "size": "%%LINUX32_SIZE%%"
             },
             {
-              "host": "x86_64-pc-linux-gnu",
+              "host": "x86_64-linux-gnu",
               "url": "http://downloads.arduino.cc/arduino-fwuploader/%%FILENAME%%_%%VERSION%%_Linux_64bit.tar.gz",
               "archiveFileName": "%%FILENAME%%_%%VERSION%%_Linux_64bit.tar.gz",
               "checksum": "SHA-256:%%LINUX64_SHA%%",
@@ -31,16 +31,23 @@
               "size": "%%WINDOWS64_SIZE%%"
             },
             {
-              "host": "i386-apple-darwin11",
+              "host": "x86_64-apple-darwin",
               "url": "http://downloads.arduino.cc/arduino-fwuploader/%%FILENAME%%_%%VERSION%%_macOS_64bit.tar.gz",
               "archiveFileName": "%%FILENAME%%_%%VERSION%%_macOS_64bit.tar.gz",
-              "checksum": "SHA-256:%%OSX_SHA%%",
-              "size": "%%OSX_SIZE%%"
+              "checksum": "SHA-256:%%OSX64_SHA%%",
+              "size": "%%OSX64_SIZE%%"
+            },
+            {
+              "host": "aarch64-apple-darwin",
+              "url": "http://downloads.arduino.cc/arduino-fwuploader/%%FILENAME%%_%%VERSION%%_macOS_ARM64.tar.gz",
+              "archiveFileName": "%%FILENAME%%_%%VERSION%%_macOS_ARM64.tar.gz",
+              "checksum": "SHA-256:%%OSXARM64_SHA%%",
+              "size": "%%OSXARM64_SIZE%%"
             },
             {
               "host": "arm-linux-gnueabihf",
-              "url": "http://downloads.arduino.cc/arduino-fwuploader/%%FILENAME%%_%%VERSION%%_Linux_ARM.tar.gz",
-              "archiveFileName": "%%FILENAME%%_%%VERSION%%_Linux_ARM.tar.gz",
+              "url": "http://downloads.arduino.cc/arduino-fwuploader/%%FILENAME%%_%%VERSION%%_Linux_ARMv6.tar.gz",
+              "archiveFileName": "%%FILENAME%%_%%VERSION%%_Linux_ARMv6.tar.gz",
               "checksum": "SHA-256:%%LINUXARM_SHA%%",
               "size": "%%LINUXARM_SIZE%%"
             },

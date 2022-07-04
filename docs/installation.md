@@ -12,6 +12,6 @@ To build we use [task](https://taskfile.dev/) for simplicity. From the sources r
 task dist:<OS>_<ARCH>
 ```
 
-Where <OS> could be one of: `macOS`,`Windows`,`Linux`. And <ARCH>: `32bit`, `64bit`, `ARM` or `ARM64`
+Where <OS> could be one of: `macOS`,`Windows`,`Linux`. And <ARCH>: `32bit`, `64bit`, `ARMv6`, `ARMv7` or `ARM64`
 
 This will create the `arduino-fwuploader` executable.
