@@ -38,7 +38,7 @@
               "size": "%%OSX64_SIZE%%"
             },
             {
-              "host": "aarch64-apple-darwin",
+              "host": "arm64-apple-darwin",
               "url": "http://downloads.arduino.cc/arduino-fwuploader/%%FILENAME%%_%%VERSION%%_macOS_ARM64.tar.gz",
               "archiveFileName": "%%FILENAME%%_%%VERSION%%_macOS_ARM64.tar.gz",
               "checksum": "SHA-256:%%OSXARM64_SHA%%",
