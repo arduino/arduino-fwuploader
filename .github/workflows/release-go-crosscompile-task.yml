@@ -10,7 +10,7 @@ env:
   AWS_PLUGIN_TARGET: /arduino-fwuploader/
   ARTIFACT_NAME: dist
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: ^1.16.2
+  GO_VERSION: "1.18"
 
 on:
   push:
