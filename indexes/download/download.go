@@ -229,7 +229,7 @@ func DownloadIndex(indexURL string) (*paths.Path, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer tempDir.Remove()
+	defer tempDir.RemoveAll()
 
 	// Download index
 	tmpGZIndex := tempDir.Join("index.gz")

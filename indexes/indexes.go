@@ -89,6 +89,7 @@ func GetPackageIndex() (*packageindex.Index, error) {
 
 // GetFirmwareIndex downloads and loads the arduino-fwuploader module_firmware_index.json
 func GetFirmwareIndex() (*firmwareindex.Index, error) {
+	defer globals.FwUploaderPath.RemoveAll()
 	indexPath, err := download.DownloadIndex(globals.ModuleFirmwareIndexGZURL)
 	if err != nil {
 		logrus.Error(err)
