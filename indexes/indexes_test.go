@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -47,4 +48,5 @@ func TestGetFirmwareIndex(t *testing.T) {
 	index, err := GetFirmwareIndex()
 	require.NoError(t, err)
 	require.NotNil(t, index)
+	require.NoDirExists(t, globals.FwUploaderPath.String())
 }
