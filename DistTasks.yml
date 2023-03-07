@@ -17,23 +17,7 @@ version: "3"
 #
 # The project MUST contain a LICENSE.txt file in the root folder or packaging will fail.
 
-vars:
-  CHECKSUM_FILE: "{{.VERSION}}-checksums.txt"
-
 tasks:
-  all:
-    desc: Build for distribution for all platforms
-    cmds:
-      - task: Windows_32bit
-      - task: Windows_64bit
-      - task: Linux_32bit
-      - task: Linux_64bit
-      - task: Linux_ARMv6
-      - task: Linux_ARMv7
-      - task: Linux_ARM64
-      - task: macOS_64bit
-      - task: macOS_ARM64
-
   Windows_32bit:
     desc: Builds Windows 32 bit binaries
     env:
@@ -45,7 +29,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_386"
       PACKAGE_PLATFORM: "Windows_32bit"
@@ -61,7 +44,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         zip {{.PACKAGE_NAME}} {{.PLATFORM_DIR}}/{{.PROJECT_NAME}}.exe ../LICENSE.txt -j
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_windows_amd64"
       PACKAGE_PLATFORM: "Windows_64bit"
@@ -78,7 +60,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd32"
       PACKAGE_PLATFORM: "Linux_32bit"
@@ -94,7 +75,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd64"
       PACKAGE_PLATFORM: "Linux_64bit"
@@ -111,7 +91,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_7"
       PACKAGE_PLATFORM: "Linux_ARMv7"
@@ -128,7 +107,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_6"
       PACKAGE_PLATFORM: "Linux_ARMv6"
@@ -144,7 +122,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_arm_64"
       PACKAGE_PLATFORM: "Linux_ARM64"
@@ -160,7 +137,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_osx_darwin_amd64"
       PACKAGE_PLATFORM: "macOS_64bit"
@@ -176,7 +152,6 @@ tasks:
         go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
         cd {{.DIST_DIR}}
         tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
-        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_osx_darwin_arm64"
       PACKAGE_PLATFORM: "macOS_ARM64"
