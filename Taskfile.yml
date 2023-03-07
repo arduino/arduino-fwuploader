@@ -29,7 +29,8 @@ tasks:
             echo "Licensed does not have Windows support."
             echo "Please use Linux/macOS or download the dependencies cache from the GitHub Actions workflow artifact."
           else
-            echo "licensed not found or not in PATH. Please install: https://github.com/github/licensed#as-an-executable"
+            echo "licensed not found or not in PATH."
+            echo "Please install: https://github.com/github/licensed#as-an-executable"
           fi
           exit 1
         fi
@@ -85,7 +86,8 @@ tasks:
           # npx --call uses the native shell, which makes it too difficult to use npx for this application on Windows,
           # so the Windows user is required to have markdown-link-check installed and in PATH.
           if ! which markdown-link-check &>/dev/null; then
-            echo "markdown-link-check not found or not in PATH. Please install: https://github.com/tcort/markdown-link-check#readme"
+            echo "markdown-link-check not found or not in PATH."
+            echo "Please install: https://github.com/tcort/markdown-link-check#readme"
             exit 1
           fi
           # Default behavior of the task on Windows is to exit the task when the first broken link causes a non-zero
@@ -190,7 +192,8 @@ tasks:
     cmds:
       - |
         if ! which ec &>/dev/null; then
-          echo "ec not found or not in PATH. Please install: https://github.com/editorconfig-checker/editorconfig-checker#installation"
+          echo "ec not found or not in PATH."
+          echo "Please install: https://github.com/editorconfig-checker/editorconfig-checker#installation"
           exit 1
         fi
       - ec
@@ -240,7 +243,11 @@ vars:
   DEFAULT_GO_MODULE_PATH: ./
   DEFAULT_GO_PACKAGES:
     sh: |
-      echo $(cd {{default .DEFAULT_GO_MODULE_PATH .GO_MODULE_PATH}} && go list ./... | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
+      echo $(
+        cd {{default .DEFAULT_GO_MODULE_PATH .GO_MODULE_PATH}} &&
+        go list ./... | tr '\n' ' ' ||
+        echo '"ERROR: Unable to discover Go packages"'
+      )
   # build vars
   COMMIT:
     sh: echo "$(git log --no-show-signature -n 1 --format=%h)"

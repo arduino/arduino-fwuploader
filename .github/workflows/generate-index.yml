@@ -70,7 +70,12 @@ jobs:
         # disable gpg pass prompt
         # https://stackoverflow.com/questions/49072403/suppress-the-passphrase-prompt-in-gpg-command
       - name: sign the json
-        run: gpg --pinentry-mode=loopback --passphrase "${{ secrets.PASSPHRASE }}" --output boards/module_firmware_index.json.sig --detach-sign boards/module_firmware_index.json
+        run: |
+          gpg \
+            --pinentry-mode=loopback \
+            --passphrase "${{ secrets.PASSPHRASE }}" \
+            --output boards/module_firmware_index.json.sig \
+            --detach-sign boards/module_firmware_index.json
 
       - name: create the gzip
         run: gzip --keep boards/module_firmware_index.json
