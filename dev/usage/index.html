@@ -527,51 +527,43 @@
 <h3 id="firmware-flashing">Firmware Flashing<a class="headerlink" href="#firmware-flashing" title="Permanent link">&para;</a></h3>
 <p>First <a href="../installation/">install</a> the Arduino Firmware Uploader. Extract the zip file and, for example, to update the NINA module present
 on the Arduino MKR WiFi 1010, run:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -b arduino:samd:mkrwifi1010 -a /dev/ttyACM0
-</code></pre></div>
+<p><code>./arduino-fwuploader firmware flash -b arduino:samd:mkrwifi1010 -a /dev/ttyACM0</code></p>
 <p>You just have to specify the FQBN (<code>-b</code> or <code>--fqbn</code>) of the board and the serial port (<code>-a</code> or <code>--address</code>). The
 firmware uploader will take care of fetching everything is required to perform the update process. If no module and
 version are specified <strong>the latest version of the firmware</strong> will be used.</p>
 <p>If you want to flash a specific version of a firmware you can use the <code>-m</code> or <code>--module</code> flag</p>
 <p>For example to flash the WINC module present on the MKR 1000 with version 19.6.1 of the firmware you can run something
 like:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1
-</code></pre></div>
+<p><code>./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1</code></p>
 <p>Or if you want upload a local firmware you can use the <code>-i</code> or <code>--input-file</code> flag followed by the path of that
 firmware.</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:samd:mkr1000 -a /dev/ttyACM0
-</code></pre></div>
+<p><code>./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:samd:mkr1000 -a /dev/ttyACM0</code></p>
 <p>There is a retry mechanism because the flashing process uses serial communication, which sometimes can be a bit
 unreliable. The retry flag is set by default to 9 retries, but it's possible to overwrite it for whatever reason. For
 example to update a Nano RP2040 Connect with the retry set to 2 you can use:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash --fqbn arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0 --retries 2
-</code></pre></div>
+<p><code>./arduino-fwuploader firmware flash --fqbn arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0 --retries 2</code></p>
 <p>It's possible to list the available firmwares for every board/module with:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware list
-</code></pre></div>
+<p><code>./arduino-fwuploader firmware list</code></p>
 <p>but you can also filter the results by specifying the <code>-b</code> or <code>--fqbn</code> flag</p>
 <p>The tool offers the ability to print output in JSON, with the <code>--format json</code> flag</p>
 <h3 id="get-version">Get Version<a class="headerlink" href="#get-version" title="Permanent link">&para;</a></h3>
 <p>You can also obtain the version of the firmware the board is currently running with:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware get-version -b arduino:samd:mkrwifi1010 -a /dev/ttyACM0
-</code></pre></div>
+<p><code>./arduino-fwuploader firmware get-version -b arduino:samd:mkrwifi1010 -a /dev/ttyACM0</code></p>
 <p>The <code>get-version</code> subcommand flashes a special sketch in order to be able to read that information using the serial
 connection:</p>
-<div class="highlight"><pre><span></span><code>...
-
-Firmware version installed: 1.4.8
-</code></pre></div>
+<p>```
+...</p>
+<p>Firmware version installed: 1.4.8
+```</p>
 <p>You can also use the <code>--format json</code> flag to parse the output with more ease.</p>
 <h3 id="certificates">Certificates<a class="headerlink" href="#certificates" title="Permanent link">&para;</a></h3>
 <p>The tool offers also the ability to flash SSL certificates to a module:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot&quot; -a COM10 -u arduino.cc:443 -u google.com:443
-</code></pre></div>
+<p><code>./arduino-fwuploader certificates flash -b arduino:samd:nano_33_iot" -a COM10 -u arduino.cc:443 -u google.com:443</code></p>
 <p>or you can specify a path to a file in <code>.der</code> format or in <code>.pem</code> format with <code>-f</code> or <code>--file</code> instead of the URL of the
 certificate</p>
 <p>Due to a limitation on the handling of certs in the NINA modules, when <code>certificates flash</code> command is launched, all the
 previous certificates are going to be erased. To overcome this it's required to upload them all together:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader certificates flash --url arduino.cc:443,google.com:443 --file ~/Downloads/my_self_signed_.der -b arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0
-</code></pre></div>
+<p><code>./arduino-fwuploader certificates flash --url arduino.cc:443,google.com:443 --file ~/Downloads/my_self_signed_.der -b arduino:mbed_nano:nanorp2040connect -a /dev/ttyACM0</code></p>
 <p>You can find the certificates that are preflashed on the NINA module
 <a href="https://github.com/arduino/nina-fw/blob/master/data/roots.pem">here</a>.</p>
 <h3 id="command-line-options">Command line options<a class="headerlink" href="#command-line-options" title="Permanent link">&para;</a></h3>
