@@ -26,8 +26,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/feedback"
 	"github.com/arduino/arduino-fwuploader/indexes"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
@@ -41,14 +40,12 @@ import (
 func InitIndexes() (*packageindex.Index, *firmwareindex.Index) {
 	packageIndex, err := indexes.GetPackageIndex()
 	if err != nil {
-		feedback.Errorf("Can't load package index: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Can't load package index: %s", err), feedback.ErrGeneric)
 	}
 
 	firmwareIndex, err := indexes.GetFirmwareIndex()
 	if err != nil {
-		feedback.Errorf("Can't load firmware index: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
 	}
 	return packageIndex, firmwareIndex
 }
@@ -56,13 +53,11 @@ func InitIndexes() (*packageindex.Index, *firmwareindex.Index) {
 // CheckFlags runs a basic check, errors if the flags are not defined
 func CheckFlags(fqbn, address string) {
 	if fqbn == "" {
-		feedback.Errorf("Error during firmware flashing: missing board fqbn")
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal("Error during firmware flashing: missing board fqbn", feedback.ErrBadArgument)
 	}
 
 	if address == "" {
-		feedback.Errorf("Error during firmware flashing: missing board address")
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal("Error during firmware flashing: missing board address", feedback.ErrBadArgument)
 	}
 	logrus.Debugf("fqbn: %s, address: %s", fqbn, address)
 }
@@ -72,8 +67,7 @@ func CheckFlags(fqbn, address string) {
 func GetBoard(firmwareIndex *firmwareindex.Index, fqbn string) *firmwareindex.IndexBoard {
 	board := firmwareIndex.GetBoard(fqbn)
 	if board == nil {
-		feedback.Errorf("Can't find board with %s fqbn", fqbn)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(fmt.Sprintf("Can't find board with %s fqbn", fqbn), feedback.ErrBadArgument)
 	}
 	logrus.Debugf("got board: %s", board.Fqbn)
 	return board
@@ -84,13 +78,11 @@ func GetBoard(firmwareIndex *firmwareindex.Index, fqbn string) *firmwareindex.In
 func GetUploadToolDir(packageIndex *packageindex.Index, board *firmwareindex.IndexBoard) *paths.Path {
 	toolRelease := indexes.GetToolRelease(packageIndex, board.Uploader)
 	if toolRelease == nil {
-		feedback.Errorf("Error getting upload tool %s for board %s", board.Uploader, board.Fqbn)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error getting upload tool %s for board %s", board.Uploader, board.Fqbn), feedback.ErrGeneric)
 	}
 	uploadToolDir, err := download.DownloadTool(toolRelease)
 	if err != nil {
-		feedback.Errorf("Error downloading tool %s: %s", board.Uploader, err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error downloading tool %s: %s", board.Uploader, err), feedback.ErrGeneric)
 	}
 	logrus.Debugf("upload tool downloaded in %s", uploadToolDir.String())
 	return uploadToolDir
@@ -112,8 +104,7 @@ func FlashSketch(board *firmwareindex.IndexBoard, sketch string, uploadToolDir *
 	logrus.Debugf("uploading with command: %s", uploaderCommand)
 	commandLine, err := properties.SplitQuotedString(uploaderCommand, "\"", false)
 	if err != nil {
-		feedback.Errorf(`Error splitting command line "%s": %s`, uploaderCommand, err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf(`Error splitting command line "%s": %s`, uploaderCommand, err), feedback.ErrGeneric)
 	}
 
 	// Flash the actual sketch
