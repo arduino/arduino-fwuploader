@@ -4,7 +4,6 @@ sources:
 
 apps:
   - source_path: ./
-  - source_path: docsgen/
 
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/AGPL-3.0/.licensed.yml
 allowed:
