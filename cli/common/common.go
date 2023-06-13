@@ -129,7 +129,7 @@ func GetNewAddress(board *firmwareindex.IndexBoard, oldAddress string) (string, 
 	bootloaderPort := oldAddress
 	if board.UploadTouch {
 		logrus.Info("Putting board into bootloader mode")
-		newUploadPort, err := serialutils.Reset(oldAddress, board.UploadWait, nil)
+		newUploadPort, err := serialutils.Reset(oldAddress, board.UploadWait, nil, false)
 		if err != nil {
 			return "", fmt.Errorf("error during sketch flashing: missing board address. %s", err)
 		}
