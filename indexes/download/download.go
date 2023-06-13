@@ -38,7 +38,6 @@ import (
 	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/arduino/go-paths-helper"
-	rice "github.com/cmaglie/go.rice"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )
@@ -316,15 +315,12 @@ func verifyPackageIndex(indexPath, signaturePath *paths.Path) (bool, error) {
 
 // verifyModuleFirmwareIndex verify if the signature is valid for the provided module firmware index
 func verifyModuleFirmwareIndex(indexPath, signaturePath *paths.Path) (bool, error) {
-	keysBox, err := rice.FindBox("gpg_keys")
+	arduinoKeyringFile, err := globals.Keys.Open("keys/module_firmware_index_public.gpg.key")
 	if err != nil {
 		return false, fmt.Errorf("could not find bundled signature keys: %s", err)
 	}
-	key, err := keysBox.Open("module_firmware_index_public.gpg.key")
-	if err != nil {
-		return false, fmt.Errorf("could not find bundled signature keys: %s", err)
-	}
-	valid, _, err := security.VerifySignature(indexPath, signaturePath, key)
+	defer arduinoKeyringFile.Close()
+	valid, _, err := security.VerifySignature(indexPath, signaturePath, arduinoKeyringFile)
 	if err != nil {
 		return valid, nil
 	}

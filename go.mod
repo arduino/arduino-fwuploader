@@ -6,7 +6,6 @@ require (
 	github.com/arduino/arduino-cli v0.0.0-20210603144340-aef5a54882fa
 	github.com/arduino/go-paths-helper v1.6.0
 	github.com/arduino/go-properties-orderedmap v1.3.0
-	github.com/cmaglie/go.rice v1.0.3
 	github.com/mattn/go-colorable v0.1.8
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.8.1
@@ -18,6 +17,7 @@ require (
 )
 
 require (
+	github.com/cmaglie/go.rice v1.0.3 // indirect
 	github.com/codeclysm/extract/v3 v3.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/creack/goselect v0.1.2 // indirect

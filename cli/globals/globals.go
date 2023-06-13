@@ -18,10 +18,17 @@
 
 package globals
 
-import "github.com/arduino/go-paths-helper"
+import (
+	"embed"
+
+	"github.com/arduino/go-paths-helper"
+)
 
 var (
 	PackageIndexGZURL        = "https://downloads.arduino.cc/packages/package_index.json.gz"
 	ModuleFirmwareIndexGZURL = "https://downloads.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz"
 	FwUploaderPath           = paths.TempDir().Join("fwuploader")
 )
+
+//go:embed keys/*
+var Keys embed.FS

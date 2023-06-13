@@ -20,11 +20,12 @@ package firmwareindex
 
 import (
 	"encoding/json"
+	"fmt"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/security"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/go-paths-helper"
-	rice "github.com/cmaglie/go.rice"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -81,15 +82,13 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
-	keysBox, err := rice.FindBox("gpg_keys")
+	arduinoKeyringFile, err := globals.Keys.Open("keys/module_firmware_index_public.gpg.key")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not find bundled signature keys: %s", err)
+
 	}
-	key, err := keysBox.Open("module_firmware_index_public.gpg.key")
-	if err != nil {
-		return nil, err
-	}
-	trusted, _, err := security.VerifySignature(jsonIndexFile, jsonSignatureFile, key)
+	defer arduinoKeyringFile.Close()
+	trusted, _, err := security.VerifySignature(jsonIndexFile, jsonSignatureFile, arduinoKeyringFile)
 	if err != nil {
 		logrus.
 			WithField("index", jsonIndexFile).
