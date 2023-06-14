@@ -59,6 +59,7 @@ func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 		logrus.Error(err)
 		return nil, err
 	}
+	defer downloadsDir.RemoveAll()
 	d, err := downloader.Download(archivePath.String(), resource.URL, downloader.NoResume)
 	if err != nil {
 		logrus.Error(err)

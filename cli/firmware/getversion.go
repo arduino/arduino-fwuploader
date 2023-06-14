@@ -27,6 +27,7 @@ import (
 
 	"github.com/arduino/arduino-fwuploader/cli/common"
 	"github.com/arduino/arduino-fwuploader/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
@@ -53,6 +54,8 @@ func NewGetVersionCommand() *cobra.Command {
 }
 
 func runGetVersion(cmd *cobra.Command, args []string) {
+	// at the end cleanup the fwuploader temp dir
+	defer globals.FwUploaderPath.RemoveAll()
 
 	packageIndex, firmwareIndex := common.InitIndexes()
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
