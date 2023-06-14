@@ -49,15 +49,17 @@ func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 		"tools",
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
-	installDir.MkdirAll()
-	downloadsDir := globals.FwUploaderPath.Join("downloads")
-	archivePath := downloadsDir.Join(resource.ArchiveFileName)
-	archivePath.Parent().MkdirAll()
-	if err := archivePath.WriteFile(nil); err != nil {
+	if err := installDir.MkdirAll(); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	d, err := downloader.Download(archivePath.String(), resource.URL)
+	downloadsDir := globals.FwUploaderPath.Join("downloads")
+	archivePath := downloadsDir.Join(resource.ArchiveFileName)
+	if err := archivePath.Parent().MkdirAll(); err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	d, err := downloader.Download(archivePath.String(), resource.URL, downloader.NoResume)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -80,12 +82,11 @@ func DownloadFirmware(firmware *firmwareindex.IndexFirmware) (*paths.Path, error
 		firmware.Module,
 		firmware.Version.String(),
 		path.Base(firmware.URL))
-	firmwarePath.Parent().MkdirAll()
-	if err := firmwarePath.WriteFile(nil); err != nil {
+	if err := firmwarePath.Parent().MkdirAll(); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	d, err := downloader.Download(firmwarePath.String(), firmware.URL)
+	d, err := downloader.Download(firmwarePath.String(), firmware.URL, downloader.NoResume)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -111,12 +112,11 @@ func DownloadSketch(loader *firmwareindex.IndexSketch) (*paths.Path, error) {
 	sketchPath := globals.FwUploaderPath.Join(
 		"sketch",
 		path.Base(loader.URL))
-	sketchPath.Parent().MkdirAll()
-	if err := sketchPath.WriteFile(nil); err != nil {
+	if err := sketchPath.Parent().MkdirAll(); err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	d, err := downloader.Download(sketchPath.String(), loader.URL)
+	d, err := downloader.Download(sketchPath.String(), loader.URL, downloader.NoResume)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -232,7 +232,7 @@ func DownloadIndex(indexURL string) (*paths.Path, error) {
 
 	// Download index
 	tmpGZIndex := tempDir.Join("index.gz")
-	d, err := downloader.Download(tmpGZIndex.String(), indexArchiveURL.String())
+	d, err := downloader.Download(tmpGZIndex.String(), indexArchiveURL.String(), downloader.NoResume)
 	if err != nil {
 		return nil, fmt.Errorf("downloading index %s: %s", indexURL, err)
 	}
@@ -253,11 +253,10 @@ func DownloadIndex(indexURL string) (*paths.Path, error) {
 	}
 	tmpSignature := tempDir.Join("index.json.sig")
 
-	d, err = downloader.Download(tmpSignature.String(), signatureURL.String())
+	d, err = downloader.Download(tmpSignature.String(), signatureURL.String(), downloader.NoResume)
 	if err != nil {
 		return nil, fmt.Errorf("downloading index signature %s: %s", signatureURL, err)
 	}
-	indexSigPath := globals.FwUploaderPath.Join(path.Base(signatureURL.Path))
 	if err := Download(d); err != nil || d.Error() != nil {
 		return nil, fmt.Errorf("downloading index signature %s: %s %s", indexArchiveURL, d.Error(), err)
 	}
@@ -267,6 +266,7 @@ func DownloadIndex(indexURL string) (*paths.Path, error) {
 	if err := globals.FwUploaderPath.MkdirAll(); err != nil { //does not overwrite if dir already present
 		return nil, fmt.Errorf("can't create data directory %s: %s", globals.FwUploaderPath, err)
 	}
+	indexSigPath := globals.FwUploaderPath.Join(path.Base(signatureURL.Path))
 	indexPath := globals.FwUploaderPath.Join(path.Base(strings.ReplaceAll(indexArchiveURL.Path, ".gz", "")))
 	if err := tmpIndex.CopyTo(indexPath); err != nil { //does overwrite
 		return nil, fmt.Errorf("saving downloaded index %s: %s", indexArchiveURL, err)
