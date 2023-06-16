@@ -26,7 +26,7 @@ import (
 
 // Flash runs the upload command and outputs to outStream and errStream
 func Flash(command []string, outStream, errStream io.Writer) error {
-	cmd, err := executils.NewProcess(command...)
+	cmd, err := executils.NewProcess(nil, command...)
 	if err != nil {
 		return err
 	}

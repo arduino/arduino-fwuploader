@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-fwuploader/cli/arguments"
 	"github.com/arduino/arduino-fwuploader/cli/common"
+	"github.com/arduino/arduino-fwuploader/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
@@ -66,6 +66,8 @@ func NewFlashCommand() *cobra.Command {
 }
 
 func runFlash(cmd *cobra.Command, args []string) {
+	// at the end cleanup the fwuploader temp dir
+	defer globals.FwUploaderPath.RemoveAll()
 
 	packageIndex, firmwareIndex := common.InitIndexes()
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
@@ -95,8 +97,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	if fwFile != "" {
 		firmwareFilePath = paths.New(fwFile)
 		if !firmwareFilePath.Exist() {
-			feedback.Errorf("firmware file not found in %s", firmwareFilePath)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("firmware file not found in %s", firmwareFilePath), feedback.ErrGeneric)
 		}
 	} else {
 		// Download the firmware
@@ -108,21 +109,18 @@ func runFlash(cmd *cobra.Command, args []string) {
 		}
 		logrus.Debugf("module name: %s, firmware version: %s", firmware.Module, firmware.Version.String())
 		if firmware == nil {
-			feedback.Errorf("Error getting firmware for board: %s", commonFlags.Fqbn)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("Error getting firmware for board: %s", commonFlags.Fqbn), feedback.ErrGeneric)
 		}
 		firmwareFilePath, err = download.DownloadFirmware(firmware)
 		if err != nil {
-			feedback.Errorf("Error downloading firmware from %s: %s", firmware.URL, err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("Error downloading firmware from %s: %s", firmware.URL, err), feedback.ErrGeneric)
 		}
 		logrus.Debugf("firmware file downloaded in %s", firmwareFilePath.String())
 	}
 
 	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
 	if err != nil {
-		feedback.Errorf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
 	}
 	logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
 
@@ -134,7 +132,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 			logrus.Info("Operation completed: success! :-)")
 			break
 		}
-		feedback.Error(err)
+		logrus.Error(err)
 		if retry == int(retries) {
 			logrus.Fatal("Operation failed. :-(")
 		}
@@ -168,12 +166,10 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 		f, err = flasher.NewWincFlasher(commonFlags.Address, baudRate, 30)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
-		feedback.Errorf("Error during firmware flashing: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error during firmware flashing: %s", err), feedback.ErrGeneric)
 	}
 	if err != nil {
-		feedback.Errorf("Error during firmware flashing: %s", err)
-		return err
+		return fmt.Errorf("Error during firmware flashing: %s", err)
 	}
 	defer f.Close()
 

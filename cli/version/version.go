@@ -21,7 +21,7 @@ package version
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/feedback"
 	v "github.com/arduino/arduino-fwuploader/version"
 	"github.com/spf13/cobra"
 )
@@ -39,5 +39,5 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	feedback.Print(v.VersionInfo)
+	feedback.PrintResult(v.VersionInfo)
 }

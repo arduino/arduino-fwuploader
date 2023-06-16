@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-fwuploader/cli/arguments"
 	"github.com/arduino/arduino-fwuploader/cli/common"
+	"github.com/arduino/arduino-fwuploader/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/go-paths-helper"
@@ -62,6 +62,8 @@ func NewFlashCommand() *cobra.Command {
 }
 
 func runFlash(cmd *cobra.Command, args []string) {
+	// at the end cleanup the fwuploader temp dir
+	defer globals.FwUploaderPath.RemoveAll()
 
 	packageIndex, firmwareIndex := common.InitIndexes()
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
@@ -69,14 +71,12 @@ func runFlash(cmd *cobra.Command, args []string) {
 	uploadToolDir := common.GetUploadToolDir(packageIndex, board)
 
 	if len(certificateURLs) == 0 && len(certificatePaths) == 0 {
-		feedback.Errorf("Error during certificates flashing: no certificates provided")
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal("Error during certificates flashing: no certificates provided", feedback.ErrBadArgument)
 	}
 
 	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
 	if err != nil {
-		feedback.Errorf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
 	}
 	logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
 
@@ -84,8 +84,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 
 	programmerOut, programmerErr, err := common.FlashSketch(board, loaderSketch, uploadToolDir, commonFlags.Address)
 	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
 	// Wait a bit after flashing the loader sketch for the board to become
@@ -110,38 +109,38 @@ func runFlash(cmd *cobra.Command, args []string) {
 		err = fmt.Errorf("unknown module: %s", moduleName)
 	}
 	if err != nil {
-		feedback.Errorf("Error during certificates flashing: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+
+		feedback.Fatal(fmt.Sprintf("Error during certificates flashing: %s", err), feedback.ErrGeneric)
 	}
 	defer f.Close()
 
 	// now flash the certificate
-	flasherOut := new(bytes.Buffer)
-	flasherErr := new(bytes.Buffer)
 	certFileList := paths.NewPathList(certificatePaths...)
 	if feedback.GetFormat() == feedback.JSON {
+		flasherOut := new(bytes.Buffer)
+		flasherErr := new(bytes.Buffer)
 		err = f.FlashCertificates(&certFileList, certificateURLs, flasherOut)
+		if err != nil {
+			flasherErr.Write([]byte(fmt.Sprintf("Error during certificates flashing: %s", err)))
+		}
+		// Print the results
+		feedback.PrintResult(&flasher.FlashResult{
+			Programmer: (&flasher.ExecOutput{
+				Stdout: programmerOut.String(),
+				Stderr: programmerErr.String(),
+			}),
+			Flasher: (&flasher.ExecOutput{
+				Stdout: flasherOut.String(),
+				Stderr: flasherErr.String(),
+			}),
+		})
+		if err != nil {
+			os.Exit(int(feedback.ErrGeneric))
+		}
 	} else {
 		err = f.FlashCertificates(&certFileList, certificateURLs, os.Stdout)
-	}
-	if err != nil {
-		feedback.Errorf("Error during certificates flashing: %s", err)
-		flasherErr.Write([]byte(fmt.Sprintf("Error during certificates flashing: %s", err)))
-	}
-
-	// Print the results
-	feedback.PrintResult(&flasher.FlashResult{
-		Programmer: (&flasher.ExecOutput{
-			Stdout: programmerOut.String(),
-			Stderr: programmerErr.String(),
-		}),
-		Flasher: (&flasher.ExecOutput{
-			Stdout: flasherOut.String(),
-			Stderr: flasherErr.String(),
-		}),
-	})
-	// Exit if something went wrong but after printing
-	if err != nil {
-		os.Exit(errorcodes.ErrGeneric)
+		if err != nil {
+			feedback.Fatal(fmt.Sprintf("Error during certificates flashing: %s", err), feedback.ErrGeneric)
+		}
 	}
 }

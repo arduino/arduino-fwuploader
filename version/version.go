@@ -49,6 +49,11 @@ func (i *info) String() string {
 	return fmt.Sprintf("%s Version: %s Commit: %s Date: %s", i.Application, i.VersionString, i.Commit, i.Date)
 }
 
+// Data implements feedback.Result interface
+func (i *info) Data() interface{} {
+	return i
+}
+
 func init() {
 	if versionString == "" {
 		versionString = defaultVersionString
