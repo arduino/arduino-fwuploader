@@ -242,6 +242,7 @@ def generate_boards_json(input_data, arduino_cli_path):
             "fqbn": "arduino:mbed_nano:nanorp2040connect",
             "firmware": [],
         },
+        "arduino:renesas_uno:unor4wifi": {"fqbn": "arduino:renesas_uno:unor4wifi", "firmware": []},
     }
 
     # Gets the installed cores
