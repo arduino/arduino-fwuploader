@@ -245,13 +245,22 @@ def generate_boards_json(input_data, arduino_cli_path):
         "arduino:renesas_uno:unor4wifi": {"fqbn": "arduino:renesas_uno:unor4wifi", "firmware": []},
     }
 
+    # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
+    old_boards = [
+        "arduino:samd:mkr1000",
+        "arduino:samd:nano_33_iot",
+        "arduino:samd:mkrvidor4000",
+        "arduino:megaavr:uno2018",
+        "arduino:mbed_nano:nanorp2040connect",
+    ]
+
     # Gets the installed cores
     res = arduino_cli(cli_path=arduino_cli_path, args=["core", "list", "--format", "json"])
     installed_cores = {c["id"]: c for c in json.loads(res)}
 
     # Verify all necessary cores are installed
     # TODO: Should we check that the latest version is installed too?
-    for fqbn in boards.keys():
+    for fqbn in old_boards:
         core_id = ":".join(fqbn.split(":")[:2])
         if core_id not in installed_cores:
             print(f"Board {fqbn} is not installed, install its core {core_id}")
@@ -260,8 +269,9 @@ def generate_boards_json(input_data, arduino_cli_path):
     for fqbn, data in input_data.items():
         simple_fqbn = fqbn.replace(":", ".")
 
-        boards[fqbn]["loader_sketch"] = create_precomp_sketch_data(simple_fqbn, "loader")
-        boards[fqbn]["version_sketch"] = create_precomp_sketch_data(simple_fqbn, "getversion")
+        if fqbn in old_boards:
+            boards[fqbn]["loader_sketch"] = create_precomp_sketch_data(simple_fqbn, "loader")
+            boards[fqbn]["version_sketch"] = create_precomp_sketch_data(simple_fqbn, "getversion")
 
         for firmware_version in data["versions"]:
             module = data["moduleName"]
@@ -279,7 +289,8 @@ def generate_boards_json(input_data, arduino_cli_path):
                 boards[fqbn]["name"] = board["name"]
                 break
 
-        boards[fqbn].update(create_upload_data(fqbn, installed_cores))
+        if fqbn in old_boards:
+            boards[fqbn].update(create_upload_data(fqbn, installed_cores))
 
     boards_json = []
     for _, b in boards.items():
