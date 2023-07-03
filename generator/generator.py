@@ -242,7 +242,14 @@ def generate_boards_json(input_data, arduino_cli_path):
             "fqbn": "arduino:mbed_nano:nanorp2040connect",
             "firmware": [],
         },
-        "arduino:renesas_uno:unor4wifi": {"fqbn": "arduino:renesas_uno:unor4wifi", "firmware": []},
+        "arduino:renesas_uno:unor4wifi": {
+            "fqbn": "arduino:renesas_uno:unor4wifi",
+            "firmware": [],
+            # "uploader_plugin" and "additional_tools" need to be hard coded because
+            # there is no way to retrieve them dinamically
+            "uploader_plugin": "arduino:uno-r4-wifi-fwuploader@1.0.0",
+            "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
+        },
     }
 
     # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
