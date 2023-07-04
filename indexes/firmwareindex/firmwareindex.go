@@ -38,17 +38,24 @@ type Index struct {
 
 // IndexBoard represents a single entry from module_firmware_index.json file.
 type IndexBoard struct {
-	Fqbn            string                `json:"fqbn"`
-	Firmwares       []*IndexFirmware      `json:"firmware"`
+	Fqbn      string           `json:"fqbn"`
+	Firmwares []*IndexFirmware `json:"firmware"`
+	Module    string           `json:"module"`
+	Name      string           `json:"name"`
+
+	// Fields required for integrated uploaders (deprecated)
 	LoaderSketch    *IndexSketch          `json:"loader_sketch"`
 	VersionSketch   *IndexSketch          `json:"version_sketch"`
-	Module          string                `json:"module"`
-	Name            string                `json:"name"`
 	Uploader        string                `json:"uploader"`
 	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
 	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
 	UploaderCommand *IndexUploaderCommand `json:"uploader.command"`
-	LatestFirmware  *IndexFirmware        `json:"-"`
+
+	// Fields required for plugin uploaders
+	UploaderPlugin  string   `json:"uploader_plugin"`
+	AdditionalTools []string `json:"additional_tools"`
+
+	LatestFirmware *IndexFirmware `json:"-"`
 }
 
 // IndexUploaderCommand represents the command-line to use for different OS
