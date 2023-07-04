@@ -38,40 +38,40 @@ type Index struct {
 
 // IndexBoard represents a single entry from module_firmware_index.json file.
 type IndexBoard struct {
-	Fqbn            string                `json:"fqbn,required"`
-	Firmwares       []*IndexFirmware      `json:"firmware,required"`
-	LoaderSketch    *IndexSketch          `json:"loader_sketch,required"`
+	Fqbn            string                `json:"fqbn"`
+	Firmwares       []*IndexFirmware      `json:"firmware"`
+	LoaderSketch    *IndexSketch          `json:"loader_sketch"`
 	VersionSketch   *IndexSketch          `json:"version_sketch"`
-	Module          string                `json:"module,required"`
-	Name            string                `json:"name,required"`
-	Uploader        string                `json:"uploader,required"`
+	Module          string                `json:"module"`
+	Name            string                `json:"name"`
+	Uploader        string                `json:"uploader"`
 	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
 	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
-	UploaderCommand *IndexUploaderCommand `json:"uploader.command,required"`
+	UploaderCommand *IndexUploaderCommand `json:"uploader.command"`
 	LatestFirmware  *IndexFirmware        `json:"-"`
 }
 
 // IndexUploaderCommand represents the command-line to use for different OS
 type IndexUploaderCommand struct {
-	Linux   string `json:"linux,required"`
+	Linux   string `json:"linux"`
 	Windows string `json:"windows"`
 	Macosx  string `json:"macosx"`
 }
 
 // IndexFirmware represents a single Firmware version from module_firmware_index.json file.
 type IndexFirmware struct {
-	Version  *semver.RelaxedVersion `json:"version,required"`
-	URL      string                 `json:"url,required"`
-	Checksum string                 `json:"checksum,required"`
-	Size     json.Number            `json:"size,required"`
-	Module   string                 `json:"module,required"`
+	Version  *semver.RelaxedVersion `json:"version"`
+	URL      string                 `json:"url"`
+	Checksum string                 `json:"checksum"`
+	Size     json.Number            `json:"size"`
+	Module   string                 `json:"module"`
 }
 
 // IndexSketch represents a sketch used to manage firmware on a board.
 type IndexSketch struct {
-	URL      string      `json:"url,required"`
-	Checksum string      `json:"checksum,required"`
-	Size     json.Number `json:"size,required"`
+	URL      string      `json:"url"`
+	Checksum string      `json:"checksum"`
+	Size     json.Number `json:"size"`
 }
 
 // LoadIndex reads a module_firmware_index.json from a file and returns the corresponding Index structure.
