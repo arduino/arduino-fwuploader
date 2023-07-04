@@ -107,10 +107,10 @@ func runFlash(cmd *cobra.Command, args []string) {
 		} else {
 			firmware = board.GetFirmware(moduleVersion)
 		}
-		logrus.Debugf("module name: %s, firmware version: %s", firmware.Module, firmware.Version.String())
 		if firmware == nil {
 			feedback.Fatal(fmt.Sprintf("Error getting firmware for board: %s", commonFlags.Fqbn), feedback.ErrGeneric)
 		}
+		logrus.Debugf("module name: %s, firmware version: %s", firmware.Module, firmware.Version.String())
 		firmwareFilePath, err = download.DownloadFirmware(firmware)
 		if err != nil {
 			feedback.Fatal(fmt.Sprintf("Error downloading firmware from %s: %s", firmware.URL, err), feedback.ErrGeneric)
@@ -169,7 +169,7 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 		feedback.Fatal(fmt.Sprintf("Error during firmware flashing: %s", err), feedback.ErrGeneric)
 	}
 	if err != nil {
-		return fmt.Errorf("Error during firmware flashing: %s", err)
+		return fmt.Errorf("error during firmware flashing: %s", err)
 	}
 	defer f.Close()
 
