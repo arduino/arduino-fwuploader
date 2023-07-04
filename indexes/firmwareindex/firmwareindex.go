@@ -54,8 +54,6 @@ type IndexBoard struct {
 	// Fields required for plugin uploaders
 	UploaderPlugin  string   `json:"uploader_plugin"`
 	AdditionalTools []string `json:"additional_tools"`
-
-	LatestFirmware *IndexFirmware `json:"-"`
 }
 
 // IndexUploaderCommand represents the command-line to use for different OS
@@ -124,16 +122,6 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	index.IsTrusted = true
-
-	// Determine latest firmware for each board
-	for _, board := range index.Boards {
-		for _, firmware := range board.Firmwares {
-			if board.LatestFirmware == nil || firmware.Version.GreaterThan(board.LatestFirmware.Version) {
-				board.LatestFirmware = firmware
-			}
-		}
-	}
-
 	return &index, nil
 }
 
@@ -168,4 +156,15 @@ func (b *IndexBoard) GetUploaderCommand() string {
 	}
 	// The linux uploader command is considere to be the generic one
 	return b.UploaderCommand.Linux
+}
+
+// LatestFirmware returns the latest firmware version for the IndexBoard
+func (b *IndexBoard) LatestFirmware() *IndexFirmware {
+	var latest *IndexFirmware
+	for _, firmware := range b.Firmwares {
+		if latest == nil || firmware.Version.GreaterThan(latest.Version) {
+			latest = firmware
+		}
+	}
+	return latest
 }

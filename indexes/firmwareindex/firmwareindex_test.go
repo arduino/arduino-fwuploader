@@ -63,7 +63,7 @@ func TestGetLatestFirmware(t *testing.T) {
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 
-	firmware := index.GetBoard("arduino:samd:mkr1000").LatestFirmware
+	firmware := index.GetBoard("arduino:samd:mkr1000").LatestFirmware()
 	require.Equal(t, firmware.Version.String(), "19.6.1")
 }
 

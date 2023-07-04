@@ -70,7 +70,7 @@ func list(fqbn string) {
 					BoardFQBN:       board.Fqbn,
 					Module:          board.Module,
 					FirmwareVersion: firmware.Version,
-					Latest:          board.LatestFirmware == firmware,
+					Latest:          board.LatestFirmware() == firmware,
 				})
 			}
 		}
