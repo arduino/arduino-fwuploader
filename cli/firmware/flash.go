@@ -103,7 +103,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 		// Download the firmware
 		var firmware *firmwareindex.IndexFirmware
 		if moduleVersion == "" {
-			firmware = board.LatestFirmware
+			firmware = board.LatestFirmware()
 		} else {
 			firmware = board.GetFirmware(moduleVersion)
 		}
