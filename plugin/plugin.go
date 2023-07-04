@@ -19,11 +19,15 @@
 package plugin
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"strings"
 
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
+	semver "go.bug.st/relaxed-semver"
 	"gopkg.in/yaml.v3"
 )
 
@@ -76,4 +80,48 @@ func (uploader *FwUploader) QueryAPIVersion() (int, error) {
 	}
 
 	return result.ApiVersion, nil
+}
+
+// GetFirmwareVersion runs the plugin to obtain the version of the installed firmware
+func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stderr io.Writer) (*GetFirmwareVersionResult, error) {
+	args := []string{"firmware", "get-version"}
+	if portAddress != "" {
+		args = append(args, "-p", portAddress)
+	}
+	proc, err := executils.NewProcessFromPath(nil, uploader.pluginPath, args...)
+	if err != nil {
+		return nil, err
+	}
+	buffer := &bytes.Buffer{}
+	if stdout != nil {
+		proc.RedirectStdoutTo(io.MultiWriter(buffer, stdout))
+	} else {
+		proc.RedirectStdoutTo(buffer)
+	}
+	if stderr != nil {
+		proc.RedirectStderrTo(stderr)
+	}
+	if err := proc.RunWithinContext(context.Background()); err != nil {
+		return nil, err
+	}
+	res := &GetFirmwareVersionResult{}
+
+	fwVersionPrefix := "FIRMWARE-VERSION: "
+	fwErrorPrefix := "GET-VERSION-ERROR: "
+	for _, line := range strings.Split(buffer.String(), "\n") {
+		if strings.HasPrefix(line, fwVersionPrefix) {
+			version := strings.TrimPrefix(line, fwVersionPrefix)
+			res.FirmwareVersion = semver.ParseRelaxed(version)
+		}
+		if strings.HasPrefix(line, fwErrorPrefix) {
+			res.Error = strings.TrimPrefix(line, fwErrorPrefix)
+		}
+	}
+	return res, nil
+}
+
+// GetFirmwareVersionResult contains the result of GetFirmwareVersion command
+type GetFirmwareVersionResult struct {
+	FirmwareVersion *semver.RelaxedVersion
+	Error           string
 }
