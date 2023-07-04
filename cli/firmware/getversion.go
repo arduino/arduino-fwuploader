@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
@@ -38,7 +39,6 @@ import (
 
 // NewGetVersionCommand creates a new `get-version` command
 func NewGetVersionCommand() *cobra.Command {
-
 	command := &cobra.Command{
 		Use:   "get-version",
 		Short: "Gets the version of the firmware the board is using.",
@@ -57,11 +57,27 @@ func runGetVersion(cmd *cobra.Command, args []string) {
 	// at the end cleanup the fwuploader temp dir
 	defer globals.FwUploaderPath.RemoveAll()
 
-	packageIndex, firmwareIndex := common.InitIndexes()
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
+	packageIndex, firmwareIndex := common.InitIndexes()
 	board := common.GetBoard(firmwareIndex, commonFlags.Fqbn)
 	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
+	var result *flasher.FlashResult
+	if !board.IsPlugin() {
+		result = getVersion(board, uploadToolDir)
+	} else {
+		feedback.Fatal("function not yet implemented for this board", feedback.ErrGeneric)
+	}
+
+	if feedback.GetFormat() == feedback.Text {
+		fmt.Printf("Firmware version installed: %s", result.Version)
+	} else {
+		// Print the results
+		feedback.PrintResult(result)
+	}
+}
+
+func getVersion(board *firmwareindex.IndexBoard, uploadToolDir *paths.Path) *flasher.FlashResult {
 	versionSketchPath, err := download.DownloadSketch(board.VersionSketch)
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
@@ -78,26 +94,6 @@ func runGetVersion(cmd *cobra.Command, args []string) {
 	// Wait a bit after flashing the sketch for the board to become available again.
 	logrus.Debug("sleeping for 3 sec")
 	time.Sleep(3 * time.Second)
-
-	currentVersion, err := getVersion(board)
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
-	}
-	if feedback.GetFormat() == feedback.Text {
-		fmt.Printf("Firmware version installed: %s", currentVersion)
-	} else {
-		// Print the results
-		feedback.PrintResult(&flasher.FlashResult{
-			Programmer: (&flasher.ExecOutput{
-				Stdout: programmerOut.String(),
-				Stderr: programmerErr.String(),
-			}),
-			Version: currentVersion,
-		})
-	}
-}
-
-func getVersion(board *firmwareindex.IndexBoard) (fwVersion string, err error) {
 
 	// 9600 is the baudrate used in the CheckVersion sketch
 	port, err := flasher.OpenSerial(commonFlags.Address, 9600, 2)
@@ -124,11 +120,18 @@ func getVersion(board *firmwareindex.IndexBoard) (fwVersion string, err error) {
 		if strings.HasPrefix(line, "Firmware version installed: ") {
 			version := strings.TrimSpace(strings.Replace(line, "Firmware version installed: ", "", 1))
 			semver := semver.ParseRelaxed(version)
-			return semver.String(), nil
+			return &flasher.FlashResult{
+				Programmer: (&flasher.ExecOutput{
+					Stdout: programmerOut.String(),
+					Stderr: programmerErr.String(),
+				}),
+				Version: semver.String(),
+			}
 		}
 		if strings.HasPrefix(line, "Communication with WiFi module failed!") {
-			return "", fmt.Errorf("communication with WiFi module failed")
+			feedback.Fatal("communication with WiFi module failed", feedback.ErrGeneric)
 		}
 	}
-	return "", fmt.Errorf("could not find the version string to parse")
+	feedback.Fatal("could not find the version string to parse", feedback.ErrGeneric)
+	return nil
 }

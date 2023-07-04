@@ -36,7 +36,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// InitIndexes does exactly what the name implies
+// InitIndexes downloads and parses the package_index.json and firmwares_index.json
 func InitIndexes() (*packageindex.Index, *firmwareindex.Index) {
 	packageIndex, err := indexes.GetPackageIndex()
 	if err != nil {
