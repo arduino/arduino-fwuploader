@@ -72,7 +72,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	packageIndex, firmwareIndex := common.InitIndexes()
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
 	board := common.GetBoard(firmwareIndex, commonFlags.Fqbn)
-	uploadToolDir := common.GetUploadToolDir(packageIndex, board)
+	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
 	// Get module name if not specified
 	moduleName := ""

@@ -73,16 +73,33 @@ func GetBoard(firmwareIndex *firmwareindex.Index, fqbn string) *firmwareindex.In
 	return board
 }
 
-// GetUploadToolDir is an helper function that downloads the correct tool to flash a board,
+// DownloadRequiredToolsForBoard is an helper function that downloads the correct tool to flash a board,
 // it returns the path of the downloaded tool
-func GetUploadToolDir(packageIndex *packageindex.Index, board *firmwareindex.IndexBoard) *paths.Path {
-	toolRelease := indexes.GetToolRelease(packageIndex, board.Uploader)
+func DownloadRequiredToolsForBoard(packageIndex *packageindex.Index, board *firmwareindex.IndexBoard) *paths.Path {
+	if !board.IsPlugin() {
+		// Just download the upload tool for integrated uploaders
+		return downloadTool(packageIndex, board.Uploader)
+	}
+
+	// Download the plugin
+	toolDir := downloadTool(packageIndex, board.UploaderPlugin)
+
+	// Also download the other additional tools
+	for _, tool := range board.AdditionalTools {
+		_ = downloadTool(packageIndex, tool)
+	}
+
+	return toolDir
+}
+
+func downloadTool(packageIndex *packageindex.Index, tool string) *paths.Path {
+	toolRelease := indexes.GetToolRelease(packageIndex, tool)
 	if toolRelease == nil {
-		feedback.Fatal(fmt.Sprintf("Error getting upload tool %s for board %s", board.Uploader, board.Fqbn), feedback.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error getting upload tool %s", tool), feedback.ErrGeneric)
 	}
 	uploadToolDir, err := download.DownloadTool(toolRelease)
 	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error downloading tool %s: %s", board.Uploader, err), feedback.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error downloading tool %s: %s", tool, err), feedback.ErrGeneric)
 	}
 	logrus.Debugf("upload tool downloaded in %s", uploadToolDir.String())
 	return uploadToolDir
