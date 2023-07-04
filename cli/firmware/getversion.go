@@ -19,7 +19,9 @@
 package firmware
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -31,6 +33,7 @@ import (
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
+	"github.com/arduino/arduino-fwuploader/plugin"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -66,7 +69,11 @@ func runGetVersion(cmd *cobra.Command, args []string) {
 	if !board.IsPlugin() {
 		result = getVersion(board, uploadToolDir)
 	} else {
-		feedback.Fatal("function not yet implemented for this board", feedback.ErrGeneric)
+		uploader, err := plugin.NewFWUploaderPlugin(uploadToolDir)
+		if err != nil {
+			feedback.Fatal(fmt.Sprintf("Could not open uploader plugin: %s", err), feedback.ErrGeneric)
+		}
+		result = getVersionWithPlugin(uploader)
 	}
 
 	if feedback.GetFormat() == feedback.Text {
@@ -74,6 +81,29 @@ func runGetVersion(cmd *cobra.Command, args []string) {
 	} else {
 		// Print the results
 		feedback.PrintResult(result)
+	}
+}
+
+func getVersionWithPlugin(uploader *plugin.FwUploader) *flasher.FlashResult {
+	stdoutBuffer := &bytes.Buffer{}
+	stderrBuffer := &bytes.Buffer{}
+	stdout := io.Writer(os.Stdout)
+	stderr := io.Writer(os.Stderr)
+	if feedback.GetFormat() == feedback.Text {
+		stdout = io.MultiWriter(stdoutBuffer, os.Stdout)
+		stderr = io.MultiWriter(stderrBuffer, os.Stderr)
+	}
+	res, err := uploader.GetFirmwareVersion(commonFlags.Address, stdout, stderr)
+	if err != nil {
+		feedback.Fatal(fmt.Sprintf("Couldn't get firmware version: %s", err), feedback.ErrGeneric)
+	}
+
+	return &flasher.FlashResult{
+		Programmer: (&flasher.ExecOutput{
+			Stdout: stdoutBuffer.String(),
+			Stderr: stderrBuffer.String(),
+		}),
+		Version: res.FirmwareVersion.String(),
 	}
 }
 
