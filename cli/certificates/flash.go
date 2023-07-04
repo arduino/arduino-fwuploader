@@ -68,7 +68,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	packageIndex, firmwareIndex := common.InitIndexes()
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
 	board := common.GetBoard(firmwareIndex, commonFlags.Fqbn)
-	uploadToolDir := common.GetUploadToolDir(packageIndex, board)
+	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
 	if len(certificateURLs) == 0 && len(certificatePaths) == 0 {
 		feedback.Fatal("Error during certificates flashing: no certificates provided", feedback.ErrBadArgument)

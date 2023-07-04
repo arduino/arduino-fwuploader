@@ -168,3 +168,8 @@ func (b *IndexBoard) LatestFirmware() *IndexFirmware {
 	}
 	return latest
 }
+
+// IsPlugin returns true if the IndexBoard uses the plugin system
+func (b *IndexBoard) IsPlugin() bool {
+	return b.UploaderPlugin != ""
+}
