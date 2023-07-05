@@ -75,17 +75,13 @@ func runFlash(cmd *cobra.Command, args []string) {
 	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
 	// Get module name if not specified
-	moduleName := ""
+	moduleName := board.Module
 	moduleVersion := ""
-	if module == "" {
-		moduleName = board.Module
-	} else {
-		moduleSplit := strings.Split(module, "@")
-		if len(moduleSplit) == 2 {
-			moduleName = moduleSplit[0]
-			moduleVersion = moduleSplit[1]
-		} else {
-			moduleName = module
+	if module != "" {
+		split := strings.SplitN(module, "@", 2)
+		moduleName = split[0]
+		if len(split) == 2 {
+			moduleVersion = split[1]
 		}
 	}
 	// Normalize module name
