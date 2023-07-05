@@ -69,8 +69,8 @@ func runFlash(cmd *cobra.Command, args []string) {
 	// at the end cleanup the fwuploader temp dir
 	defer globals.FwUploaderPath.RemoveAll()
 
-	packageIndex, firmwareIndex := common.InitIndexes()
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
+	packageIndex, firmwareIndex := common.InitIndexes()
 	board := common.GetBoard(firmwareIndex, commonFlags.Fqbn)
 	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
@@ -92,7 +92,6 @@ func runFlash(cmd *cobra.Command, args []string) {
 	moduleName = strings.ToUpper(moduleName)
 
 	var firmwareFilePath *paths.Path
-	var err error
 	// If a local firmware file has been specified
 	if fwFile != "" {
 		firmwareFilePath = paths.New(fwFile)
@@ -111,9 +110,10 @@ func runFlash(cmd *cobra.Command, args []string) {
 			feedback.Fatal(fmt.Sprintf("Error getting firmware for board: %s", commonFlags.Fqbn), feedback.ErrGeneric)
 		}
 		logrus.Debugf("module name: %s, firmware version: %s", firmware.Module, firmware.Version.String())
-		firmwareFilePath, err = download.DownloadFirmware(firmware)
-		if err != nil {
+		if fwPath, err := download.DownloadFirmware(firmware); err != nil {
 			feedback.Fatal(fmt.Sprintf("Error downloading firmware from %s: %s", firmware.URL, err), feedback.ErrGeneric)
+		} else {
+			firmwareFilePath = fwPath
 		}
 		logrus.Debugf("firmware file downloaded in %s", firmwareFilePath.String())
 	}
