@@ -89,25 +89,12 @@ func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stder
 	if portAddress != "" {
 		args = append(args, "-p", portAddress)
 	}
-	proc, err := executils.NewProcessFromPath(nil, uploader.pluginPath, args...)
-	if err != nil {
-		return nil, err
-	}
-	buffer := &bytes.Buffer{}
-	if stdout != nil {
-		proc.RedirectStdoutTo(io.MultiWriter(buffer, stdout))
-	} else {
-		proc.RedirectStdoutTo(buffer)
-	}
-	if stderr != nil {
-		proc.RedirectStderrTo(stderr)
-	}
-	pluginExecErr := proc.RunWithinContext(context.Background())
+	execStdout, _, execErr := uploader.exec(stdout, stderr, args...)
 
 	res := &GetFirmwareVersionResult{}
 	fwVersionPrefix := "FIRMWARE-VERSION: "
 	fwErrorPrefix := "GET-VERSION-ERROR: "
-	for _, line := range strings.Split(buffer.String(), "\n") {
+	for _, line := range strings.Split(execStdout.String(), "\n") {
 		if strings.HasPrefix(line, fwVersionPrefix) {
 			version := strings.TrimPrefix(line, fwVersionPrefix)
 			res.FirmwareVersion = semver.ParseRelaxed(version)
@@ -116,18 +103,44 @@ func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stder
 			res.Error = strings.TrimPrefix(line, fwErrorPrefix)
 		}
 	}
+
 	if res.Error != "" {
-		if pluginExecErr != nil {
-			err = fmt.Errorf("%s: %w", res.Error, pluginExecErr)
+		if execErr != nil {
+			execErr = fmt.Errorf("%s: %w", res.Error, execErr)
 		} else {
-			err = errors.New(res.Error)
+			execErr = errors.New(res.Error)
 		}
 	}
-	return res, err
+	return res, execErr
 }
 
 // GetFirmwareVersionResult contains the result of GetFirmwareVersion command
 type GetFirmwareVersionResult struct {
 	FirmwareVersion *semver.RelaxedVersion
 	Error           string
+}
+
+func (uploader *FwUploader) exec(stdout, stderr io.Writer, args ...string) (*bytes.Buffer, *bytes.Buffer, error) {
+	stdoutBuffer := &bytes.Buffer{}
+	stderrBuffer := &bytes.Buffer{}
+
+	proc, err := executils.NewProcessFromPath(nil, uploader.pluginPath, args...)
+	if err != nil {
+		return stdoutBuffer, stderrBuffer, err
+	}
+
+	if stdout != nil {
+		proc.RedirectStdoutTo(io.MultiWriter(stdoutBuffer, stdout))
+	} else {
+		proc.RedirectStdoutTo(stdoutBuffer)
+	}
+
+	if stderr != nil {
+		proc.RedirectStderrTo(io.MultiWriter(stderrBuffer, stderr))
+	} else {
+		proc.RedirectStderrTo(stderr)
+	}
+
+	execErr := proc.RunWithinContext(context.Background())
+	return stdoutBuffer, stderrBuffer, execErr
 }
