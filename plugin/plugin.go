@@ -21,6 +21,7 @@ package plugin
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -101,11 +102,9 @@ func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stder
 	if stderr != nil {
 		proc.RedirectStderrTo(stderr)
 	}
-	if err := proc.RunWithinContext(context.Background()); err != nil {
-		return nil, err
-	}
-	res := &GetFirmwareVersionResult{}
+	pluginExecErr := proc.RunWithinContext(context.Background())
 
+	res := &GetFirmwareVersionResult{}
 	fwVersionPrefix := "FIRMWARE-VERSION: "
 	fwErrorPrefix := "GET-VERSION-ERROR: "
 	for _, line := range strings.Split(buffer.String(), "\n") {
@@ -117,7 +116,14 @@ func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stder
 			res.Error = strings.TrimPrefix(line, fwErrorPrefix)
 		}
 	}
-	return res, nil
+	if res.Error != "" {
+		if pluginExecErr != nil {
+			err = fmt.Errorf("%s: %w", res.Error, pluginExecErr)
+		} else {
+			err = errors.New(res.Error)
+		}
+	}
+	return res, err
 }
 
 // GetFirmwareVersionResult contains the result of GetFirmwareVersion command
