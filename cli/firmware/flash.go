@@ -40,7 +40,7 @@ import (
 var (
 	commonFlags arguments.Flags // contains fqbn and address
 	module      string
-	retries     uint8
+	retries     int
 	fwFile      string
 )
 
@@ -60,7 +60,7 @@ func NewFlashCommand() *cobra.Command {
 	}
 	commonFlags.AddToCommand(command)
 	command.Flags().StringVarP(&module, "module", "m", "", "Firmware module ID, e.g.: WINC1500, NINA")
-	command.Flags().Uint8Var(&retries, "retries", 9, "Number of retries in case of upload failure (default 9)")
+	command.Flags().IntVar(&retries, "retries", 9, "Number of retries in case of upload failure (default 9)")
 	command.Flags().StringVarP(&fwFile, "input-file", "i", "", "Path of the firmware to upload")
 	return command
 }
@@ -114,22 +114,31 @@ func runFlash(cmd *cobra.Command, args []string) {
 		logrus.Debugf("firmware file downloaded in %s", firmwareFilePath.String())
 	}
 
-	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
-	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
+	loaderSketch := ""
+	if !board.IsPlugin() {
+		loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
+		if err != nil {
+			feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
+		}
+		logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
+		loaderSketch = strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
+	} else {
+		// TODO...
 	}
-	logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
 
-	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
-
-	for retry := 1; retry <= int(retries); retry++ {
-		err = updateFirmware(board, loaderSketch, moduleName, uploadToolDir, firmwareFilePath)
+	for retry := 1; retry <= retries; retry++ {
+		var err error
+		if !board.IsPlugin() {
+			err = updateFirmware(board, loaderSketch, moduleName, uploadToolDir, firmwareFilePath)
+		} else {
+			err = nil // TODO...
+		}
 		if err == nil {
 			logrus.Info("Operation completed: success! :-)")
 			break
 		}
 		logrus.Error(err)
-		if retry == int(retries) {
+		if retry == retries {
 			logrus.Fatal("Operation failed. :-(")
 		}
 		logrus.Info("Waiting 1 second before retrying...")
