@@ -120,6 +120,41 @@ type GetFirmwareVersionResult struct {
 	Error           string
 }
 
+// FlashFirmware runs the plugin to flash the selected firmware
+func (uploader *FwUploader) FlashFirmware(portAddress string, firmwarePath *paths.Path, stdout, stderr io.Writer) (*FlashFirmwareResult, error) {
+	args := []string{"firmware", "flash", firmwarePath.String()}
+	if portAddress != "" {
+		args = append(args, "-p", portAddress)
+	}
+	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
+
+	res := &FlashFirmwareResult{
+		Stdout: execStdout.Bytes(),
+		Stderr: execStderr.Bytes(),
+	}
+	fwErrorPrefix := "FLASH-FIRMWARE-ERROR: "
+	for _, line := range strings.Split(execStdout.String(), "\n") {
+		if strings.HasPrefix(line, fwErrorPrefix) {
+			res.Error = strings.TrimPrefix(line, fwErrorPrefix)
+		}
+	}
+	if res.Error != "" {
+		if execErr != nil {
+			execErr = fmt.Errorf("%s: %w", res.Error, execErr)
+		} else {
+			execErr = errors.New(res.Error)
+		}
+	}
+	return res, execErr
+}
+
+// GetFirmwareVersionResult contains the result of GetFirmwareVersion command
+type FlashFirmwareResult struct {
+	Error  string
+	Stdout []byte
+	Stderr []byte
+}
+
 func (uploader *FwUploader) exec(stdout, stderr io.Writer, args ...string) (*bytes.Buffer, *bytes.Buffer, error) {
 	stdoutBuffer := &bytes.Buffer{}
 	stderrBuffer := &bytes.Buffer{}

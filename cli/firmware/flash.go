@@ -21,6 +21,7 @@ package firmware
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -32,6 +33,7 @@ import (
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
+	"github.com/arduino/arduino-fwuploader/plugin"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -68,6 +70,10 @@ func NewFlashCommand() *cobra.Command {
 func runFlash(cmd *cobra.Command, args []string) {
 	// at the end cleanup the fwuploader temp dir
 	defer globals.FwUploaderPath.RemoveAll()
+
+	if retries < 1 {
+		feedback.Fatal("Number of retries should be at least 1", feedback.ErrBadArgument)
+	}
 
 	common.CheckFlags(commonFlags.Fqbn, commonFlags.Address)
 	packageIndex, firmwareIndex := common.InitIndexes()
@@ -115,6 +121,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	}
 
 	loaderSketch := ""
+	var uploader *plugin.FwUploader
 	if !board.IsPlugin() {
 		loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
 		if err != nil {
@@ -123,34 +130,63 @@ func runFlash(cmd *cobra.Command, args []string) {
 		logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
 		loaderSketch = strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
 	} else {
-		// TODO...
+		var err error
+		uploader, err = plugin.NewFWUploaderPlugin(uploadToolDir)
+		if err != nil {
+			feedback.Fatal(fmt.Sprintf("Could not open uploader plugin: %s", err), feedback.ErrGeneric)
+		}
 	}
 
-	for retry := 1; retry <= retries; retry++ {
+	retry := 0
+	for {
+		retry++
+		logrus.Infof("Uploading firmware (try %d of %d)", retry, retries)
+
+		var res *flasher.FlashResult
 		var err error
 		if !board.IsPlugin() {
-			err = updateFirmware(board, loaderSketch, moduleName, uploadToolDir, firmwareFilePath)
+			res, err = updateFirmware(board, loaderSketch, moduleName, uploadToolDir, firmwareFilePath)
 		} else {
-			err = nil // TODO...
+			res, err = updateFirmwareWithPlugin(uploader, firmwareFilePath)
 		}
 		if err == nil {
+			feedback.PrintResult(res)
 			logrus.Info("Operation completed: success! :-)")
 			break
 		}
 		logrus.Error(err)
+
 		if retry == retries {
 			logrus.Fatal("Operation failed. :-(")
 		}
+
 		logrus.Info("Waiting 1 second before retrying...")
 		time.Sleep(time.Second)
-		logrus.Infof("Retrying upload (%d of %d)", retry, retries)
 	}
 }
 
-func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName string, uploadToolDir, firmwareFile *paths.Path) error {
+func updateFirmwareWithPlugin(uploader *plugin.FwUploader, fwPath *paths.Path) (*flasher.FlashResult, error) {
+	var stdout, stderr io.Writer
+	if feedback.GetFormat() == feedback.Text {
+		stdout = os.Stdout
+		stderr = os.Stderr
+	}
+	res, err := uploader.FlashFirmware(commonFlags.Address, fwPath, stdout, stderr)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't update firmware: %s", err)
+	}
+	return &flasher.FlashResult{
+		Programmer: &flasher.ExecOutput{
+			Stdout: string(res.Stdout),
+			Stderr: string(res.Stderr),
+		},
+	}, nil
+}
+
+func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName string, uploadToolDir, firmwareFile *paths.Path) (*flasher.FlashResult, error) {
 	programmerOut, programmerErr, err := common.FlashSketch(board, loaderSketch, uploadToolDir, commonFlags.Address)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// Wait a bit after flashing the loader sketch for the board to become
 	// available again.
@@ -174,7 +210,7 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 		feedback.Fatal(fmt.Sprintf("Error during firmware flashing: %s", err), feedback.ErrGeneric)
 	}
 	if err != nil {
-		return fmt.Errorf("error during firmware flashing: %s", err)
+		return nil, fmt.Errorf("error during firmware flashing: %s", err)
 	}
 	defer f.Close()
 
@@ -189,11 +225,11 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 	}
 	if err != nil {
 		flasherErr.Write([]byte(fmt.Sprintf("Error during firmware flashing: %s", err)))
-		return err
+		return nil, err
 	}
 
 	// Print the results
-	feedback.PrintResult(&flasher.FlashResult{
+	return &flasher.FlashResult{
 		Programmer: (&flasher.ExecOutput{
 			Stdout: programmerOut.String(),
 			Stderr: programmerErr.String(),
@@ -202,8 +238,7 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 			Stdout: flasherOut.String(),
 			Stderr: flasherErr.String(),
 		}),
-	})
-	return nil
+	}, nil
 }
 
 // callback used to print the progress
