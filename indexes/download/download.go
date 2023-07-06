@@ -54,8 +54,8 @@ func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 		return nil, err
 	}
 	downloadsDir := globals.FwUploaderPath.Join("downloads")
-	archivePath := downloadsDir.Join(resource.ArchiveFileName)
-	if err := archivePath.Parent().MkdirAll(); err != nil {
+	archivePath, err := resource.ArchivePath(downloadsDir)
+	if err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
