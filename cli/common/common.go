@@ -24,9 +24,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-fwuploader/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/indexes"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
@@ -37,9 +38,10 @@ import (
 )
 
 // InitIndexes downloads and parses the package_index.json and firmwares_index.json
-func InitIndexes() (*packageindex.Index, *firmwareindex.Index) {
-	packageIndex, err := indexes.GetPackageIndex()
-	if err != nil {
+func InitIndexes() (*packagemanager.PackageManager, *firmwareindex.Index) {
+	// Load main package index and optional additional indexes
+	pmbuilder := packagemanager.NewBuilder(nil, nil, nil, nil, "")
+	if err := indexes.GetPackageIndex(pmbuilder, globals.PackageIndexGZURL); err != nil {
 		feedback.Fatal(fmt.Sprintf("Can't load package index: %s", err), feedback.ErrGeneric)
 	}
 
@@ -47,7 +49,7 @@ func InitIndexes() (*packageindex.Index, *firmwareindex.Index) {
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
 	}
-	return packageIndex, firmwareIndex
+	return pmbuilder.Build(), firmwareIndex
 }
 
 // CheckFlags runs a basic check, errors if the flags are not defined
@@ -75,25 +77,25 @@ func GetBoard(firmwareIndex *firmwareindex.Index, fqbn string) *firmwareindex.In
 
 // DownloadRequiredToolsForBoard is an helper function that downloads the correct tool to flash a board,
 // it returns the path of the downloaded tool
-func DownloadRequiredToolsForBoard(packageIndex *packageindex.Index, board *firmwareindex.IndexBoard) *paths.Path {
+func DownloadRequiredToolsForBoard(pm *packagemanager.PackageManager, board *firmwareindex.IndexBoard) *paths.Path {
 	if !board.IsPlugin() {
 		// Just download the upload tool for integrated uploaders
-		return downloadTool(packageIndex, board.Uploader)
+		return downloadTool(pm, board.Uploader)
 	}
 
 	// Download the plugin
-	toolDir := downloadTool(packageIndex, board.UploaderPlugin)
+	toolDir := downloadTool(pm, board.UploaderPlugin)
 
 	// Also download the other additional tools
 	for _, tool := range board.AdditionalTools {
-		_ = downloadTool(packageIndex, tool)
+		_ = downloadTool(pm, tool)
 	}
 
 	return toolDir
 }
 
-func downloadTool(packageIndex *packageindex.Index, tool string) *paths.Path {
-	toolRelease := indexes.GetToolRelease(packageIndex, tool)
+func downloadTool(pm *packagemanager.PackageManager, tool string) *paths.Path {
+	toolRelease := indexes.GetToolRelease(pm, tool)
 	if toolRelease == nil {
 		feedback.Fatal(fmt.Sprintf("Error getting upload tool %s", tool), feedback.ErrGeneric)
 	}

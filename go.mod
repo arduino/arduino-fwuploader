@@ -18,6 +18,7 @@ require (
 )
 
 require (
+	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b // indirect
 	github.com/arduino/go-win32-utils v1.0.0 // indirect
 	github.com/cmaglie/pb v1.0.27 // indirect
 	github.com/codeclysm/extract/v3 v3.1.1 // indirect
