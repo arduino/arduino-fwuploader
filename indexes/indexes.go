@@ -23,7 +23,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/sirupsen/logrus"
@@ -58,13 +57,16 @@ func GetPackageIndex(pmbuilder *packagemanager.Builder, indexURL string) error {
 		logrus.Error(err)
 		return err
 	}
-	pmbuilder.LoadPackageIndexFromFile(indexPath)
-	return nil
+	_, err = pmbuilder.LoadPackageIndexFromFile(indexPath)
+	if err != nil {
+		logrus.Error(err)
+	}
+	return err
 }
 
 // GetFirmwareIndex downloads and loads the arduino-fwuploader module_firmware_index.json
-func GetFirmwareIndex() (*firmwareindex.Index, error) {
-	indexPath, err := download.DownloadIndex(globals.ModuleFirmwareIndexGZURL)
+func GetFirmwareIndex(indexUrl string) (*firmwareindex.Index, error) {
+	indexPath, err := download.DownloadIndex(indexUrl)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
