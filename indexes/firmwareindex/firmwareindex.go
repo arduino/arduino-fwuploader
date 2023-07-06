@@ -125,6 +125,13 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	return &index, nil
 }
 
+// MergeWith merge this index with the other given index (the boards from the other index)
+// are added to this one.
+func (i *Index) MergeWith(j *Index) {
+	i.Boards = append(i.Boards, j.Boards...)
+	i.IsTrusted = i.IsTrusted && j.IsTrusted
+}
+
 // GetBoard returns the IndexBoard for the given FQBN
 func (i *Index) GetBoard(fqbn string) *IndexBoard {
 	for _, b := range i.Boards {

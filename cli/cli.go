@@ -24,6 +24,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-fwuploader/cli/certificates"
+	"github.com/arduino/arduino-fwuploader/cli/common"
 	"github.com/arduino/arduino-fwuploader/cli/firmware"
 	"github.com/arduino/arduino-fwuploader/cli/version"
 
@@ -36,11 +37,13 @@ import (
 )
 
 var (
-	outputFormat string
-	verbose      bool
-	logFile      string
-	logFormat    string
-	logLevel     string
+	outputFormat           string
+	verbose                bool
+	logFile                string
+	logFormat              string
+	logLevel               string
+	additionalFirmwareURLs []string
+	additionalPackageURLs  []string
 )
 
 func NewCommand() *cobra.Command {
@@ -63,7 +66,8 @@ func NewCommand() *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&logFormat, "log-format", "", "The output format for the logs, can be {text|json}.")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
-
+	rootCmd.PersistentFlags().StringArrayVarP(&additionalFirmwareURLs, "additional-fw-index", "F", nil, "Additional firmwares index URLs (useful for testing purposes)")
+	rootCmd.PersistentFlags().StringArrayVarP(&additionalPackageURLs, "additional-packages-index", "P", nil, "Additional packages index URLs (useful for testing purposes)")
 	return rootCmd
 }
 
@@ -84,7 +88,6 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-
 	// Prepare the Feedback system
 	// check the right output format was passed
 	format, found := feedback.ParseOutputFormat(outputFormat)
@@ -132,4 +135,8 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info(v.VersionInfo)
+
+	// Setup additional indexes
+	common.AdditionalPackageIndexURLs = append(common.AdditionalPackageIndexURLs, additionalPackageURLs...)
+	common.AdditionalFirmwareIndexURLs = append(common.AdditionalFirmwareIndexURLs, additionalFirmwareURLs...)
 }

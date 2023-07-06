@@ -37,6 +37,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// AdditionalPackageIndexURLs is a list of additional package_index.json URLs that
+// are loaded together with the main index.
+var AdditionalPackageIndexURLs []string
+
+// AdditionalFirmwareIndexURLs is a list of additional firwamre_index.json URLs that
+// are loaded together with the main index.
+var AdditionalFirmwareIndexURLs []string
+
 // InitIndexes downloads and parses the package_index.json and firmwares_index.json
 func InitIndexes() (*packagemanager.PackageManager, *firmwareindex.Index) {
 	// Load main package index and optional additional indexes
@@ -44,11 +52,25 @@ func InitIndexes() (*packagemanager.PackageManager, *firmwareindex.Index) {
 	if err := indexes.GetPackageIndex(pmbuilder, globals.PackageIndexGZURL); err != nil {
 		feedback.Fatal(fmt.Sprintf("Can't load package index: %s", err), feedback.ErrGeneric)
 	}
+	for _, indexURL := range AdditionalPackageIndexURLs {
+		if err := indexes.GetPackageIndex(pmbuilder, indexURL); err != nil {
+			feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
+		}
+	}
 
-	firmwareIndex, err := indexes.GetFirmwareIndex()
+	// Load main firmware index and optional additional indexes
+	firmwareIndex, err := indexes.GetFirmwareIndex(globals.ModuleFirmwareIndexGZURL)
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
 	}
+	for _, additionalURL := range AdditionalFirmwareIndexURLs {
+		additionalIndex, err := indexes.GetFirmwareIndex(additionalURL)
+		if err != nil {
+			feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
+		}
+		firmwareIndex.MergeWith(additionalIndex)
+	}
+
 	return pmbuilder.Build(), firmwareIndex
 }
 

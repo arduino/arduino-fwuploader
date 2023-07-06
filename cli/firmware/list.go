@@ -22,8 +22,8 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/table"
+	"github.com/arduino/arduino-fwuploader/cli/common"
 	"github.com/arduino/arduino-fwuploader/cli/feedback"
-	"github.com/arduino/arduino-fwuploader/indexes"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -56,10 +56,7 @@ type FirmwareResult struct {
 type FirmwareListResult []*FirmwareResult
 
 func list(fqbn string) {
-	firmwareIndex, err := indexes.GetFirmwareIndex()
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
-	}
+	_, firmwareIndex := common.InitIndexes()
 
 	res := FirmwareListResult{}
 	for _, board := range firmwareIndex.Boards {
