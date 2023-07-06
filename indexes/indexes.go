@@ -19,12 +19,14 @@
 package indexes
 
 import (
+	"net/url"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -52,12 +54,16 @@ func GetToolRelease(pm *packagemanager.PackageManager, toolID string) *cores.Too
 
 // GetPackageIndex downloads and loads the Arduino package_index.json
 func GetPackageIndex(pmbuilder *packagemanager.Builder, indexURL string) error {
-	indexPath, err := download.DownloadIndex(indexURL)
-	if err != nil {
-		logrus.Error(err)
-		return err
+	indexPath := paths.New(indexURL)
+	if u, err := url.Parse(indexURL); err == nil && u.Scheme != "" {
+		downloadedPath, err := download.DownloadIndex(indexURL)
+		if err != nil {
+			logrus.Error(err)
+			return err
+		}
+		indexPath = downloadedPath
 	}
-	_, err = pmbuilder.LoadPackageIndexFromFile(indexPath)
+	_, err := pmbuilder.LoadPackageIndexFromFile(indexPath)
 	if err != nil {
 		logrus.Error(err)
 	}
@@ -65,11 +71,15 @@ func GetPackageIndex(pmbuilder *packagemanager.Builder, indexURL string) error {
 }
 
 // GetFirmwareIndex downloads and loads the arduino-fwuploader module_firmware_index.json
-func GetFirmwareIndex(indexUrl string) (*firmwareindex.Index, error) {
-	indexPath, err := download.DownloadIndex(indexUrl)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
+func GetFirmwareIndex(indexURL string) (*firmwareindex.Index, error) {
+	indexPath := paths.New(indexURL)
+	if u, err := url.Parse(indexURL); err == nil && u.Scheme != "" {
+		downloadedPath, err := download.DownloadIndex(indexURL)
+		if err != nil {
+			logrus.Error(err)
+			return nil, err
+		}
+		indexPath = downloadedPath
 	}
 	in, err := firmwareindex.LoadIndex(indexPath)
 	if err != nil {
