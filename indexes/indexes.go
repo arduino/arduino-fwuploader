@@ -19,11 +19,13 @@
 package indexes
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-fwuploader/cli/feedback"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/arduino/go-paths-helper"
@@ -43,11 +45,16 @@ func GetToolRelease(pm *packagemanager.PackageManager, toolID string) *cores.Too
 
 	pme, release := pm.NewExplorer()
 	defer release()
-	toolRelease := pme.FindToolDependency(&cores.ToolDependency{
+	dep := &cores.ToolDependency{
 		ToolName:     toolName,
 		ToolVersion:  version,
 		ToolPackager: packageName,
-	})
+	}
+	logrus.WithField("dep", dep).Debug("Tool dependency to download")
+	toolRelease := pme.FindToolDependency(dep)
+	if toolRelease == nil {
+		feedback.Fatal(fmt.Sprintf("Can't find tool %s in index", dep), feedback.ErrGeneric)
+	}
 	logrus.WithField("tool", toolRelease.String()).Debug("Tool release to download")
 	return toolRelease
 }
