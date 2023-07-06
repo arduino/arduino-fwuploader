@@ -59,12 +59,12 @@ func InitIndexes() (*packagemanager.PackageManager, *firmwareindex.Index) {
 	}
 
 	// Load main firmware index and optional additional indexes
-	firmwareIndex, err := indexes.GetFirmwareIndex(globals.ModuleFirmwareIndexGZURL)
+	firmwareIndex, err := indexes.GetFirmwareIndex(globals.ModuleFirmwareIndexGZURL, true)
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
 	}
 	for _, additionalURL := range AdditionalFirmwareIndexURLs {
-		additionalIndex, err := indexes.GetFirmwareIndex(additionalURL)
+		additionalIndex, err := indexes.GetFirmwareIndex(additionalURL, false)
 		if err != nil {
 			feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
 		}

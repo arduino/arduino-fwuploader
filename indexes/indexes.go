@@ -71,7 +71,7 @@ func GetPackageIndex(pmbuilder *packagemanager.Builder, indexURL string) error {
 }
 
 // GetFirmwareIndex downloads and loads the arduino-fwuploader module_firmware_index.json
-func GetFirmwareIndex(indexURL string) (*firmwareindex.Index, error) {
+func GetFirmwareIndex(indexURL string, verifySignature bool) (*firmwareindex.Index, error) {
 	indexPath := paths.New(indexURL)
 	if u, err := url.Parse(indexURL); err == nil && u.Scheme != "" {
 		downloadedPath, err := download.DownloadIndex(indexURL)
@@ -81,7 +81,14 @@ func GetFirmwareIndex(indexURL string) (*firmwareindex.Index, error) {
 		}
 		indexPath = downloadedPath
 	}
-	in, err := firmwareindex.LoadIndex(indexPath)
+
+	var in *firmwareindex.Index
+	var err error
+	if verifySignature {
+		in, err = firmwareindex.LoadIndex(indexPath)
+	} else {
+		in, err = firmwareindex.LoadIndexNoSign(indexPath)
+	}
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
