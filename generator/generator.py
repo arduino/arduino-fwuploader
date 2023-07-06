@@ -255,6 +255,7 @@ def generate_boards_json(input_data, arduino_cli_path):
     # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
     old_boards = [
         "arduino:samd:mkr1000",
+        "arduino:samd:mkrwifi1010",
         "arduino:samd:nano_33_iot",
         "arduino:samd:mkrvidor4000",
         "arduino:megaavr:uno2018",
