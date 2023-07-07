@@ -79,7 +79,6 @@ func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 
 func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error {
 	var certificatesData []byte
-	certificatesNumber := 0
 	for _, certPath := range *certificatePaths {
 		logrus.Infof("Converting and flashing certificate %s", certPath)
 		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
@@ -89,7 +88,6 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 			return err
 		}
 		certificatesData = append(certificatesData, data...)
-		certificatesNumber++
 	}
 
 	for _, URL := range URLs {
@@ -100,7 +98,6 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 			return err
 		}
 		certificatesData = append(certificatesData, data...)
-		certificatesNumber++
 	}
 
 	certificatesOffset := 0x4000
