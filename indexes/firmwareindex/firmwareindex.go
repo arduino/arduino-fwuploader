@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
+	"golang.org/x/exp/slices"
 )
 
 // Index represents Boards struct as seen from module_firmware_index.json file.
@@ -128,7 +129,14 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 // MergeWith merge this index with the other given index (the boards from the other index)
 // are added to this one.
 func (i *Index) MergeWith(j *Index) {
-	i.Boards = append(i.Boards, j.Boards...)
+	for _, boardToAdd := range j.Boards {
+		idx := slices.IndexFunc(i.Boards, func(x *IndexBoard) bool { return x.Overlaps(boardToAdd) })
+		if idx == -1 {
+			i.Boards = append(i.Boards, boardToAdd)
+		} else {
+			i.Boards[idx] = boardToAdd
+		}
+	}
 	i.IsTrusted = i.IsTrusted && j.IsTrusted
 }
 
@@ -140,6 +148,13 @@ func (i *Index) GetBoard(fqbn string) *IndexBoard {
 		}
 	}
 	return nil
+}
+
+// Overlaps returns true if the two IndexBoard represent the same board.
+func (b *IndexBoard) Overlaps(x *IndexBoard) bool {
+	return b.Fqbn == x.Fqbn &&
+		b.Module == x.Module &&
+		b.Name == x.Name
 }
 
 // GetFirmware returns the specified IndexFirmware version for this board.
