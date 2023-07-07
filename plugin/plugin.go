@@ -89,9 +89,12 @@ func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stder
 	if portAddress != "" {
 		args = append(args, "-p", portAddress)
 	}
-	execStdout, _, execErr := uploader.exec(stdout, stderr, args...)
+	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
 
-	res := &GetFirmwareVersionResult{}
+	res := &GetFirmwareVersionResult{
+		Stdout: execStdout.Bytes(),
+		Stderr: execStderr.Bytes(),
+	}
 	fwVersionPrefix := "FIRMWARE-VERSION: "
 	fwErrorPrefix := "GET-VERSION-ERROR: "
 	for _, line := range strings.Split(execStdout.String(), "\n") {
@@ -118,6 +121,8 @@ func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stder
 type GetFirmwareVersionResult struct {
 	FirmwareVersion *semver.RelaxedVersion
 	Error           string
+	Stdout          []byte
+	Stderr          []byte
 }
 
 // FlashFirmware runs the plugin to flash the selected firmware

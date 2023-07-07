@@ -19,7 +19,6 @@
 package firmware
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -85,13 +84,10 @@ func runGetVersion(cmd *cobra.Command, args []string) {
 }
 
 func getVersionWithPlugin(uploader *plugin.FwUploader) *flasher.FlashResult {
-	stdoutBuffer := &bytes.Buffer{}
-	stderrBuffer := &bytes.Buffer{}
-	stdout := io.Writer(os.Stdout)
-	stderr := io.Writer(os.Stderr)
+	var stdout, stderr io.Writer
 	if feedback.GetFormat() == feedback.Text {
-		stdout = io.MultiWriter(stdoutBuffer, os.Stdout)
-		stderr = io.MultiWriter(stderrBuffer, os.Stderr)
+		stdout = os.Stdout
+		stderr = os.Stderr
 	}
 	res, err := uploader.GetFirmwareVersion(commonFlags.Address, stdout, stderr)
 	if err != nil {
@@ -100,8 +96,8 @@ func getVersionWithPlugin(uploader *plugin.FwUploader) *flasher.FlashResult {
 
 	return &flasher.FlashResult{
 		Programmer: (&flasher.ExecOutput{
-			Stdout: stdoutBuffer.String(),
-			Stderr: stderrBuffer.String(),
+			Stdout: string(res.Stdout),
+			Stderr: string(res.Stderr),
 		}),
 		Version: res.FirmwareVersion.String(),
 	}
