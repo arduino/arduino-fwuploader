@@ -63,6 +63,11 @@ func InitIndexes() (*packagemanager.PackageManager, *firmwareindex.Index) {
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
 	}
+	if pluginIndex, err := indexes.GetFirmwareIndex(globals.PluginFirmwareIndexGZURL, true); err != nil {
+		feedback.Fatal(fmt.Sprintf("Can't load (plugin) firmware index: %s", err), feedback.ErrGeneric)
+	} else {
+		firmwareIndex.MergeWith(pluginIndex)
+	}
 	for _, additionalURL := range AdditionalFirmwareIndexURLs {
 		additionalIndex, err := indexes.GetFirmwareIndex(additionalURL, false)
 		if err != nil {
