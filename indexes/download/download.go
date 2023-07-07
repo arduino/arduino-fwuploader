@@ -288,6 +288,8 @@ func verifyIndex(indexPath *paths.Path, URL *url.URL) error {
 		valid, err = verifyPackageIndex(indexPath, signaturePath)
 	} else if index == "module_firmware_index.json.gz" {
 		valid, err = verifyModuleFirmwareIndex(indexPath, signaturePath)
+	} else if index == "plugin_firmware_index.json.gz" {
+		valid, err = verifyModuleFirmwareIndex(indexPath, signaturePath)
 	} else {
 		return fmt.Errorf("index %s not supported", URL.Path)
 	}
