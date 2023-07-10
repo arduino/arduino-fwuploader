@@ -342,7 +342,7 @@ if __name__ == "__main__":
 
     boards_json = generate_boards_json(boards, args.arduino_cli, args.new)
 
-    Path("boards").mkdir()
+    Path("boards").mkdir(exist_ok=True)
 
     with open("boards/" + output_file, "w") as f:
         json.dump(boards_json, f, indent=2)
