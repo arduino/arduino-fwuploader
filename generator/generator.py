@@ -222,26 +222,18 @@ def create_upload_data(fqbn, installed_cores):  # noqa: C901
     return upload_data
 
 
-def generate_boards_json(input_data, arduino_cli_path):
+def generate_boards_json(input_data, arduino_cli_path, new_boards):
+    # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
+    old_boards = [
+        "arduino:samd:mkr1000",
+        "arduino:samd:mkrwifi1010",
+        "arduino:samd:nano_33_iot",
+        "arduino:samd:mkrvidor4000",
+        "arduino:megaavr:uno2018",
+        "arduino:mbed_nano:nanorp2040connect",
+    ]
+
     boards = {
-        "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
-        "arduino:samd:mkrwifi1010": {
-            "fqbn": "arduino:samd:mkrwifi1010",
-            "firmware": [],
-        },
-        "arduino:samd:nano_33_iot": {
-            "fqbn": "arduino:samd:nano_33_iot",
-            "firmware": [],
-        },
-        "arduino:samd:mkrvidor4000": {
-            "fqbn": "arduino:samd:mkrvidor4000",
-            "firmware": [],
-        },
-        "arduino:megaavr:uno2018": {"fqbn": "arduino:megaavr:uno2018", "firmware": []},
-        "arduino:mbed_nano:nanorp2040connect": {
-            "fqbn": "arduino:mbed_nano:nanorp2040connect",
-            "firmware": [],
-        },
         "arduino:renesas_uno:unor4wifi": {
             "fqbn": "arduino:renesas_uno:unor4wifi",
             "firmware": [],
@@ -252,15 +244,27 @@ def generate_boards_json(input_data, arduino_cli_path):
         },
     }
 
-    # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
-    old_boards = [
-        "arduino:samd:mkr1000",
-        "arduino:samd:mkrwifi1010",
-        "arduino:samd:nano_33_iot",
-        "arduino:samd:mkrvidor4000",
-        "arduino:megaavr:uno2018",
-        "arduino:mbed_nano:nanorp2040connect",
-    ]
+    if not new_boards:
+        boards = {
+            "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
+            "arduino:samd:mkrwifi1010": {
+                "fqbn": "arduino:samd:mkrwifi1010",
+                "firmware": [],
+            },
+            "arduino:samd:nano_33_iot": {
+                "fqbn": "arduino:samd:nano_33_iot",
+                "firmware": [],
+            },
+            "arduino:samd:mkrvidor4000": {
+                "fqbn": "arduino:samd:mkrvidor4000",
+                "firmware": [],
+            },
+            "arduino:megaavr:uno2018": {"fqbn": "arduino:megaavr:uno2018", "firmware": []},
+            "arduino:mbed_nano:nanorp2040connect": {
+                "fqbn": "arduino:mbed_nano:nanorp2040connect",
+                "firmware": [],
+            },
+        }
 
     # Gets the installed cores
     res = arduino_cli(cli_path=arduino_cli_path, args=["core", "list", "--format", "json"])
@@ -316,18 +320,31 @@ if __name__ == "__main__":
         help="Path to arduino-cli executable",
         required=True,
     )
+    parser.add_argument(
+        "--new",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Generate the index for old boards",
+    )
     args = parser.parse_args(sys.argv[1:])
+
+    if args.new:
+        input_file = "new_boards.json"
+        output_file = "plugin_firmware_index.json"
+    else:
+        input_file = "boards.json"
+        output_file = "module_firmware_index.json"
 
     # raw_boards.json has been generated using --get_available_for FirmwareUploader (version 0.1.8) flag.
     # It has been edited a bit to better handle parsing.
-    with open("boards.json", "r") as f:
+    with open(input_file, "r") as f:
         boards = json.load(f)
 
-    boards_json = generate_boards_json(boards, args.arduino_cli)
+    boards_json = generate_boards_json(boards, args.arduino_cli, args.new)
 
     Path("boards").mkdir()
 
-    with open("boards/module_firmware_index.json", "w") as f:
+    with open("boards/" + output_file, "w") as f:
         json.dump(boards_json, f, indent=2)
 
 # board_index.json must be formatted like so:

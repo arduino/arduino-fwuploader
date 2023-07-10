@@ -74,9 +74,5 @@
   "arduino:mbed_nano:nanorp2040connect": {
     "moduleName": "NINA",
     "versions": ["1.4.5", "1.4.6", "1.4.7", "1.4.8", "1.5.0"]
-  },
-  "arduino:renesas_uno:unor4wifi": {
-    "moduleName": "ESP32-S3",
-    "versions": ["0.1.0", "0.2.0"]
   }
 }
