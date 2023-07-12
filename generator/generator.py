@@ -26,6 +26,42 @@ from pathlib import Path
 DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 
 
+# create a different dictionary for new boards
+def create_boards_dictionary(new):
+    boards = {
+        "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
+        "arduino:samd:mkrwifi1010": {
+            "fqbn": "arduino:samd:mkrwifi1010",
+            "firmware": [],
+        },
+        "arduino:samd:nano_33_iot": {
+            "fqbn": "arduino:samd:nano_33_iot",
+            "firmware": [],
+        },
+        "arduino:samd:mkrvidor4000": {
+            "fqbn": "arduino:samd:mkrvidor4000",
+            "firmware": [],
+        },
+        "arduino:megaavr:uno2018": {"fqbn": "arduino:megaavr:uno2018", "firmware": []},
+        "arduino:mbed_nano:nanorp2040connect": {
+            "fqbn": "arduino:mbed_nano:nanorp2040connect",
+            "firmware": [],
+        },
+    }
+    if new:
+        boards = {
+            "arduino:renesas_uno:unor4wifi": {
+                "fqbn": "arduino:renesas_uno:unor4wifi",
+                "firmware": [],
+                # "uploader_plugin" and "additional_tools" need to be hard coded because
+                # there is no way to retrieve them dinamically
+                "uploader_plugin": "arduino:uno-r4-wifi-fwuploader@1.0.0",
+                "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
+            },
+        }
+    return boards
+
+
 # handle firmware name
 def get_firmware_file(module, simple_fqbn, version):
     firmware_full_path = Path(__file__).parent.parent / "firmwares" / module / version
@@ -233,38 +269,7 @@ def generate_boards_json(input_data, arduino_cli_path, new_boards):
         "arduino:mbed_nano:nanorp2040connect",
     ]
 
-    boards = {
-        "arduino:renesas_uno:unor4wifi": {
-            "fqbn": "arduino:renesas_uno:unor4wifi",
-            "firmware": [],
-            # "uploader_plugin" and "additional_tools" need to be hard coded because
-            # there is no way to retrieve them dinamically
-            "uploader_plugin": "arduino:uno-r4-wifi-fwuploader@1.0.0",
-            "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
-        },
-    }
-
-    if not new_boards:
-        boards = {
-            "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
-            "arduino:samd:mkrwifi1010": {
-                "fqbn": "arduino:samd:mkrwifi1010",
-                "firmware": [],
-            },
-            "arduino:samd:nano_33_iot": {
-                "fqbn": "arduino:samd:nano_33_iot",
-                "firmware": [],
-            },
-            "arduino:samd:mkrvidor4000": {
-                "fqbn": "arduino:samd:mkrvidor4000",
-                "firmware": [],
-            },
-            "arduino:megaavr:uno2018": {"fqbn": "arduino:megaavr:uno2018", "firmware": []},
-            "arduino:mbed_nano:nanorp2040connect": {
-                "fqbn": "arduino:mbed_nano:nanorp2040connect",
-                "firmware": [],
-            },
-        }
+    boards = create_boards_dictionary(new_boards)
 
     # Gets the installed cores
     res = arduino_cli(cli_path=arduino_cli_path, args=["core", "list", "--format", "json"])
