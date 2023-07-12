@@ -56,8 +56,11 @@ jobs:
           cd $GITHUB_WORKSPACE
           task poetry:install-deps
 
-      - name: Generate index
+      - name: Generate plugin firmware index
         run: poetry run ./generator.py -a $(which arduino-cli)
+
+      - name: Generate module firmware index
+        run: poetry run ./generator.py -a $(which arduino-cli) --no-new
 
         # fix `gpg: signing failed: Inappropriate ioctl for device`
         # https://github.com/keybase/keybase-issues/issues/2798
@@ -69,7 +72,7 @@ jobs:
 
         # disable gpg pass prompt
         # https://stackoverflow.com/questions/49072403/suppress-the-passphrase-prompt-in-gpg-command
-      - name: sign the json
+      - name: sign the module firmware index json
         run: |
           gpg \
             --pinentry-mode=loopback \
@@ -77,8 +80,16 @@ jobs:
             --output boards/module_firmware_index.json.sig \
             --detach-sign boards/module_firmware_index.json
 
+      - name: sign the plugin firmware index json
+        run: |
+          gpg \
+            --pinentry-mode=loopback \
+            --passphrase "${{ secrets.PASSPHRASE }}" \
+            --output boards/plugin_firmware_index.json.sig \
+            --detach-sign boards/plugin_firmware_index.json
+
       - name: create the gzip
-        run: gzip --keep boards/module_firmware_index.json
+        run: gzip --keep boards/module_firmware_index.json boards/plugin_firmware_index.json
 
       - name: s3 sync
         run: |
