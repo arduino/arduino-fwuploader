@@ -96,3 +96,12 @@ func LoadCertificatesFromFile(certificateFile *paths.Path) ([]*x509.Certificate,
 		return nil, fmt.Errorf("cert format %s not supported, please use .pem or .cer", certificateFile.Ext())
 	}
 }
+
+// EncodeCertificateAsPEM returns the PEM encoding of the given certificate
+func EncodeCertificateAsPEM(cert *x509.Certificate) []byte {
+	pemBlock := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: cert.Raw,
+	}
+	return pem.EncodeToMemory(pemBlock)
+}

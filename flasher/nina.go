@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/binary"
-	"encoding/pem"
 	"fmt"
 	"io"
 	"time"
@@ -106,7 +105,7 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 			return err
 		}
 		for _, cert := range certs {
-			data := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+			data := certificates.EncodeCertificateAsPEM(cert)
 			certificatesData = append(certificatesData, data...)
 		}
 	}
@@ -118,7 +117,7 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 		if err != nil {
 			return err
 		}
-		data := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: rootCertificate.Raw})
+		data := certificates.EncodeCertificateAsPEM(rootCertificate)
 		certificatesData = append(certificatesData, data...)
 	}
 
