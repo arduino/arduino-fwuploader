@@ -55,7 +55,7 @@ def create_boards_dictionary(new):
                 "firmware": [],
                 # "uploader_plugin" and "additional_tools" need to be hard coded because
                 # there is no way to retrieve them dinamically
-                "uploader_plugin": "arduino:uno-r4-wifi-fwuploader@1.0.0",
+                "uploader_plugin": "arduino:uno-r4-wifi-fwuploader-plugin@1.0.0",
                 "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
             },
         }
