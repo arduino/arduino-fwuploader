@@ -21,8 +21,10 @@ package certificates
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
 
@@ -52,4 +54,45 @@ func ScrapeRootCertificatesFromURL(URL string) (*x509.Certificate, error) {
 
 	rootCertificate := peerCertificates[len(peerCertificates)-1]
 	return rootCertificate, nil
+}
+
+// LoadCertificatesFromFile read certificates from the given file. PEM and CER formats
+// are supported.
+func LoadCertificatesFromFile(certificateFile *paths.Path) ([]*x509.Certificate, error) {
+	data, err := certificateFile.ReadFile()
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	var res []*x509.Certificate
+	switch certificateFile.Ext() {
+	case ".cer":
+		cert, err := x509.ParseCertificate(data)
+		if err != nil {
+			logrus.Error(err)
+		}
+		res = append(res, cert)
+		return res, err
+
+	case ".pem":
+		for {
+			block, rest := pem.Decode(data)
+			if block == nil && len(rest) > 0 {
+				return nil, fmt.Errorf("invalid .pem data")
+			}
+			if block == nil {
+				return res, nil
+			}
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse certificate: %w", err)
+			}
+			res = append(res, cert)
+			if len(rest) == 0 {
+				return res, nil
+			}
+		}
+	default:
+		return nil, fmt.Errorf("cert format %s not supported, please use .pem or .cer", certificateFile.Ext())
+	}
 }

@@ -83,11 +83,17 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 		logrus.Infof("Converting and flashing certificate %s", certPath)
 		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
 
-		data, err := f.certificateFromFile(certPath)
+		certs, err := certificates.LoadCertificatesFromFile(certPath)
 		if err != nil {
 			return err
 		}
-		certificatesData = append(certificatesData, data...)
+		for _, cert := range certs {
+			data, err := f.getCertificateData(cert)
+			if err != nil {
+				return err
+			}
+			certificatesData = append(certificatesData, data...)
+		}
 	}
 
 	for _, URL := range URLs {
@@ -108,28 +114,6 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	logrus.Infof("Flashed all the things")
 	flasherOut.Write([]byte("Flashed all the things\n"))
 	return nil
-}
-
-func (f *WincFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {
-	data, err := certificateFile.ReadFile()
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	switch certificateFile.Ext() {
-	case ".cer":
-		cert, err := x509.ParseCertificate(data)
-		if err != nil {
-			logrus.Error(err)
-			return nil, err
-		}
-		return f.getCertificateData(cert)
-	case ".pem":
-		// the data is already encoded in pem format and we do not need to parse it.
-		return data, nil
-	default:
-		return nil, fmt.Errorf("cert format %s not supported, please use .pem or .cer", certificateFile.Ext())
-	}
 }
 
 func (f *WincFlasher) certificateFromURL(URL string) ([]byte, error) {

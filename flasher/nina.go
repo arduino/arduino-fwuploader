@@ -21,7 +21,6 @@ package flasher
 import (
 	"bytes"
 	"crypto/md5"
-	"crypto/x509"
 	"encoding/binary"
 	"encoding/pem"
 	"fmt"
@@ -102,11 +101,14 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 		logrus.Infof("Converting and flashing certificate %s", certPath)
 		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
 
-		data, err := f.certificateFromFile(certPath)
+		certs, err := certificates.LoadCertificatesFromFile(certPath)
 		if err != nil {
 			return err
 		}
-		certificatesData = append(certificatesData, data...)
+		for _, cert := range certs {
+			data := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+			certificatesData = append(certificatesData, data...)
+		}
 	}
 
 	for _, URL := range URLs {
@@ -139,29 +141,6 @@ func (f *NinaFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	logrus.Infof("Flashed all the things")
 	flasherOut.Write([]byte("Flashed all the things\n"))
 	return nil
-}
-
-func (f *NinaFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {
-	data, err := certificateFile.ReadFile()
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	switch certificateFile.Ext() {
-	case ".cer":
-		// the data needs to be formatted in PEM format
-		cert, err := x509.ParseCertificate(data)
-		if err != nil {
-			logrus.Error(err)
-			return nil, err
-		}
-		return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw}), nil
-	case ".pem":
-		// the data is already encoded in pem format and we do not need to parse it.
-		return data, nil
-	default:
-		return nil, fmt.Errorf("cert format %s not supported, please use .pem or .cer", certificateFile.Ext())
-	}
 }
 
 func (f *NinaFlasher) certificateFromURL(URL string) ([]byte, error) {
