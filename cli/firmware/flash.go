@@ -171,7 +171,7 @@ func updateFirmwareWithPlugin(uploader *plugin.FwUploader, fwPath *paths.Path) (
 		stdout = os.Stdout
 		stderr = os.Stderr
 	}
-	res, err := uploader.FlashFirmware(commonFlags.Address, fwPath, stdout, stderr)
+	res, err := uploader.FlashFirmware(commonFlags.Address, commonFlags.Fqbn, fwPath, stdout, stderr)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't update firmware: %s", err)
 	}

@@ -84,10 +84,13 @@ func (uploader *FwUploader) QueryAPIVersion() (int, error) {
 }
 
 // GetFirmwareVersion runs the plugin to obtain the version of the installed firmware
-func (uploader *FwUploader) GetFirmwareVersion(portAddress string, stdout, stderr io.Writer) (*GetFirmwareVersionResult, error) {
+func (uploader *FwUploader) GetFirmwareVersion(portAddress, fqbn string, stdout, stderr io.Writer) (*GetFirmwareVersionResult, error) {
 	args := []string{"firmware", "get-version"}
 	if portAddress != "" {
 		args = append(args, "-p", portAddress)
+	}
+	if fqbn != "" {
+		args = append(args, "-b", fqbn)
 	}
 	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
 
@@ -126,10 +129,13 @@ type GetFirmwareVersionResult struct {
 }
 
 // FlashFirmware runs the plugin to flash the selected firmware
-func (uploader *FwUploader) FlashFirmware(portAddress string, firmwarePath *paths.Path, stdout, stderr io.Writer) (*FlashFirmwareResult, error) {
+func (uploader *FwUploader) FlashFirmware(portAddress, fqbn string, firmwarePath *paths.Path, stdout, stderr io.Writer) (*FlashFirmwareResult, error) {
 	args := []string{"firmware", "flash", firmwarePath.String()}
 	if portAddress != "" {
 		args = append(args, "-p", portAddress)
+	}
+	if fqbn != "" {
+		args = append(args, "-b", fqbn)
 	}
 	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
 
