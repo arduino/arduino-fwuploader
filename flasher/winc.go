@@ -99,7 +99,11 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	for _, URL := range URLs {
 		logrus.Infof("Converting and flashing certificate from %s", URL)
 		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s\n", URL)))
-		data, err := f.certificateFromURL(URL)
+		rootCertificate, err := certificates.ScrapeRootCertificatesFromURL(URL)
+		if err != nil {
+			return err
+		}
+		data, err := f.getCertificateData(rootCertificate)
 		if err != nil {
 			return err
 		}
@@ -114,14 +118,6 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	logrus.Infof("Flashed all the things")
 	flasherOut.Write([]byte("Flashed all the things\n"))
 	return nil
-}
-
-func (f *WincFlasher) certificateFromURL(URL string) ([]byte, error) {
-	rootCertificate, err := certificates.ScrapeRootCertificatesFromURL(URL)
-	if err != nil {
-		return nil, err
-	}
-	return f.getCertificateData(rootCertificate)
 }
 
 func (f *WincFlasher) getCertificateData(cert *x509.Certificate) ([]byte, error) {
