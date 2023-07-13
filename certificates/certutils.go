@@ -77,6 +77,7 @@ func LoadCertificatesFromFile(certificateFile *paths.Path) ([]*x509.Certificate,
 	case ".pem":
 		for {
 			block, rest := pem.Decode(data)
+			data = rest
 			if block == nil && len(rest) > 0 {
 				return nil, fmt.Errorf("invalid .pem data")
 			}
