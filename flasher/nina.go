@@ -21,7 +21,6 @@ package flasher
 import (
 	"bytes"
 	"crypto/md5"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/binary"
 	"encoding/pem"
@@ -29,6 +28,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/arduino/arduino-fwuploader/certificates"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/serial"
@@ -165,30 +165,10 @@ func (f *NinaFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, 
 }
 
 func (f *NinaFlasher) certificateFromURL(URL string) ([]byte, error) {
-	config := &tls.Config{
-		InsecureSkipVerify: true,
-	}
-
-	conn, err := tls.Dial("tcp", URL, config)
+	rootCertificate, err := certificates.ScrapeRootCertificatesFromURL(URL)
 	if err != nil {
-		logrus.Error(err)
 		return nil, err
 	}
-	defer conn.Close()
-
-	if err := conn.Handshake(); err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	peerCertificates := conn.ConnectionState().PeerCertificates
-	if len(peerCertificates) == 0 {
-		err = fmt.Errorf("no peer certificates found at %s", URL)
-		logrus.Error(err)
-		return nil, err
-	}
-
-	rootCertificate := peerCertificates[len(peerCertificates)-1]
 	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: rootCertificate.Raw}), nil
 }
 
