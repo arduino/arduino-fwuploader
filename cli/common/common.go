@@ -41,7 +41,7 @@ import (
 // are loaded together with the main index.
 var AdditionalPackageIndexURLs []string
 
-// AdditionalFirmwareIndexURLs is a list of additional firwamre_index.json URLs that
+// AdditionalFirmwareIndexURLs is a list of additional module_firmware_index.json URLs that
 // are loaded together with the main index.
 var AdditionalFirmwareIndexURLs []string
 
