@@ -20,12 +20,14 @@ package certificates
 
 import (
 	"bytes"
+	"crypto/x509"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-fwuploader/certificates"
 	"github.com/arduino/arduino-fwuploader/cli/arguments"
 	"github.com/arduino/arduino-fwuploader/cli/common"
 	"github.com/arduino/arduino-fwuploader/cli/feedback"
@@ -80,17 +82,84 @@ func runFlash(certificateURLs, certificatePaths []string) {
 	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
 	var res *flasher.FlashResult
-	var err error
+	var flashErr error
 	if !board.IsPlugin() {
-		res, err = flashCertificates(board, uploadToolDir, certificateURLs, certificatePaths)
+		res, flashErr = flashCertificates(board, uploadToolDir, certificateURLs, certificatePaths)
 	} else {
-		// TODO
+		uploader, err := plugin.NewFWUploaderPlugin(uploadToolDir)
+		if err != nil {
+			feedback.Fatal(fmt.Sprintf("Could not open uploader plugin: %s", err), feedback.ErrGeneric)
+		}
+		res, flashErr = flashCertificatesWithPlugin(uploader, certificateURLs, certificatePaths)
 	}
 
 	feedback.PrintResult(res)
-	if err != nil {
+	if flashErr != nil {
 		os.Exit(int(feedback.ErrGeneric))
 	}
+}
+
+func flashCertificatesWithPlugin(uploader *plugin.FwUploader, certificateURLs, certificatePaths []string) (*flasher.FlashResult, error) {
+	tmp, err := paths.MkTempDir("", "")
+	if err != nil {
+		return nil, err
+	}
+	defer tmp.RemoveAll()
+	certsBundle := tmp.Join("certs.pem")
+
+	stdoutBuffer := &bytes.Buffer{}
+	stderrBuffer := &bytes.Buffer{}
+	var stdout io.Writer = stdoutBuffer
+	var stderr io.Writer = stdoutBuffer
+	if feedback.GetFormat() == feedback.Text {
+		stdout = io.MultiWriter(os.Stdout, stdoutBuffer)
+		stderr = io.MultiWriter(os.Stderr, stderrBuffer)
+	}
+
+	var allCerts []*x509.Certificate
+	for _, certPath := range certificatePaths {
+		logrus.Infof("Converting and flashing certificate %s", certPath)
+		stdout.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
+
+		certs, err := certificates.LoadCertificatesFromFile(paths.New(certPath))
+		if err != nil {
+			return nil, err
+		}
+		allCerts = append(allCerts, certs...)
+	}
+
+	for _, URL := range certificateURLs {
+		logrus.Infof("Converting and flashing certificate from %s", URL)
+		stdout.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s\n", URL)))
+		rootCert, err := certificates.ScrapeRootCertificatesFromURL(URL)
+		if err != nil {
+			return nil, err
+		}
+		allCerts = append(allCerts, rootCert)
+	}
+
+	f, err := certsBundle.Create()
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close() // Defer close if an error occurs while writing file
+	for _, cert := range allCerts {
+		_, err := f.Write(certificates.EncodeCertificateAsPEM(cert))
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := f.Close(); err != nil {
+		return nil, err
+	}
+
+	_, err = uploader.FlashCertificates(commonFlags.Address, commonFlags.Fqbn, certsBundle, stdout, stderr)
+	return &flasher.FlashResult{
+		Flasher: &flasher.ExecOutput{
+			Stdout: stdoutBuffer.String(),
+			Stderr: stderrBuffer.String(),
+		},
+	}, err
 }
 
 func flashCertificates(board *firmwareindex.IndexBoard, uploadToolDir *paths.Path, certificateURLs, certificatePaths []string) (*flasher.FlashResult, error) {

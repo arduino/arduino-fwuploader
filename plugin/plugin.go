@@ -190,3 +190,41 @@ func (uploader *FwUploader) exec(stdout, stderr io.Writer, args ...string) (*byt
 	execErr := proc.RunWithinContext(context.Background())
 	return stdoutBuffer, stderrBuffer, execErr
 }
+
+// FlashCertificates writes the given certificates bundle in PEM format.
+func (uploader *FwUploader) FlashCertificates(portAddress, fqbn string, certsPath *paths.Path, stdout, stderr io.Writer) (*FlashCertificatesResult, error) {
+	args := []string{"cert", "flash", certsPath.String()}
+	if portAddress != "" {
+		args = append(args, "-p", portAddress)
+	}
+	if fqbn != "" {
+		args = append(args, "-b", fqbn)
+	}
+	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
+
+	res := &FlashCertificatesResult{
+		Stdout: execStdout.Bytes(),
+		Stderr: execStderr.Bytes(),
+	}
+	fwErrorPrefix := "FLASH-CERTIFICATES-ERROR: "
+	for _, line := range strings.Split(execStdout.String(), "\n") {
+		if strings.HasPrefix(line, fwErrorPrefix) {
+			res.Error = strings.TrimPrefix(line, fwErrorPrefix)
+		}
+	}
+	if res.Error != "" {
+		if execErr != nil {
+			execErr = fmt.Errorf("%s: %w", res.Error, execErr)
+		} else {
+			execErr = errors.New(res.Error)
+		}
+	}
+	return res, execErr
+}
+
+// FlashCertificatesResult contains the result of GetFirmwareVersion command
+type FlashCertificatesResult struct {
+	Error  string
+	Stdout []byte
+	Stderr []byte
+}
