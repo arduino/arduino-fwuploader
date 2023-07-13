@@ -152,9 +152,7 @@ func (i *Index) GetBoard(fqbn string) *IndexBoard {
 
 // Overlaps returns true if the two IndexBoard represent the same board.
 func (b *IndexBoard) Overlaps(x *IndexBoard) bool {
-	return b.Fqbn == x.Fqbn &&
-		b.Module == x.Module &&
-		b.Name == x.Name
+	return b.Fqbn == x.Fqbn && b.Module == x.Module
 }
 
 // GetFirmware returns the specified IndexFirmware version for this board.
