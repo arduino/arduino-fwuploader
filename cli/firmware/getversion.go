@@ -89,7 +89,7 @@ func getVersionWithPlugin(uploader *plugin.FwUploader) *flasher.FlashResult {
 		stdout = os.Stdout
 		stderr = os.Stderr
 	}
-	res, err := uploader.GetFirmwareVersion(commonFlags.Address, commonFlags.Fqbn, stdout, stderr)
+	res, err := uploader.GetFirmwareVersion(commonFlags.Address, commonFlags.Fqbn, globals.LogLevel, globals.Verbose, stdout, stderr)
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Couldn't get firmware version: %s", err), feedback.ErrGeneric)
 	}

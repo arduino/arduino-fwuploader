@@ -153,7 +153,7 @@ func flashCertificatesWithPlugin(uploader *plugin.FwUploader, certificateURLs, c
 		return nil, err
 	}
 
-	_, err = uploader.FlashCertificates(commonFlags.Address, commonFlags.Fqbn, certsBundle, stdout, stderr)
+	_, err = uploader.FlashCertificates(commonFlags.Address, commonFlags.Fqbn, globals.LogLevel, globals.Verbose, certsBundle, stdout, stderr)
 	return &flasher.FlashResult{
 		Flasher: &flasher.ExecOutput{
 			Stdout: stdoutBuffer.String(),
