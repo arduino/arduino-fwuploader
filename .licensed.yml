@@ -2,6 +2,11 @@
 sources:
   go: true
 
+reviewed:
+  go:
+    - golang.org/x/exp/constraints
+    - golang.org/x/exp/slices
+
 apps:
   - source_path: ./
 
