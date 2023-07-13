@@ -42,7 +42,10 @@ type FwUploader struct {
 func NewFWUploaderPlugin(pluginDir *paths.Path) (*FwUploader, error) {
 	files, err := pluginDir.ReadDirRecursiveFiltered(
 		paths.FilterNames(),
-		paths.FilterOutDirectories(),
+		paths.AndFilter(
+			paths.FilterOutDirectories(),
+			paths.FilterOutPrefixes("LICENSE"),
+		),
 	)
 	if err != nil {
 		return nil, err
