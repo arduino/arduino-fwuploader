@@ -84,13 +84,19 @@ func (uploader *FwUploader) QueryAPIVersion() (int, error) {
 }
 
 // GetFirmwareVersion runs the plugin to obtain the version of the installed firmware
-func (uploader *FwUploader) GetFirmwareVersion(portAddress, fqbn string, stdout, stderr io.Writer) (*GetFirmwareVersionResult, error) {
+func (uploader *FwUploader) GetFirmwareVersion(portAddress, fqbn, LogLevel string, verbose bool, stdout, stderr io.Writer) (*GetFirmwareVersionResult, error) {
 	args := []string{"firmware", "get-version"}
 	if portAddress != "" {
 		args = append(args, "-p", portAddress)
 	}
 	if fqbn != "" {
 		args = append(args, "-b", fqbn)
+	}
+	if verbose {
+		args = append(args, "-v")
+	}
+	if LogLevel != "" {
+		args = append(args, "--log-level", LogLevel)
 	}
 	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
 
@@ -129,13 +135,19 @@ type GetFirmwareVersionResult struct {
 }
 
 // FlashFirmware runs the plugin to flash the selected firmware
-func (uploader *FwUploader) FlashFirmware(portAddress, fqbn string, firmwarePath *paths.Path, stdout, stderr io.Writer) (*FlashFirmwareResult, error) {
+func (uploader *FwUploader) FlashFirmware(portAddress, fqbn, LogLevel string, verbose bool, firmwarePath *paths.Path, stdout, stderr io.Writer) (*FlashFirmwareResult, error) {
 	args := []string{"firmware", "flash", firmwarePath.String()}
 	if portAddress != "" {
 		args = append(args, "-p", portAddress)
 	}
 	if fqbn != "" {
 		args = append(args, "-b", fqbn)
+	}
+	if verbose {
+		args = append(args, "-v")
+	}
+	if LogLevel != "" {
+		args = append(args, "--log-level", LogLevel)
 	}
 	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
 
@@ -192,13 +204,19 @@ func (uploader *FwUploader) exec(stdout, stderr io.Writer, args ...string) (*byt
 }
 
 // FlashCertificates writes the given certificates bundle in PEM format.
-func (uploader *FwUploader) FlashCertificates(portAddress, fqbn string, certsPath *paths.Path, stdout, stderr io.Writer) (*FlashCertificatesResult, error) {
+func (uploader *FwUploader) FlashCertificates(portAddress, fqbn, LogLevel string, verbose bool, certsPath *paths.Path, stdout, stderr io.Writer) (*FlashCertificatesResult, error) {
 	args := []string{"cert", "flash", certsPath.String()}
 	if portAddress != "" {
 		args = append(args, "-p", portAddress)
 	}
 	if fqbn != "" {
 		args = append(args, "-b", fqbn)
+	}
+	if verbose {
+		args = append(args, "-v")
+	}
+	if LogLevel != "" {
+		args = append(args, "--log-level", LogLevel)
 	}
 	execStdout, execStderr, execErr := uploader.exec(stdout, stderr, args...)
 
