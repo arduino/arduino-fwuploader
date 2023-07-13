@@ -33,19 +33,20 @@ import (
 	"github.com/arduino/arduino-fwuploader/flasher"
 	"github.com/arduino/arduino-fwuploader/indexes/download"
 	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
+	"github.com/arduino/arduino-fwuploader/plugin"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	commonFlags      arguments.Flags
-	certificateURLs  []string
-	certificatePaths []string
+	commonFlags arguments.Flags
 )
 
 // NewFlashCommand creates a new `flash` command
 func NewFlashCommand() *cobra.Command {
+	var certificateURLs []string
+	var certificatePaths []string
 	command := &cobra.Command{
 		Use:   "flash",
 		Short: "Flashes certificates to board.",
@@ -55,7 +56,9 @@ func NewFlashCommand() *cobra.Command {
 			"  " + os.Args[0] + " certificates flash -b arduino:samd:mkr1000 -a COM10 -u arduino.cc:443 -u google.com:443\n" +
 			"  " + os.Args[0] + " certificates flash -b arduino:samd:mkr1000 -a COM10 -f /home/me/VeriSign.cer -f /home/me/Digicert.cer\n",
 		Args: cobra.NoArgs,
-		Run:  runFlash,
+		Run: func(cmd *cobra.Command, args []string) {
+			runFlash(certificateURLs, certificatePaths)
+		},
 	}
 	commonFlags.AddToCommand(command)
 	command.Flags().StringSliceVarP(&certificateURLs, "url", "u", []string{}, "List of urls to download root certificates, e.g.: arduino.cc:443")
@@ -63,7 +66,7 @@ func NewFlashCommand() *cobra.Command {
 	return command
 }
 
-func runFlash(cmd *cobra.Command, args []string) {
+func runFlash(certificateURLs, certificatePaths []string) {
 	// at the end cleanup the fwuploader temp dir
 	defer globals.FwUploaderPath.RemoveAll()
 
@@ -79,7 +82,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	var res *flasher.FlashResult
 	var err error
 	if !board.IsPlugin() {
-		res, err = flashCertificates(board, uploadToolDir)
+		res, err = flashCertificates(board, uploadToolDir, certificateURLs, certificatePaths)
 	} else {
 		// TODO
 	}
@@ -90,7 +93,7 @@ func runFlash(cmd *cobra.Command, args []string) {
 	}
 }
 
-func flashCertificates(board *firmwareindex.IndexBoard, uploadToolDir *paths.Path) (*flasher.FlashResult, error) {
+func flashCertificates(board *firmwareindex.IndexBoard, uploadToolDir *paths.Path, certificateURLs, certificatePaths []string) (*flasher.FlashResult, error) {
 	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
