@@ -126,12 +126,12 @@ func downloadTool(pm *packagemanager.PackageManager, tool string) *paths.Path {
 	if toolRelease == nil {
 		feedback.Fatal(fmt.Sprintf("Error getting upload tool %s", tool), feedback.ErrGeneric)
 	}
-	uploadToolDir, err := download.DownloadTool(toolRelease)
+	toolDir, err := download.DownloadTool(toolRelease)
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error downloading tool %s: %s", tool, err), feedback.ErrGeneric)
 	}
-	logrus.Debugf("upload tool downloaded in %s", uploadToolDir.String())
-	return uploadToolDir
+	logrus.Debugf("upload tool downloaded in %s", toolDir.String())
+	return toolDir
 }
 
 // FlashSketch is the business logic that handles the flashing procedure,
