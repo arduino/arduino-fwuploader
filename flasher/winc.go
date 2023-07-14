@@ -21,7 +21,6 @@ package flasher
 import (
 	"bytes"
 	"crypto/rsa"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/binary"
 	"errors"
@@ -29,6 +28,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/arduino/arduino-fwuploader/certificates"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/serial"
@@ -79,28 +79,35 @@ func (f *WincFlasher) FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writ
 
 func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error {
 	var certificatesData []byte
-	certificatesNumber := 0
 	for _, certPath := range *certificatePaths {
 		logrus.Infof("Converting and flashing certificate %s", certPath)
 		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
 
-		data, err := f.certificateFromFile(certPath)
+		certs, err := certificates.LoadCertificatesFromFile(certPath)
 		if err != nil {
 			return err
 		}
-		certificatesData = append(certificatesData, data...)
-		certificatesNumber++
+		for _, cert := range certs {
+			data, err := f.getCertificateData(cert)
+			if err != nil {
+				return err
+			}
+			certificatesData = append(certificatesData, data...)
+		}
 	}
 
 	for _, URL := range URLs {
 		logrus.Infof("Converting and flashing certificate from %s", URL)
 		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s\n", URL)))
-		data, err := f.certificateFromURL(URL)
+		rootCertificate, err := certificates.ScrapeRootCertificatesFromURL(URL)
+		if err != nil {
+			return err
+		}
+		data, err := f.getCertificateData(rootCertificate)
 		if err != nil {
 			return err
 		}
 		certificatesData = append(certificatesData, data...)
-		certificatesNumber++
 	}
 
 	certificatesOffset := 0x4000
@@ -111,55 +118,6 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 	logrus.Infof("Flashed all the things")
 	flasherOut.Write([]byte("Flashed all the things\n"))
 	return nil
-}
-
-func (f *WincFlasher) certificateFromFile(certificateFile *paths.Path) ([]byte, error) {
-	data, err := certificateFile.ReadFile()
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	switch certificateFile.Ext() {
-	case ".cer":
-		cert, err := x509.ParseCertificate(data)
-		if err != nil {
-			logrus.Error(err)
-			return nil, err
-		}
-		return f.getCertificateData(cert)
-	case ".pem":
-		// the data is already encoded in pem format and we do not need to parse it.
-		return data, nil
-	default:
-		return nil, fmt.Errorf("cert format %s not supported, please use .pem or .cer", certificateFile.Ext())
-	}
-}
-
-func (f *WincFlasher) certificateFromURL(URL string) ([]byte, error) {
-	config := &tls.Config{
-		InsecureSkipVerify: true,
-	}
-
-	conn, err := tls.Dial("tcp", URL, config)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	defer conn.Close()
-
-	if err := conn.Handshake(); err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	peerCertificates := conn.ConnectionState().PeerCertificates
-	if len(peerCertificates) == 0 {
-		err = fmt.Errorf("no peer certificates found at %s", URL)
-		logrus.Error(err)
-		return nil, err
-	}
-	rootCertificate := peerCertificates[len(peerCertificates)-1]
-	return f.getCertificateData(rootCertificate)
 }
 
 func (f *WincFlasher) getCertificateData(cert *x509.Certificate) ([]byte, error) {

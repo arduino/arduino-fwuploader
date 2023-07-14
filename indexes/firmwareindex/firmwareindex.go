@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
+	"golang.org/x/exp/slices"
 )
 
 // Index represents Boards struct as seen from module_firmware_index.json file.
@@ -38,40 +39,45 @@ type Index struct {
 
 // IndexBoard represents a single entry from module_firmware_index.json file.
 type IndexBoard struct {
-	Fqbn            string                `json:"fqbn,required"`
-	Firmwares       []*IndexFirmware      `json:"firmware,required"`
-	LoaderSketch    *IndexSketch          `json:"loader_sketch,required"`
+	Fqbn      string           `json:"fqbn"`
+	Firmwares []*IndexFirmware `json:"firmware"`
+	Module    string           `json:"module"`
+	Name      string           `json:"name"`
+
+	// Fields required for integrated uploaders (deprecated)
+	LoaderSketch    *IndexSketch          `json:"loader_sketch"`
 	VersionSketch   *IndexSketch          `json:"version_sketch"`
-	Module          string                `json:"module,required"`
-	Name            string                `json:"name,required"`
-	Uploader        string                `json:"uploader,required"`
+	Uploader        string                `json:"uploader"`
 	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
 	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
-	UploaderCommand *IndexUploaderCommand `json:"uploader.command,required"`
-	LatestFirmware  *IndexFirmware        `json:"-"`
+	UploaderCommand *IndexUploaderCommand `json:"uploader.command"`
+
+	// Fields required for plugin uploaders
+	UploaderPlugin  string   `json:"uploader_plugin"`
+	AdditionalTools []string `json:"additional_tools"`
 }
 
 // IndexUploaderCommand represents the command-line to use for different OS
 type IndexUploaderCommand struct {
-	Linux   string `json:"linux,required"`
+	Linux   string `json:"linux"`
 	Windows string `json:"windows"`
 	Macosx  string `json:"macosx"`
 }
 
 // IndexFirmware represents a single Firmware version from module_firmware_index.json file.
 type IndexFirmware struct {
-	Version  *semver.RelaxedVersion `json:"version,required"`
-	URL      string                 `json:"url,required"`
-	Checksum string                 `json:"checksum,required"`
-	Size     json.Number            `json:"size,required"`
-	Module   string                 `json:"module,required"`
+	Version  *semver.RelaxedVersion `json:"version"`
+	URL      string                 `json:"url"`
+	Checksum string                 `json:"checksum"`
+	Size     json.Number            `json:"size"`
+	Module   string                 `json:"module"`
 }
 
 // IndexSketch represents a sketch used to manage firmware on a board.
 type IndexSketch struct {
-	URL      string      `json:"url,required"`
-	Checksum string      `json:"checksum,required"`
-	Size     json.Number `json:"size,required"`
+	URL      string      `json:"url"`
+	Checksum string      `json:"checksum"`
+	Size     json.Number `json:"size"`
 }
 
 // LoadIndex reads a module_firmware_index.json from a file and returns the corresponding Index structure.
@@ -117,17 +123,21 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	index.IsTrusted = true
+	return &index, nil
+}
 
-	// Determine latest firmware for each board
-	for _, board := range index.Boards {
-		for _, firmware := range board.Firmwares {
-			if board.LatestFirmware == nil || firmware.Version.GreaterThan(board.LatestFirmware.Version) {
-				board.LatestFirmware = firmware
-			}
+// MergeWith merge this index with the other given index (the boards from the other index)
+// are added to this one.
+func (i *Index) MergeWith(j *Index) {
+	for _, boardToAdd := range j.Boards {
+		idx := slices.IndexFunc(i.Boards, func(x *IndexBoard) bool { return x.Overlaps(boardToAdd) })
+		if idx == -1 {
+			i.Boards = append(i.Boards, boardToAdd)
+		} else {
+			i.Boards[idx] = boardToAdd
 		}
 	}
-
-	return &index, nil
+	i.IsTrusted = i.IsTrusted && j.IsTrusted
 }
 
 // GetBoard returns the IndexBoard for the given FQBN
@@ -138,6 +148,11 @@ func (i *Index) GetBoard(fqbn string) *IndexBoard {
 		}
 	}
 	return nil
+}
+
+// Overlaps returns true if the two IndexBoard represent the same board.
+func (b *IndexBoard) Overlaps(x *IndexBoard) bool {
+	return b.Fqbn == x.Fqbn && b.Module == x.Module
 }
 
 // GetFirmware returns the specified IndexFirmware version for this board.
@@ -161,4 +176,20 @@ func (b *IndexBoard) GetUploaderCommand() string {
 	}
 	// The linux uploader command is considere to be the generic one
 	return b.UploaderCommand.Linux
+}
+
+// LatestFirmware returns the latest firmware version for the IndexBoard
+func (b *IndexBoard) LatestFirmware() *IndexFirmware {
+	var latest *IndexFirmware
+	for _, firmware := range b.Firmwares {
+		if latest == nil || firmware.Version.GreaterThan(latest.Version) {
+			latest = firmware
+		}
+	}
+	return latest
+}
+
+// IsPlugin returns true if the IndexBoard uses the plugin system
+func (b *IndexBoard) IsPlugin() bool {
+	return b.UploaderPlugin != ""
 }

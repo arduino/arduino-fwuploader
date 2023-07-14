@@ -24,10 +24,11 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-fwuploader/cli/certificates"
-	"github.com/arduino/arduino-fwuploader/cli/firmware"
-	"github.com/arduino/arduino-fwuploader/cli/version"
-
+	"github.com/arduino/arduino-fwuploader/cli/common"
 	"github.com/arduino/arduino-fwuploader/cli/feedback"
+	"github.com/arduino/arduino-fwuploader/cli/firmware"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
+	"github.com/arduino/arduino-fwuploader/cli/version"
 	v "github.com/arduino/arduino-fwuploader/version"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
@@ -36,11 +37,11 @@ import (
 )
 
 var (
-	outputFormat string
-	verbose      bool
-	logFile      string
-	logFormat    string
-	logLevel     string
+	outputFormat           string
+	logFile                string
+	logFormat              string
+	additionalFirmwareURLs []string
+	additionalPackageURLs  []string
 )
 
 func NewCommand() *cobra.Command {
@@ -61,9 +62,10 @@ func NewCommand() *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
 	rootCmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written")
 	rootCmd.PersistentFlags().StringVar(&logFormat, "log-format", "", "The output format for the logs, can be {text|json}.")
-	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
-
+	rootCmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", "info", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
+	rootCmd.PersistentFlags().BoolVarP(&globals.Verbose, "verbose", "v", false, "Print the logs on the standard output.")
+	rootCmd.PersistentFlags().StringArrayVarP(&additionalFirmwareURLs, "additional-fw-index", "F", nil, "Additional firmwares index URLs (useful for testing purposes)")
+	rootCmd.PersistentFlags().StringArrayVarP(&additionalPackageURLs, "additional-packages-index", "P", nil, "Additional packages index URLs (useful for testing purposes)")
 	return rootCmd
 }
 
@@ -84,7 +86,6 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-
 	// Prepare the Feedback system
 	// check the right output format was passed
 	format, found := feedback.ParseOutputFormat(outputFormat)
@@ -94,7 +95,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	feedback.SetFormat(format)
 
 	// Prepare logging
-	if verbose {
+	if globals.Verbose {
 		// if we print on stdout, do it in full colors
 		logrus.SetOutput(colorable.NewColorableStdout())
 		logrus.SetFormatter(&logrus.TextFormatter{
@@ -125,11 +126,15 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 
 	// Configure logging filter
-	if lvl, found := toLogLevel(logLevel); !found {
-		feedback.Fatal(fmt.Sprintf("Invalid option for --log-level: %s", logLevel), feedback.ErrBadArgument)
+	if lvl, found := toLogLevel(globals.LogLevel); !found {
+		feedback.Fatal(fmt.Sprintf("Invalid option for --log-level: %s", globals.LogLevel), feedback.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
 	}
 
 	logrus.Info(v.VersionInfo)
+
+	// Setup additional indexes
+	common.AdditionalPackageIndexURLs = append(common.AdditionalPackageIndexURLs, additionalPackageURLs...)
+	common.AdditionalFirmwareIndexURLs = append(common.AdditionalFirmwareIndexURLs, additionalFirmwareURLs...)
 }

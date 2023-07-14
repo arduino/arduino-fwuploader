@@ -21,30 +21,19 @@ package indexes
 import (
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
-	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetToolRelease(t *testing.T) {
-	indexFile := paths.New("testdata/package_index.json")
-	index, err := packageindex.LoadIndexNoSign(indexFile)
-	require.NoError(t, err)
-	toolRelease := GetToolRelease(index, "arduino:bossac@1.7.0-arduino3")
-
-	require.Equal(t, toolRelease.Version.String(), "1.7.0-arduino3")
-	require.Equal(t, toolRelease.Tool.Name, "bossac")
-	require.NotEmpty(t, toolRelease.Flavors)
-}
-
 func TestGetPackageIndex(t *testing.T) {
-	index, err := GetPackageIndex()
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "")
+	err := GetPackageIndex(pmb, globals.PackageIndexGZURL)
 	require.NoError(t, err)
-	require.NotNil(t, index)
 }
 
 func TestGetFirmwareIndex(t *testing.T) {
-	index, err := GetFirmwareIndex()
+	index, err := GetFirmwareIndex(globals.ModuleFirmwareIndexGZURL, true)
 	require.NoError(t, err)
 	require.NotNil(t, index)
 }

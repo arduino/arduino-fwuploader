@@ -54,8 +54,8 @@ func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 		return nil, err
 	}
 	downloadsDir := globals.FwUploaderPath.Join("downloads")
-	archivePath := downloadsDir.Join(resource.ArchiveFileName)
-	if err := archivePath.Parent().MkdirAll(); err != nil {
+	archivePath, err := resource.ArchivePath(downloadsDir)
+	if err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
@@ -287,6 +287,8 @@ func verifyIndex(indexPath *paths.Path, URL *url.URL) error {
 	if index == "package_index.json.gz" {
 		valid, err = verifyPackageIndex(indexPath, signaturePath)
 	} else if index == "module_firmware_index.json.gz" {
+		valid, err = verifyModuleFirmwareIndex(indexPath, signaturePath)
+	} else if index == "plugin_firmware_index.json.gz" {
 		valid, err = verifyModuleFirmwareIndex(indexPath, signaturePath)
 	} else {
 		return fmt.Errorf("index %s not supported", URL.Path)

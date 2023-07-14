@@ -14,9 +14,12 @@ require (
 	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.10.2
 	go.bug.st/serial v1.3.2
+	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
+	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b // indirect
 	github.com/arduino/go-win32-utils v1.0.0 // indirect
 	github.com/cmaglie/pb v1.0.27 // indirect
 	github.com/codeclysm/extract/v3 v3.1.1 // indirect
@@ -63,5 +66,4 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
