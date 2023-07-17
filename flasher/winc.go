@@ -83,6 +83,16 @@ func (f *WincFlasher) FlashCertificates(certificatePaths *paths.PathList, URLs [
 		logrus.Infof("Converting and flashing certificate %s", certPath)
 		flasherOut.Write([]byte(fmt.Sprintf("Converting and flashing certificate %s\n", certPath)))
 
+		// Needed to mantain backword compatability
+		if certPath.Ext() == ".pem" {
+			certData, err := certPath.ReadFile()
+			if err != nil {
+				return err
+			}
+			certificatesData = append(certificatesData, certData...)
+			continue
+		}
+
 		certs, err := certificates.LoadCertificatesFromFile(certPath)
 		if err != nil {
 			return err
