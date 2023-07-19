@@ -10,5 +10,10 @@ You have several options to install the latest version of the Arduino Firmware U
 
 Follow the [Usage guide] to see how to use the most common CLI commands.
 
+## Plugins
+
+Read the [plugins] section to learn more on the topic.
+
 [installation]: installation.md
 [usage guide]: usage.md
+[plugins]: plugins.md
