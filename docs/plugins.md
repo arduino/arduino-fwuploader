@@ -1,9 +1,9 @@
 # Plugins
 
-A new plugin-system has been implemented in the fwuploader. A plugin is basically another executable/tool, specifically
-tailored for a board/family of boards, but with a well-defined user interface. Inside the plugin, there is all the
-business logic to support a board/family of boards. Every plugin implements the
-[interface](https://github.com/arduino/fwuploader-plugin-helper/blob/main/plugin.go#L28) contained in the
+A new plugin-system has been implemented in the Arduino Firmware Uploader. A plugin is basically another
+executable/tool, specifically tailored for a board/family of boards, but with a well-defined user interface. Inside the
+plugin, there is all the business logic to support a board/family of boards. Every plugin implements the
+[interface](https://pkg.go.dev/github.com/arduino/fwuploader-plugin-helper#Plugin) contained in the
 [fwuploader-plugin-helper](https://github.com/arduino/fwuploader-plugin-helper) repository.
 
 The fwuploader is still responsible for downloading the files required for the plugin to work:
@@ -35,10 +35,10 @@ Error:   × Main thread panicked.
         backtrace.
 ```
 
-#### The esp32 module does not go into download mode
+#### The ESP32 module does not go into download mode
 
-On Linux, the uno r4 must be plugged into a **hub usb** to make the flash process work. Otherwise, it won’t be able to
-reboot in download mode.
+On Linux, the UNO R4 WiFi must be plugged into a **USB hub** to make the flash process work. Otherwise, it won’t be able
+to reboot in download mode.
 
 ```bash
 $ arduino-fwuploader firmware flash -b arduino:renesas_uno:unor4wifi -a /dev/ttyACM0 -v --log-level debug
@@ -81,9 +81,11 @@ Error: reboot mode: upload commands sketch: setting DTR to OFF
 
 #### I flashed the certificates, but I am unable to reach the host
 
-The **whole certificate chain** is needed to make it work. Using `-u` flags (ex: `-u www.arduino.cc:443`) won’t work
-because it only downloads the root certificates. The solution is to use only the `-f` flag and provide a pem certificate
-containing the whole chain.
+The **whole certificate chain** is needed to make it work. Using
+[`-u` flags](commands/arduino-fwuploader_certificates_flash.md#options) (ex: `-u www.arduino.cc:443`) won’t work because
+it only downloads the root certificates. The solution is to use only the
+[`-f` flag](commands/arduino-fwuploader_certificates_flash.md#options) and provide a pem certificate containing the
+whole chain.
 
 #### My antivirus says that `espflash` is a threat
 
