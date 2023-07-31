@@ -289,25 +289,25 @@ def generate_boards_json(input_data, arduino_cli_path, new_boards):
         if fqbn in old_boards:
             boards[fqbn]["loader_sketch"] = create_precomp_sketch_data(simple_fqbn, "loader")
             boards[fqbn]["version_sketch"] = create_precomp_sketch_data(simple_fqbn, "getversion")
+            boards[fqbn].update(create_upload_data(fqbn, installed_cores))
+            # Gets the old_board name
+            res = arduino_cli(
+                cli_path=arduino_cli_path,
+                args=["board", "search", fqbn, "--format", "json"],
+            )
+            for board in json.loads(res):
+                if board["fqbn"] == fqbn:
+                    boards[fqbn]["name"] = board["name"]
+                    break
+
+        else:
+            boards[fqbn]["name"] = data["name"]
 
         for firmware_version in data["versions"]:
             module = data["moduleName"]
             firmware_file = get_firmware_file(module, simple_fqbn, firmware_version)
             boards[fqbn]["firmware"].append(create_firmware_data(firmware_file, module, firmware_version))
             boards[fqbn]["module"] = module
-
-        res = arduino_cli(
-            cli_path=arduino_cli_path,
-            args=["board", "search", fqbn, "--format", "json"],
-        )
-        # Gets the board name
-        for board in json.loads(res):
-            if board["fqbn"] == fqbn:
-                boards[fqbn]["name"] = board["name"]
-                break
-
-        if fqbn in old_boards:
-            boards[fqbn].update(create_upload_data(fqbn, installed_cores))
 
     boards_json = []
     for _, b in boards.items():
