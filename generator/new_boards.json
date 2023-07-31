@@ -7,6 +7,14 @@
     "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
     "module": "ESP32-S3"
   },
+  "arduino:renesas_portenta:portenta_c33": {
+    "moduleName": "ESP32-C3",
+    "versions": ["1.5.0"],
+    "name": "Arduino Portenta C33",
+    "uploader_plugin": "arduino:portenta-c33-fwuploader-plugin@1.0.0",
+    "additional_tools": ["arduino:esptool@3.3.3", "arduino:dfu-util@0.11.0-arduino5"],
+    "module": "ESP32-C3"
+  },
   "arduino:samd:mkrwifi1010": {
     "moduleName": "NINA",
     "versions": [
