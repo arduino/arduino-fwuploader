@@ -30,24 +30,12 @@ DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 def create_boards_dictionary(new):
     boards = {
         "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
-        "arduino:samd:mkrwifi1010": {
-            "fqbn": "arduino:samd:mkrwifi1010",
-            "firmware": [],
-        },
-        "arduino:samd:nano_33_iot": {
-            "fqbn": "arduino:samd:nano_33_iot",
-            "firmware": [],
-        },
         "arduino:samd:mkrvidor4000": {
             "fqbn": "arduino:samd:mkrvidor4000",
             "firmware": [],
-        },
-        "arduino:megaavr:uno2018": {"fqbn": "arduino:megaavr:uno2018", "firmware": []},
-        "arduino:mbed_nano:nanorp2040connect": {
-            "fqbn": "arduino:mbed_nano:nanorp2040connect",
-            "firmware": [],
-        },
+        }
     }
+    # the boards that support the plugin system (the ones present in the new_boards.json file)
     if new:
         boards = {
             "arduino:renesas_uno:unor4wifi": {
@@ -57,6 +45,30 @@ def create_boards_dictionary(new):
                 # there is no way to retrieve them dinamically
                 "uploader_plugin": "arduino:uno-r4-wifi-fwuploader-plugin@1.0.0",
                 "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
+            },
+            "arduino:samd:mkrwifi1010": {
+                "fqbn": "arduino:samd:mkrwifi1010",
+                "firmware": [],
+                "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+                "additional_tools": ["arduino:bossac@1.7.0-arduino3"],
+            },
+            "arduino:samd:nano_33_iot": {
+                "fqbn": "arduino:samd:nano_33_iot",
+                "firmware": [],
+                "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+                "additional_tools": ["arduino:bossac@1.7.0-arduino3"],
+            },
+            "arduino:megaavr:uno2018": {
+                "fqbn": "arduino:megaavr:uno2018",
+                "firmware": [],
+                "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+                "additional_tools": ["arduino:avrdude@6.3.0-arduino17"],
+            },
+            "arduino:mbed_nano:nanorp2040connect": {
+                "fqbn": "arduino:mbed_nano:nanorp2040connect",
+                "firmware": [],
+                "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+                "additional_tools": ["arduino:bossac@1.9.1-arduino2"],
             },
         }
     return boards
@@ -262,11 +274,7 @@ def generate_boards_json(input_data, arduino_cli_path, new_boards):
     # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
     old_boards = [
         "arduino:samd:mkr1000",
-        "arduino:samd:mkrwifi1010",
-        "arduino:samd:nano_33_iot",
         "arduino:samd:mkrvidor4000",
-        "arduino:megaavr:uno2018",
-        "arduino:mbed_nano:nanorp2040connect",
     ]
 
     boards = create_boards_dictionary(new_boards)
