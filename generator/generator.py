@@ -25,6 +25,7 @@ from pathlib import Path
 
 DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 
+
 # handle firmware name
 def get_firmware_file(module, simple_fqbn, version):
     firmware_full_path = Path(__file__).parent.parent / "firmwares" / module / version
@@ -227,7 +228,7 @@ def generate_boards_json(input_data, arduino_cli_path):
         "arduino:samd:mkrvidor4000": {
             "fqbn": "arduino:samd:mkrvidor4000",
             "firmware": [],
-        }
+        },
     }
 
     # Gets the installed cores
@@ -270,6 +271,7 @@ def generate_boards_json(input_data, arduino_cli_path):
 
     return boards_json
 
+
 def generate_new_boards_json(input_data):
     # init the boards dict
     boards = {}
@@ -294,6 +296,7 @@ def generate_new_boards_json(input_data):
         boards_json.append(b)
 
     return boards_json
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="generator.py")
