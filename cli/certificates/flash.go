@@ -54,9 +54,9 @@ func NewFlashCommand() *cobra.Command {
 		Short: "Flashes certificates to board.",
 		Long:  "Flashes specified certificates to board at specified address.",
 		Example: "" +
-			"  " + os.Args[0] + " certificates flash --fqbn arduino:samd:mkr1000 --address COM10 --url arduino.cc:443 --file /home/me/Digicert.cer\n" +
-			"  " + os.Args[0] + " certificates flash -b arduino:samd:mkr1000 -a COM10 -u arduino.cc:443 -u google.com:443\n" +
-			"  " + os.Args[0] + " certificates flash -b arduino:samd:mkr1000 -a COM10 -f /home/me/VeriSign.cer -f /home/me/Digicert.cer\n",
+			"  " + os.Args[0] + " certificates flash --fqbn arduino:samd:mkrwifi1010 --address COM10 --url arduino.cc:443 --file /home/me/Digicert.cer\n" +
+			"  " + os.Args[0] + " certificates flash -b arduino:renesas_uno:unor4wifi -a COM10 -u arduino.cc:443 -u google.com:443\n" +
+			"  " + os.Args[0] + " certificates flash -b arduino:samd:mkrwifi1010 -a COM10 -f /home/me/VeriSign.cer -f /home/me/Digicert.cer\n",
 		Args: cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			runFlash(certificateURLs, certificatePaths)

@@ -15,18 +15,18 @@ version are specified **the latest version of the firmware** will be used.
 
 If you want to flash a specific version of a firmware you can use the `-m` or `--module` flag
 
-For example to flash the WINC module present on the MKR 1000 with version 19.6.1 of the firmware you can run something
-like:
+For example to flash the ESP32-S3 module present on the UNO R4 WiFi with version 0.2.1 of the firmware you can run
+something like:
 
 ```
-./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1
+./arduino-fwuploader firmware flash -b arduino:renesas_uno:unor4wifi -a /dev/ttyACM0 -m ESP32-S3@0.2.1
 ```
 
 Or if you want upload a local firmware you can use the `-i` or `--input-file` flag followed by the path of that
 firmware.
 
 ```
-./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:samd:mkr1000 -a /dev/ttyACM0
+./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:renesas_uno:unor4wifi -a /dev/ttyACM0
 ```
 
 There is a retry mechanism because the flashing process uses serial communication, which sometimes can be a bit

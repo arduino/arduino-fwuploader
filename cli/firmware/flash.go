@@ -53,15 +53,15 @@ func NewFlashCommand() *cobra.Command {
 		Short: "Flashes firmwares to board.",
 		Long:  "Flashes specified module firmware to board at specified address. Module name and version can be omitted to install latest version.",
 		Example: "" +
-			"  " + os.Args[0] + " firmware flash --fqbn arduino:samd:mkr1000 --address COM10 --module WINC1500@19.5.2\n" +
-			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10 -m WINC15000\n" +
-			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10\n" +
-			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkr1000 -a COM10 -i firmware.bin\n",
+			"  " + os.Args[0] + " firmware flash --fqbn arduino:samd:mkrwifi1010 --address COM10 --module NINA@1.4.8\n" +
+			"  " + os.Args[0] + " firmware flash -b arduino:renesas_uno:unor4wifi -a COM10 -m ESP32-S3\n" +
+			"  " + os.Args[0] + " firmware flash -b arduino:renesas_uno:unor4wifi -a COM10\n" +
+			"  " + os.Args[0] + " firmware flash -b arduino:samd:mkrwifi1010 -a COM10 -i firmware.bin\n",
 		Args: cobra.NoArgs,
 		Run:  runFlash,
 	}
 	commonFlags.AddToCommand(command)
-	command.Flags().StringVarP(&module, "module", "m", "", "Firmware module ID, e.g.: WINC1500, NINA")
+	command.Flags().StringVarP(&module, "module", "m", "", "Firmware module ID, e.g.: ESP32-S3, NINA")
 	command.Flags().IntVar(&retries, "retries", 9, "Number of retries in case of upload failure (default 9)")
 	command.Flags().StringVarP(&fwFile, "input-file", "i", "", "Path of the firmware to upload")
 	return command

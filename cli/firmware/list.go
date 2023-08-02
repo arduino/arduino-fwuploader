@@ -35,7 +35,7 @@ func newListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "List available firmwares",
 		Long:    "Displays the availale firmwares, is it possible to filter results for a specific board.",
-		Example: "  " + os.Args[0] + " firmware list -b arduino:samd:mkr1000",
+		Example: "  " + os.Args[0] + " firmware list -b arduino:renesas_uno:unor4wifi",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			list(*fqbn)

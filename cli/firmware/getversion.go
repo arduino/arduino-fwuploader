@@ -46,8 +46,8 @@ func NewGetVersionCommand() *cobra.Command {
 		Short: "Gets the version of the firmware the board is using.",
 		Long:  "Flashes a sketch to a board to obtain the firmware version used by the board",
 		Example: "" +
-			"  " + os.Args[0] + " firmware get-version --fqbn arduino:samd:mkr1000 --address COM10\n" +
-			"  " + os.Args[0] + " firmware get-version -b arduino:samd:mkr1000 -a COM10\n",
+			"  " + os.Args[0] + " firmware get-version --fqbn arduino:samd:mkrwifi1010 --address COM10\n" +
+			"  " + os.Args[0] + " firmware get-version -b arduino:renesas_uno:unor4wifi -a COM10\n",
 		Args: cobra.NoArgs,
 		Run:  runGetVersion,
 	}
