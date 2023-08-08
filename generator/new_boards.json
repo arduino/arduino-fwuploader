@@ -88,7 +88,7 @@
     "versions": ["1.4.5", "1.4.6", "1.4.7", "1.4.8", "1.5.0"],
     "name": "Arduino Nano RP2040 Connect",
     "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
-    "additional_tools": ["arduino:bossac@1.9.1-arduino2"],
+    "additional_tools": ["arduino:rp2040tools@1.0.6"],
     "module": "NINA"
   }
 }
