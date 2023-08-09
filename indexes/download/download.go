@@ -316,7 +316,7 @@ func verifyPackageIndex(indexPath, signaturePath *paths.Path) (bool, error) {
 
 // verifyPluginFirmwareIndex verify if the signature is valid for the provided plugin firmware index
 func verifyPluginFirmwareIndex(indexPath, signaturePath *paths.Path) (bool, error) {
-	arduinoKeyringFile, err := globals.Keys.Open("keys/module_firmware_index_public.gpg.key")
+	arduinoKeyringFile, err := globals.Keys.Open("keys/plugin_firmware_index_public.gpg.key")
 	if err != nil {
 		return false, fmt.Errorf("could not find bundled signature keys: %s", err)
 	}

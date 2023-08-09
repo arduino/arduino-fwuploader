@@ -77,7 +77,7 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
-	arduinoKeyringFile, err := globals.Keys.Open("keys/module_firmware_index_public.gpg.key")
+	arduinoKeyringFile, err := globals.Keys.Open("keys/plugin_firmware_index_public.gpg.key")
 	if err != nil {
 		return nil, fmt.Errorf("could not find bundled signature keys: %s", err)
 
