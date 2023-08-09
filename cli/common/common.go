@@ -59,24 +59,19 @@ func InitIndexes() (*packagemanager.PackageManager, *firmwareindex.Index) {
 	}
 
 	// Load main firmware index and optional additional indexes
-	firmwareIndex, err := indexes.GetFirmwareIndex(globals.ModuleFirmwareIndexGZURL, true)
+	pluginFirmwareIndex, err := indexes.GetFirmwareIndex(globals.PluginFirmwareIndexGZURL, true)
 	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
-	}
-	if pluginIndex, err := indexes.GetFirmwareIndex(globals.PluginFirmwareIndexGZURL, true); err != nil {
 		feedback.Fatal(fmt.Sprintf("Can't load (plugin) firmware index: %s", err), feedback.ErrGeneric)
-	} else {
-		firmwareIndex.MergeWith(pluginIndex)
 	}
 	for _, additionalURL := range AdditionalFirmwareIndexURLs {
 		additionalIndex, err := indexes.GetFirmwareIndex(additionalURL, false)
 		if err != nil {
 			feedback.Fatal(fmt.Sprintf("Can't load firmware index: %s", err), feedback.ErrGeneric)
 		}
-		firmwareIndex.MergeWith(additionalIndex)
+		pluginFirmwareIndex.MergeWith(additionalIndex)
 	}
 
-	return pmbuilder.Build(), firmwareIndex
+	return pmbuilder.Build(), pluginFirmwareIndex
 }
 
 // CheckFlags runs a basic check, errors if the flags are not defined
