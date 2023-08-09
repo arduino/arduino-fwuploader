@@ -2,6 +2,93 @@
   "arduino:renesas_uno:unor4wifi": {
     "moduleName": "ESP32-S3",
     "versions": ["0.1.0", "0.2.0", "0.2.1"],
-    "name": "Arduino UNO R4 WiFi"
+    "name": "Arduino UNO R4 WiFi",
+    "uploader_plugin": "arduino:uno-r4-wifi-fwuploader-plugin@1.0.0",
+    "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
+    "module": "ESP32-S3"
+  },
+  "arduino:samd:mkrwifi1010": {
+    "moduleName": "NINA",
+    "versions": [
+      "1.0.0",
+      "1.1.0",
+      "1.2.1",
+      "1.2.2",
+      "1.2.3",
+      "1.2.4",
+      "1.3.0",
+      "1.4.0",
+      "1.4.1",
+      "1.4.2",
+      "1.4.3",
+      "1.4.4",
+      "1.4.5",
+      "1.4.6",
+      "1.4.7",
+      "1.4.8",
+      "1.5.0"
+    ],
+    "name": "Arduino MKR WiFi 1010",
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": ["arduino:bossac@1.7.0-arduino3"],
+    "module": "NINA"
+  },
+  "arduino:samd:nano_33_iot": {
+    "moduleName": "NINA",
+    "versions": [
+      "1.0.0",
+      "1.1.0",
+      "1.2.1",
+      "1.2.2",
+      "1.2.3",
+      "1.2.4",
+      "1.3.0",
+      "1.4.0",
+      "1.4.1",
+      "1.4.2",
+      "1.4.3",
+      "1.4.4",
+      "1.4.5",
+      "1.4.6",
+      "1.4.7",
+      "1.4.8",
+      "1.5.0"
+    ],
+    "name": "Arduino NANO 33 IoT",
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": ["arduino:bossac@1.7.0-arduino3"],
+    "module": "NINA"
+  },
+  "arduino:megaavr:uno2018": {
+    "moduleName": "NINA",
+    "versions": [
+      "1.2.1",
+      "1.2.2",
+      "1.2.3",
+      "1.2.4",
+      "1.3.0",
+      "1.4.0",
+      "1.4.1",
+      "1.4.2",
+      "1.4.3",
+      "1.4.4",
+      "1.4.5",
+      "1.4.6",
+      "1.4.7",
+      "1.4.8",
+      "1.5.0"
+    ],
+    "name": "Arduino Uno WiFi Rev2",
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": ["arduino:avrdude@6.3.0-arduino17"],
+    "module": "NINA"
+  },
+  "arduino:mbed_nano:nanorp2040connect": {
+    "moduleName": "NINA",
+    "versions": ["1.4.5", "1.4.6", "1.4.7", "1.4.8", "1.5.0"],
+    "name": "Arduino Nano RP2040 Connect",
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": ["arduino:rp2040tools@1.0.6"],
+    "module": "NINA"
   }
 }

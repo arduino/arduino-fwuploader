@@ -26,42 +26,6 @@ from pathlib import Path
 DOWNLOAD_URL = "https://downloads.arduino.cc/arduino-fwuploader"
 
 
-# create a different dictionary for new boards
-def create_boards_dictionary(new):
-    boards = {
-        "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
-        "arduino:samd:mkrwifi1010": {
-            "fqbn": "arduino:samd:mkrwifi1010",
-            "firmware": [],
-        },
-        "arduino:samd:nano_33_iot": {
-            "fqbn": "arduino:samd:nano_33_iot",
-            "firmware": [],
-        },
-        "arduino:samd:mkrvidor4000": {
-            "fqbn": "arduino:samd:mkrvidor4000",
-            "firmware": [],
-        },
-        "arduino:megaavr:uno2018": {"fqbn": "arduino:megaavr:uno2018", "firmware": []},
-        "arduino:mbed_nano:nanorp2040connect": {
-            "fqbn": "arduino:mbed_nano:nanorp2040connect",
-            "firmware": [],
-        },
-    }
-    if new:
-        boards = {
-            "arduino:renesas_uno:unor4wifi": {
-                "fqbn": "arduino:renesas_uno:unor4wifi",
-                "firmware": [],
-                # "uploader_plugin" and "additional_tools" need to be hard coded because
-                # there is no way to retrieve them dinamically
-                "uploader_plugin": "arduino:uno-r4-wifi-fwuploader-plugin@1.0.0",
-                "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
-            },
-        }
-    return boards
-
-
 # handle firmware name
 def get_firmware_file(module, simple_fqbn, version):
     firmware_full_path = Path(__file__).parent.parent / "firmwares" / module / version
@@ -258,18 +222,14 @@ def create_upload_data(fqbn, installed_cores):  # noqa: C901
     return upload_data
 
 
-def generate_boards_json(input_data, arduino_cli_path, new_boards):
-    # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
-    old_boards = [
-        "arduino:samd:mkr1000",
-        "arduino:samd:mkrwifi1010",
-        "arduino:samd:nano_33_iot",
-        "arduino:samd:mkrvidor4000",
-        "arduino:megaavr:uno2018",
-        "arduino:mbed_nano:nanorp2040connect",
-    ]
-
-    boards = create_boards_dictionary(new_boards)
+def generate_boards_json(input_data, arduino_cli_path):
+    boards = {
+        "arduino:samd:mkr1000": {"fqbn": "arduino:samd:mkr1000", "firmware": []},
+        "arduino:samd:mkrvidor4000": {
+            "fqbn": "arduino:samd:mkrvidor4000",
+            "firmware": [],
+        },
+    }
 
     # Gets the installed cores
     res = arduino_cli(cli_path=arduino_cli_path, args=["core", "list", "--format", "json"])
@@ -277,37 +237,59 @@ def generate_boards_json(input_data, arduino_cli_path, new_boards):
 
     # Verify all necessary cores are installed
     # TODO: Should we check that the latest version is installed too?
-    for fqbn in old_boards:
+    for fqbn, data in input_data.items():
         core_id = ":".join(fqbn.split(":")[:2])
         if core_id not in installed_cores:
             print(f"Board {fqbn} is not installed, install its core {core_id}")
             sys.exit(1)
 
-    for fqbn, data in input_data.items():
         simple_fqbn = fqbn.replace(":", ".")
 
-        if fqbn in old_boards:
-            boards[fqbn]["loader_sketch"] = create_precomp_sketch_data(simple_fqbn, "loader")
-            boards[fqbn]["version_sketch"] = create_precomp_sketch_data(simple_fqbn, "getversion")
-            boards[fqbn].update(create_upload_data(fqbn, installed_cores))
-            # Gets the old_board name
-            res = arduino_cli(
-                cli_path=arduino_cli_path,
-                args=["board", "search", fqbn, "--format", "json"],
-            )
-            for board in json.loads(res):
-                if board["fqbn"] == fqbn:
-                    boards[fqbn]["name"] = board["name"]
-                    break
-
-        else:
-            boards[fqbn]["name"] = data["name"]
+        # List of old boards that need precompiled sketch data and uploader information obtained through platform.txt.
+        boards[fqbn]["loader_sketch"] = create_precomp_sketch_data(simple_fqbn, "loader")
+        boards[fqbn]["version_sketch"] = create_precomp_sketch_data(simple_fqbn, "getversion")
+        boards[fqbn].update(create_upload_data(fqbn, installed_cores))
+        # Gets the old_board name
+        res = arduino_cli(
+            cli_path=arduino_cli_path,
+            args=["board", "search", fqbn, "--format", "json"],
+        )
+        for board in json.loads(res):
+            if board["fqbn"] == fqbn:
+                boards[fqbn]["name"] = board["name"]
+                break
 
         for firmware_version in data["versions"]:
             module = data["moduleName"]
             firmware_file = get_firmware_file(module, simple_fqbn, firmware_version)
             boards[fqbn]["firmware"].append(create_firmware_data(firmware_file, module, firmware_version))
             boards[fqbn]["module"] = module
+
+    boards_json = []
+    for _, b in boards.items():
+        boards_json.append(b)
+
+    return boards_json
+
+
+def generate_new_boards_json(input_data):
+    # init the boards dict
+    boards = {}
+    for fqbn, data in input_data.items():
+        simple_fqbn = fqbn.replace(":", ".")
+
+        # populate the boards dict
+        boards[fqbn] = {}
+        boards[fqbn]["fqbn"] = fqbn
+        module = data["moduleName"]
+        boards[fqbn]["firmware"] = []
+        for firmware_version in data["versions"]:
+            firmware_file = get_firmware_file(module, simple_fqbn, firmware_version)
+            boards[fqbn]["firmware"].append(create_firmware_data(firmware_file, module, firmware_version))
+        boards[fqbn]["uploader_plugin"] = data["uploader_plugin"]
+        boards[fqbn]["additional_tools"] = data["additional_tools"]
+        boards[fqbn]["module"] = module
+        boards[fqbn]["name"] = data["name"]
 
     boards_json = []
     for _, b in boards.items():
@@ -345,7 +327,10 @@ if __name__ == "__main__":
     with open(input_file, "r") as f:
         boards = json.load(f)
 
-    boards_json = generate_boards_json(boards, args.arduino_cli, args.new)
+    if args.new:
+        boards_json = generate_new_boards_json(boards)
+    else:
+        boards_json = generate_boards_json(boards, args.arduino_cli)
 
     Path("boards").mkdir(exist_ok=True)
 

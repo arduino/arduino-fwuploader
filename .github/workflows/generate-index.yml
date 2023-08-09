@@ -44,12 +44,8 @@ jobs:
           arduino-cli core update-index -v
           arduino-cli version
           arduino-cli core install arduino:samd@${{ env.SAMD_V }} -v
-          arduino-cli core install arduino:megaavr@${{ env.MEGAAVR_V }} -v
-          arduino-cli core install arduino:mbed_nano@${{ env.MBED_NANO_V }} -v
         env:
           SAMD_V: 1.8.11
-          MEGAAVR_V: 1.8.7
-          MBED_NANO_V: 2.4.1
 
       - name: Install dependencies
         run: |
