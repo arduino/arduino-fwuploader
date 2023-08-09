@@ -93,11 +93,6 @@ func GetBoard(firmwareIndex *firmwareindex.Index, fqbn string) *firmwareindex.In
 // DownloadRequiredToolsForBoard is an helper function that downloads the correct tool to flash a board,
 // it returns the path of the downloaded tool
 func DownloadRequiredToolsForBoard(pm *packagemanager.PackageManager, board *firmwareindex.IndexBoard) *paths.Path {
-	if !board.IsPlugin() {
-		// Just download the upload tool for integrated uploaders
-		return downloadTool(pm, board.Uploader)
-	}
-
 	// Download the plugin
 	toolDir := downloadTool(pm, board.UploaderPlugin)
 

@@ -21,7 +21,6 @@ package firmwareindex
 import (
 	"encoding/json"
 	"fmt"
-	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-fwuploader/cli/globals"
@@ -39,22 +38,12 @@ type Index struct {
 
 // IndexBoard represents a single entry from module_firmware_index.json file.
 type IndexBoard struct {
-	Fqbn      string           `json:"fqbn"`
-	Firmwares []*IndexFirmware `json:"firmware"`
-	Module    string           `json:"module"`
-	Name      string           `json:"name"`
-
-	// Fields required for integrated uploaders (deprecated)
-	LoaderSketch    *IndexSketch          `json:"loader_sketch"`
-	VersionSketch   *IndexSketch          `json:"version_sketch"`
-	Uploader        string                `json:"uploader"`
-	UploadTouch     bool                  `json:"upload.use_1200bps_touch"`
-	UploadWait      bool                  `json:"upload.wait_for_upload_port"`
-	UploaderCommand *IndexUploaderCommand `json:"uploader.command"`
-
-	// Fields required for plugin uploaders
-	UploaderPlugin  string   `json:"uploader_plugin"`
-	AdditionalTools []string `json:"additional_tools"`
+	Fqbn            string           `json:"fqbn"`
+	Firmwares       []*IndexFirmware `json:"firmware"`
+	Module          string           `json:"module"`
+	Name            string           `json:"name"`
+	UploaderPlugin  string           `json:"uploader_plugin"`
+	AdditionalTools []string         `json:"additional_tools"`
 }
 
 // IndexUploaderCommand represents the command-line to use for different OS
@@ -167,17 +156,6 @@ func (b *IndexBoard) GetFirmware(version string) *IndexFirmware {
 	return nil
 }
 
-// GetUploaderCommand returns the command to use for the upload
-func (b *IndexBoard) GetUploaderCommand() string {
-	if runtime.GOOS == "windows" && b.UploaderCommand.Windows != "" {
-		return b.UploaderCommand.Linux
-	} else if runtime.GOOS == "darwin" && b.UploaderCommand.Macosx != "" {
-		return b.UploaderCommand.Macosx
-	}
-	// The linux uploader command is considere to be the generic one
-	return b.UploaderCommand.Linux
-}
-
 // LatestFirmware returns the latest firmware version for the IndexBoard
 func (b *IndexBoard) LatestFirmware() *IndexFirmware {
 	var latest *IndexFirmware
@@ -187,9 +165,4 @@ func (b *IndexBoard) LatestFirmware() *IndexFirmware {
 		}
 	}
 	return latest
-}
-
-// IsPlugin returns true if the IndexBoard uses the plugin system
-func (b *IndexBoard) IsPlugin() bool {
-	return b.UploaderPlugin != ""
 }
