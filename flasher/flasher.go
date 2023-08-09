@@ -18,66 +18,6 @@
 
 package flasher
 
-import (
-	"fmt"
-	"io"
-	"time"
-
-	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
-	"go.bug.st/serial"
-)
-
-type CommandData struct {
-	Command byte
-	Address uint32
-	Value   uint32
-	Payload []byte
-}
-
-func (d CommandData) String() string {
-	return fmt.Sprintf("%+v, %+v, %+v, %+v", d.Command, d.Address, d.Value, d.Payload)
-}
-
-type FlasherError struct {
-	err string
-}
-
-func (e FlasherError) Error() string {
-	return e.err
-}
-
-type Flasher interface {
-	FlashFirmware(firmwareFile *paths.Path, flasherOut io.Writer) error
-	FlashCertificates(certificatePaths *paths.PathList, URLs []string, flasherOut io.Writer) error
-	Close() error
-	SetProgressCallback(func(progress int))
-
-	hello() error
-	write(address uint32, buffer []byte) error
-	flashChunk(offset int, buffer []byte) error
-	getMaximumPayloadSize() (uint16, error)
-	serialFillBuffer(buffer []byte) error
-	sendCommand(data CommandData) error
-}
-
-// OpenSerial opens a new serial connection with the specified portAddress
-func OpenSerial(portAddress string, baudRate int, readTimeout int) (serial.Port, error) {
-
-	port, err := serial.Open(portAddress, &serial.Mode{BaudRate: baudRate})
-	if err != nil {
-		return nil, err
-	}
-	logrus.Infof("Opened port %s at %d", portAddress, baudRate)
-
-	if err := port.SetReadTimeout(time.Duration(readTimeout) * time.Second); err != nil {
-		err = fmt.Errorf("could not set timeout on serial port: %s", err)
-		logrus.Error(err)
-		return nil, err
-	}
-	return port, nil
-}
-
 // FlashResult contains the result of the flashing procedure
 type FlashResult struct {
 	Programmer *ExecOutput `json:"programmer"`
