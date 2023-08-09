@@ -24,8 +24,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/arduino/arduino-fwuploader/certificates"
 	"github.com/arduino/arduino-fwuploader/cli/arguments"
@@ -33,8 +31,6 @@ import (
 	"github.com/arduino/arduino-fwuploader/cli/feedback"
 	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/flasher"
-	"github.com/arduino/arduino-fwuploader/indexes/download"
-	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-fwuploader/plugin"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -81,25 +77,19 @@ func runFlash(certificateURLs, certificatePaths []string) {
 	board := common.GetBoard(firmwareIndex, commonFlags.Fqbn)
 	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
-	var res *flasher.FlashResult
-	var flashErr error
-	if !board.IsPlugin() {
-		res, flashErr = flashCertificates(board, uploadToolDir, certificateURLs, certificatePaths)
-	} else {
-		uploader, err := plugin.NewFWUploaderPlugin(uploadToolDir)
-		if err != nil {
-			feedback.Fatal(fmt.Sprintf("Could not open uploader plugin: %s", err), feedback.ErrGeneric)
-		}
-		res, flashErr = flashCertificatesWithPlugin(uploader, certificateURLs, certificatePaths)
+	uploader, err := plugin.NewFWUploaderPlugin(uploadToolDir)
+	if err != nil {
+		feedback.Fatal(fmt.Sprintf("Could not open uploader plugin: %s", err), feedback.ErrGeneric)
 	}
 
+	res, flashErr := flashCertificates(uploader, certificateURLs, certificatePaths)
 	feedback.PrintResult(res)
 	if flashErr != nil {
 		os.Exit(int(feedback.ErrGeneric))
 	}
 }
 
-func flashCertificatesWithPlugin(uploader *plugin.FwUploader, certificateURLs, certificatePaths []string) (*flasher.FlashResult, error) {
+func flashCertificates(uploader *plugin.FwUploader, certificateURLs, certificatePaths []string) (*flasher.FlashResult, error) {
 	tmp, err := paths.MkTempDir("", "")
 	if err != nil {
 		return nil, err
@@ -158,66 +148,6 @@ func flashCertificatesWithPlugin(uploader *plugin.FwUploader, certificateURLs, c
 		Flasher: &flasher.ExecOutput{
 			Stdout: stdoutBuffer.String(),
 			Stderr: stderrBuffer.String(),
-		},
-	}, err
-}
-
-func flashCertificates(board *firmwareindex.IndexBoard, uploadToolDir *paths.Path, certificateURLs, certificatePaths []string) (*flasher.FlashResult, error) {
-	loaderSketchPath, err := download.DownloadSketch(board.LoaderSketch)
-	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
-	}
-	logrus.Debugf("loader sketch downloaded in %s", loaderSketchPath.String())
-
-	loaderSketch := strings.ReplaceAll(loaderSketchPath.String(), loaderSketchPath.Ext(), "")
-	programmerOut, programmerErr, err := common.FlashSketch(board, loaderSketch, uploadToolDir, commonFlags.Address)
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
-	}
-
-	// Wait a bit after flashing the loader sketch for the board to become
-	// available again.
-	logrus.Debug("sleeping for 3 sec")
-	time.Sleep(3 * time.Second)
-
-	// Get flasher depending on which module to use
-	var f flasher.Flasher
-	moduleName := board.Module
-
-	// This matches the baudrate used in the FirmwareUpdater.ino sketch
-	const baudRate = 1000000
-	switch moduleName {
-	default:
-		err = fmt.Errorf("unknown module: %s", moduleName)
-	}
-	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error during certificates flashing: %s", err), feedback.ErrGeneric)
-	}
-	defer f.Close()
-
-	// now flash the certificate
-	certFileList := paths.NewPathList(certificatePaths...)
-	flasherOut := new(bytes.Buffer)
-	flasherErr := new(bytes.Buffer)
-	if feedback.GetFormat() == feedback.JSON {
-		err = f.FlashCertificates(&certFileList, certificateURLs, flasherOut)
-		if err != nil {
-			flasherErr.Write([]byte(fmt.Sprintf("Error during certificates flashing: %s", err)))
-		}
-	} else {
-		err = f.FlashCertificates(&certFileList, certificateURLs, io.MultiWriter(flasherOut, os.Stdout))
-		if err != nil {
-			os.Stderr.Write([]byte(fmt.Sprintf("Error during certificates flashing: %s", err)))
-		}
-	}
-	return &flasher.FlashResult{
-		Programmer: &flasher.ExecOutput{
-			Stdout: programmerOut.String(),
-			Stderr: programmerErr.String(),
-		},
-		Flasher: &flasher.ExecOutput{
-			Stdout: flasherOut.String(),
-			Stderr: flasherErr.String(),
 		},
 	}, err
 }
