@@ -191,8 +191,6 @@ func flashCertificates(board *firmwareindex.IndexBoard, uploadToolDir *paths.Pat
 	case "NINA":
 		// we use address and not bootloaderPort because the board should not be in bootloader mode
 		f, err = flasher.NewNinaFlasher(commonFlags.Address, baudRate, 30)
-	case "WINC1500":
-		f, err = flasher.NewWincFlasher(commonFlags.Address, baudRate, 30)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
 	}

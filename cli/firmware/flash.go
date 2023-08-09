@@ -203,8 +203,6 @@ func updateFirmware(board *firmwareindex.IndexBoard, loaderSketch, moduleName st
 	case "NINA":
 		// we use address and not bootloaderPort because the board should not be in bootloader mode
 		f, err = flasher.NewNinaFlasher(commonFlags.Address, baudRate, 30)
-	case "WINC1500":
-		f, err = flasher.NewWincFlasher(commonFlags.Address, baudRate, 30)
 	default:
 		err = fmt.Errorf("unknown module: %s", moduleName)
 		feedback.Fatal(fmt.Sprintf("Error during firmware flashing: %s", err), feedback.ErrGeneric)
