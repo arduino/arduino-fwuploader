@@ -482,6 +482,21 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deprecated/" class="md-nav__link">
+        Deprecated boards
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -577,13 +592,13 @@ on the Arduino MKR WiFi 1010, run:</p>
 firmware uploader will take care of fetching everything is required to perform the update process. If no module and
 version are specified <strong>the latest version of the firmware</strong> will be used.</p>
 <p>If you want to flash a specific version of a firmware you can use the <code>-m</code> or <code>--module</code> flag</p>
-<p>For example to flash the WINC module present on the MKR 1000 with version 19.6.1 of the firmware you can run something
-like:</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -b arduino:samd:mkr1000 -a /dev/ttyACM0 -m WINC1500@19.6.1
+<p>For example to flash the ESP32-S3 module present on the UNO R4 WiFi with version 0.2.1 of the firmware you can run
+something like:</p>
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -b arduino:renesas_uno:unor4wifi -a /dev/ttyACM0 -m ESP32-S3@0.2.1
 </code></pre></div>
 <p>Or if you want upload a local firmware you can use the <code>-i</code> or <code>--input-file</code> flag followed by the path of that
 firmware.</p>
-<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:samd:mkr1000 -a /dev/ttyACM0
+<div class="highlight"><pre><span></span><code>./arduino-fwuploader firmware flash -i custom_fw.bin -b arduino:renesas_uno:unor4wifi -a /dev/ttyACM0
 </code></pre></div>
 <p>There is a retry mechanism because the flashing process uses serial communication, which sometimes can be a bit
 unreliable. The retry flag is set by default to 9 retries, but it's possible to overwrite it for whatever reason. For
