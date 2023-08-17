@@ -34,7 +34,7 @@ import (
 
 var defaultIndexGZURL = []string{
 	"https://downloads.arduino.cc/packages/package_index.json.gz",
-	"https://downloads.arduino.cc/arduino-fwuploader/boards/module_firmware_index.json.gz",
+	"https://downloads.arduino.cc/arduino-fwuploader/boards/plugin_firmware_index.json.gz",
 }
 
 func TestDownloadIndex(t *testing.T) {
@@ -130,7 +130,7 @@ func TestDownloadTool(t *testing.T) {
 
 func TestDownloadFirmware(t *testing.T) {
 	defer os.RemoveAll(globals.FwUploaderPath.String())
-	indexFile := paths.New("testdata/module_firmware_index.json")
+	indexFile := paths.New("testdata/plugin_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := firmwareindex.LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
@@ -139,17 +139,4 @@ func TestDownloadFirmware(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, firmwarePath)
 	require.FileExists(t, firmwarePath.String())
-}
-
-func TestDownloadLoaderSketch(t *testing.T) {
-	defer os.RemoveAll(globals.FwUploaderPath.String())
-	indexFile := paths.New("testdata/module_firmware_index.json")
-	t.Logf("testing with index: %s", indexFile)
-	index, e := firmwareindex.LoadIndexNoSign(indexFile)
-	require.NoError(t, e)
-	require.NotEmpty(t, index)
-	loaderPath, err := DownloadSketch(index.Boards[0].LoaderSketch)
-	require.NoError(t, err)
-	require.NotEmpty(t, loaderPath)
-	require.FileExists(t, loaderPath.String())
 }

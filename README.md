@@ -1,7 +1,7 @@
 # Arduino Firmware Uploader
 
 The Arduino Firmware Uploader is a tool made to update the firmware and/or add SSL certificates for any Arduino board
-equipped with WINC or NINA Wi-Fi module.
+equipped with ESP32-S3 or NINA Wi-Fi module.
 
 [![Test Go status](https://github.com/arduino/arduino-fwuploader/actions/workflows/test-go-task.yml/badge.svg)](https://github.com/arduino/arduino-fwuploader/actions/workflows/test-go-task.yml)
 [![Codecov](https://codecov.io/gh/arduino/arduino-fwuploader/branch/main/graph/badge.svg)](https://codecov.io/gh/arduino/arduino-fwuploader)

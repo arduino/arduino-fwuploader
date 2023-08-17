@@ -1,0 +1,457 @@
+[
+  {
+    "fqbn": "arduino:renesas_uno:unor4wifi",
+    "firmware": [
+      {
+        "version": "0.1.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/ESP32-S3/0.1.0/ESP32-S3.bin",
+        "checksum": "SHA-256:37c4f003373448504d49d5e3c1754d1d90b9bba3f8f3b529b435d331ca6900b1",
+        "size": "3951616",
+        "module": "ESP32-S3"
+      },
+      {
+        "version": "0.2.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/ESP32-S3/0.2.0/ESP32-S3.bin",
+        "checksum": "SHA-256:cb535826ba96d4f51bdac33d252c24bd9c692a7bef56710ec0431979cef09fc3",
+        "size": "3951616",
+        "module": "ESP32-S3"
+      },
+      {
+        "version": "0.2.1",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/ESP32-S3/0.2.1/ESP32-S3.bin",
+        "checksum": "SHA-256:8fad86ac6b44ba16853c41644338ba61e64383904c757b37d8adaeca9b76da03",
+        "size": "3951616",
+        "module": "ESP32-S3"
+      }
+    ],
+    "uploader_plugin": "arduino:uno-r4-wifi-fwuploader-plugin@1.0.0",
+    "additional_tools": [
+      "arduino:espflash@2.0.0",
+      "arduino:bossac@1.9.1-arduino5"
+    ],
+    "module": "ESP32-S3",
+    "name": "Arduino UNO R4 WiFi"
+  },
+  {
+    "fqbn": "arduino:samd:mkrwifi1010",
+    "firmware": [
+      {
+        "version": "1.0.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.0.0/NINA.bin",
+        "checksum": "SHA-256:3fe2cd90a0774e271624d42ab1b238d92c7495648e9918ad49dea3b20379905e",
+        "size": "736256",
+        "module": "NINA"
+      },
+      {
+        "version": "1.1.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.1.0/NINA.bin",
+        "checksum": "SHA-256:3b38f44a2e2e2d28995973f432bc2795f7c58a14e8638f55e3f024ffa499bcf8",
+        "size": "814080",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.1",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.1/NINA.bin",
+        "checksum": "SHA-256:3121bf4074fce0248946810c4d03f5d3fb1296cd4667aeb801b5d066e1b07ff3",
+        "size": "880640",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.2",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.2/NINA.bin",
+        "checksum": "SHA-256:71d0a49a4d79aa46dff6f434383133b4365581407846d709fbd961e2b770eb3c",
+        "size": "893952",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.3",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.3/NINA.bin",
+        "checksum": "SHA-256:9c908f33cc05831972833a274f65baf84da35c61fc081856959211ae3504c899",
+        "size": "893952",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.4",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.4/NINA.bin",
+        "checksum": "SHA-256:8b9c07abdaa5647c47466aa3c575e743495a295fd8db2fe91b7e28fe4135ffad",
+        "size": "917504",
+        "module": "NINA"
+      },
+      {
+        "version": "1.3.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.3.0/NINA.bin",
+        "checksum": "SHA-256:aa37c920df18aabc6544df93c64bea6b3b97841b68ff4a6a53d2b800b265d2b5",
+        "size": "986112",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.0/NINA.bin",
+        "checksum": "SHA-256:ca5ed0b5efd727dd3c507f39a744e171ce690ef17b116c0571f18d1fea17aa85",
+        "size": "1035264",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.1",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.1/NINA.bin",
+        "checksum": "SHA-256:b20f213bc886a95556fc5cec5003c7ebc617da83581ba20fb9f96db003063bbd",
+        "size": "1208320",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.2",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.2/NINA.bin",
+        "checksum": "SHA-256:61d0acbd3d2eeb45b6971448d9537f7c4fa27f264e20970ad5dfdd4cbfdd8ee0",
+        "size": "1125376",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.3",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.3/NINA.bin",
+        "checksum": "SHA-256:8c10c3ee3b8fb2ade3a650b41a3081566fc160e89b32e5d0ee040e63647692b8",
+        "size": "1125376",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.4",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.4/NINA.bin",
+        "checksum": "SHA-256:c8678e00ab9b2dc99cdc45ef577b77498dac802c3f5b99961da190374fddcef8",
+        "size": "1125376",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.5",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.5/NINA.bin",
+        "checksum": "SHA-256:7c2814c8f879e62d234d7ac3a9c28f9a2d1e1dbc3569bd740761ca796247a4c9",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.6",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.6/NINA.bin",
+        "checksum": "SHA-256:9f3df8446bb5038437bfd25b4fe06cb84b32bff29c5ba8eea852b49d059837f7",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.7",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.7/NINA.bin",
+        "checksum": "SHA-256:22cfa44b41bf4219a025b93a33752528735ba82cb638999ff4015c5579a46cef",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.8",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.8/NINA.bin",
+        "checksum": "SHA-256:6b75e118fedc8d1f45ac5667d59effe227d651f38e77ed2dac45f9a7593c07f6",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.5.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.5.0/NINA.bin",
+        "checksum": "SHA-256:12e915d44f3acfc26f2b9d266228afd11ad795fe37b7a4ba98a1eddc91a0eed1",
+        "size": "1129472",
+        "module": "NINA"
+      }
+    ],
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": [
+      "arduino:bossac@1.7.0-arduino3"
+    ],
+    "module": "NINA",
+    "name": "Arduino MKR WiFi 1010"
+  },
+  {
+    "fqbn": "arduino:samd:nano_33_iot",
+    "firmware": [
+      {
+        "version": "1.0.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.0.0/NINA.bin",
+        "checksum": "SHA-256:3fe2cd90a0774e271624d42ab1b238d92c7495648e9918ad49dea3b20379905e",
+        "size": "736256",
+        "module": "NINA"
+      },
+      {
+        "version": "1.1.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.1.0/NINA.bin",
+        "checksum": "SHA-256:3b38f44a2e2e2d28995973f432bc2795f7c58a14e8638f55e3f024ffa499bcf8",
+        "size": "814080",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.1",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.1/NINA.bin",
+        "checksum": "SHA-256:3121bf4074fce0248946810c4d03f5d3fb1296cd4667aeb801b5d066e1b07ff3",
+        "size": "880640",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.2",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.2/NINA.bin",
+        "checksum": "SHA-256:71d0a49a4d79aa46dff6f434383133b4365581407846d709fbd961e2b770eb3c",
+        "size": "893952",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.3",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.3/NINA.bin",
+        "checksum": "SHA-256:9c908f33cc05831972833a274f65baf84da35c61fc081856959211ae3504c899",
+        "size": "893952",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.4",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.4/NINA.bin",
+        "checksum": "SHA-256:8b9c07abdaa5647c47466aa3c575e743495a295fd8db2fe91b7e28fe4135ffad",
+        "size": "917504",
+        "module": "NINA"
+      },
+      {
+        "version": "1.3.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.3.0/NINA.bin",
+        "checksum": "SHA-256:aa37c920df18aabc6544df93c64bea6b3b97841b68ff4a6a53d2b800b265d2b5",
+        "size": "986112",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.0/NINA.bin",
+        "checksum": "SHA-256:ca5ed0b5efd727dd3c507f39a744e171ce690ef17b116c0571f18d1fea17aa85",
+        "size": "1035264",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.1",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.1/NINA.bin",
+        "checksum": "SHA-256:b20f213bc886a95556fc5cec5003c7ebc617da83581ba20fb9f96db003063bbd",
+        "size": "1208320",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.2",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.2/NINA.bin",
+        "checksum": "SHA-256:61d0acbd3d2eeb45b6971448d9537f7c4fa27f264e20970ad5dfdd4cbfdd8ee0",
+        "size": "1125376",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.3",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.3/NINA.bin",
+        "checksum": "SHA-256:8c10c3ee3b8fb2ade3a650b41a3081566fc160e89b32e5d0ee040e63647692b8",
+        "size": "1125376",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.4",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.4/NINA.bin",
+        "checksum": "SHA-256:c8678e00ab9b2dc99cdc45ef577b77498dac802c3f5b99961da190374fddcef8",
+        "size": "1125376",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.5",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.5/NINA.bin",
+        "checksum": "SHA-256:7c2814c8f879e62d234d7ac3a9c28f9a2d1e1dbc3569bd740761ca796247a4c9",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.6",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.6/NINA.bin",
+        "checksum": "SHA-256:9f3df8446bb5038437bfd25b4fe06cb84b32bff29c5ba8eea852b49d059837f7",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.7",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.7/NINA.bin",
+        "checksum": "SHA-256:22cfa44b41bf4219a025b93a33752528735ba82cb638999ff4015c5579a46cef",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.8",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.8/NINA.bin",
+        "checksum": "SHA-256:6b75e118fedc8d1f45ac5667d59effe227d651f38e77ed2dac45f9a7593c07f6",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.5.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.5.0/NINA.bin",
+        "checksum": "SHA-256:12e915d44f3acfc26f2b9d266228afd11ad795fe37b7a4ba98a1eddc91a0eed1",
+        "size": "1129472",
+        "module": "NINA"
+      }
+    ],
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": [
+      "arduino:bossac@1.7.0-arduino3"
+    ],
+    "module": "NINA",
+    "name": "Arduino NANO 33 IoT"
+  },
+  {
+    "fqbn": "arduino:megaavr:uno2018",
+    "firmware": [
+      {
+        "version": "1.2.1",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.1/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:bac23326dd4c3b6358ee88ff322da8c16e24e9917b8b0bbd18f663aacfb758cf",
+        "size": "880640",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.2",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.2/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:d1f496b185eff6b2ab2f839f6673afc80e1b3e3b2056fc8d9290a74895baf0e5",
+        "size": "893952",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.3",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.3/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:53668eb76be80fffdd67ced7cbb8ab231638b9ee428ae83568dfe48359008bb4",
+        "size": "893952",
+        "module": "NINA"
+      },
+      {
+        "version": "1.2.4",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.2.4/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:37b042cf759b52a96304c35af6a066038184533cc6256f795e92ed1b4fbda3d5",
+        "size": "917504",
+        "module": "NINA"
+      },
+      {
+        "version": "1.3.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.3.0/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:c538028f428b3fc219d2f7c0d9debacd07bababf43dbc28680ed452225ff4629",
+        "size": "986112",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.0/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:fe852e28eb0547a324069194dcce524b5a9f18adce2983bbe11a818a7ae8200a",
+        "size": "1041408",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.1",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.1/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:f11deb8ce5abe908353eebca7253c18359eb8ea2a601908d5cdb56bf035b4158",
+        "size": "1044480",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.2",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.2/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:7adff887267297dccc6c3ce77f41a986a23a1f7dfce9e8f3b70b3aa038371d47",
+        "size": "1132544",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.3",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.3/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:c026f967bd3add27716a1afaf729d669a5e093771098329bab2477980d6879b5",
+        "size": "1132544",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.4",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.4/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:6b7809357a57946638b271dd1b0b43a84cbcbea9b854d3ff093752fa0fe7b818",
+        "size": "1132544",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.5",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.5/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:b641c4f6f76ab4c7a529848da54f15b9b9857a9627920129a0a6f65edc465c67",
+        "size": "1133568",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.6",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.6/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:9a0c9e5f4b63dbc468f1458dd01d4d33be272e0436055efeea033dd7e2b11880",
+        "size": "1133568",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.7",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.7/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:b560dd7bfef78513b3c468999da1f83b6185aa319a9da544260bc6a74aa8b89b",
+        "size": "1133568",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.8",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.8/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:89cbfbeb776437c15691c29da269cde63a13f8994a7ba2f3bba8e9fb1ef6efcb",
+        "size": "1133568",
+        "module": "NINA"
+      },
+      {
+        "version": "1.5.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.5.0/NINA-arduino.megaavr.uno2018.bin",
+        "checksum": "SHA-256:9687f9491d4f804487055dd1db3b8932567050c18552e4be109f096dea4201ca",
+        "size": "1135616",
+        "module": "NINA"
+      }
+    ],
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": [
+      "arduino:avrdude@6.3.0-arduino17"
+    ],
+    "module": "NINA",
+    "name": "Arduino Uno WiFi Rev2"
+  },
+  {
+    "fqbn": "arduino:mbed_nano:nanorp2040connect",
+    "firmware": [
+      {
+        "version": "1.4.5",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.5/NINA-arduino.mbed_nano.nanorp2040connect.bin",
+        "checksum": "SHA-256:5cc391414abd2233001923221a0103dd5ca37222cf885dace065962c962ccd2b",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.6",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.6/NINA-arduino.mbed_nano.nanorp2040connect.bin",
+        "checksum": "SHA-256:6b46f3cd771d6a322819855690b2703c51f15fa00894e94c77bad3f8c216be58",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.7",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.7/NINA-arduino.mbed_nano.nanorp2040connect.bin",
+        "checksum": "SHA-256:d3fb2da91f46803e3dfed552d328e7d4d495be8b2773504bc695aefff3d114cb",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.4.8",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.4.8/NINA-arduino.mbed_nano.nanorp2040connect.bin",
+        "checksum": "SHA-256:922b3c156498c4493272e15548fdf587ee957a1f400bd44d444e68890ad12eba",
+        "size": "1127424",
+        "module": "NINA"
+      },
+      {
+        "version": "1.5.0",
+        "url": "https://downloads.arduino.cc/arduino-fwuploader/firmwares/NINA/1.5.0/NINA-arduino.mbed_nano.nanorp2040connect.bin",
+        "checksum": "SHA-256:f456ff99fc3d697ffd4c715a75172d793abd3d98c16b76589c4de92b6f787cf0",
+        "size": "1129472",
+        "module": "NINA"
+      }
+    ],
+    "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
+    "additional_tools": [
+      "arduino:rp2040tools@1.0.6"
+    ],
+    "module": "NINA",
+    "name": "Arduino Nano RP2040 Connect"
+  }
+]

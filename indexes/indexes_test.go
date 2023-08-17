@@ -33,7 +33,7 @@ func TestGetPackageIndex(t *testing.T) {
 }
 
 func TestGetFirmwareIndex(t *testing.T) {
-	index, err := GetFirmwareIndex(globals.ModuleFirmwareIndexGZURL, true)
+	index, err := GetFirmwareIndex(globals.PluginFirmwareIndexGZURL, true)
 	require.NoError(t, err)
 	require.NotNil(t, index)
 }

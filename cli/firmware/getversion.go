@@ -21,22 +21,14 @@ package firmware
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/arduino/arduino-fwuploader/cli/common"
 	"github.com/arduino/arduino-fwuploader/cli/feedback"
 	"github.com/arduino/arduino-fwuploader/cli/globals"
 	"github.com/arduino/arduino-fwuploader/flasher"
-	"github.com/arduino/arduino-fwuploader/indexes/download"
-	"github.com/arduino/arduino-fwuploader/indexes/firmwareindex"
 	"github.com/arduino/arduino-fwuploader/plugin"
-	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	semver "go.bug.st/relaxed-semver"
 )
 
 // NewGetVersionCommand creates a new `get-version` command
@@ -46,8 +38,8 @@ func NewGetVersionCommand() *cobra.Command {
 		Short: "Gets the version of the firmware the board is using.",
 		Long:  "Flashes a sketch to a board to obtain the firmware version used by the board",
 		Example: "" +
-			"  " + os.Args[0] + " firmware get-version --fqbn arduino:samd:mkr1000 --address COM10\n" +
-			"  " + os.Args[0] + " firmware get-version -b arduino:samd:mkr1000 -a COM10\n",
+			"  " + os.Args[0] + " firmware get-version --fqbn arduino:samd:mkrwifi1010 --address COM10\n" +
+			"  " + os.Args[0] + " firmware get-version -b arduino:renesas_uno:unor4wifi -a COM10\n",
 		Args: cobra.NoArgs,
 		Run:  runGetVersion,
 	}
@@ -64,26 +56,20 @@ func runGetVersion(cmd *cobra.Command, args []string) {
 	board := common.GetBoard(firmwareIndex, commonFlags.Fqbn)
 	uploadToolDir := common.DownloadRequiredToolsForBoard(packageIndex, board)
 
-	var result *flasher.FlashResult
-	if !board.IsPlugin() {
-		result = getVersion(board, uploadToolDir)
-	} else {
-		uploader, err := plugin.NewFWUploaderPlugin(uploadToolDir)
-		if err != nil {
-			feedback.Fatal(fmt.Sprintf("Could not open uploader plugin: %s", err), feedback.ErrGeneric)
-		}
-		result = getVersionWithPlugin(uploader)
+	uploader, err := plugin.NewFWUploaderPlugin(uploadToolDir)
+	if err != nil {
+		feedback.Fatal(fmt.Sprintf("Could not open uploader plugin: %s", err), feedback.ErrGeneric)
 	}
 
+	result := getVersion(uploader)
 	if feedback.GetFormat() == feedback.Text {
 		fmt.Printf("Firmware version installed: %s", result.Version)
 	} else {
-		// Print the results
 		feedback.PrintResult(result)
 	}
 }
 
-func getVersionWithPlugin(uploader *plugin.FwUploader) *flasher.FlashResult {
+func getVersion(uploader *plugin.FwUploader) *flasher.FlashResult {
 	var stdout, stderr io.Writer
 	if feedback.GetFormat() == feedback.Text {
 		stdout = os.Stdout
@@ -101,63 +87,4 @@ func getVersionWithPlugin(uploader *plugin.FwUploader) *flasher.FlashResult {
 		}),
 		Version: res.FirmwareVersion.String(),
 	}
-}
-
-func getVersion(board *firmwareindex.IndexBoard, uploadToolDir *paths.Path) *flasher.FlashResult {
-	versionSketchPath, err := download.DownloadSketch(board.VersionSketch)
-	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error downloading loader sketch from %s: %s", board.LoaderSketch.URL, err), feedback.ErrGeneric)
-	}
-	logrus.Debugf("version sketch downloaded in %s", versionSketchPath.String())
-
-	versionSketch := strings.ReplaceAll(versionSketchPath.String(), versionSketchPath.Ext(), "")
-
-	programmerOut, programmerErr, err := common.FlashSketch(board, versionSketch, uploadToolDir, commonFlags.Address)
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
-	}
-
-	// Wait a bit after flashing the sketch for the board to become available again.
-	logrus.Debug("sleeping for 3 sec")
-	time.Sleep(3 * time.Second)
-
-	// 9600 is the baudrate used in the CheckVersion sketch
-	port, err := flasher.OpenSerial(commonFlags.Address, 9600, 2)
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
-	}
-
-	buff := make([]byte, 200)
-	serialResult := make([]byte, 0)
-	for {
-		n, err := port.Read(buff)
-		if err != nil {
-			log.Fatal(err)
-			break
-		}
-		serialResult = append(serialResult, buff[:n]...)
-		if n == 0 { // exit when done reading from serial
-			break
-		}
-		logrus.Info(string(buff[:n]))
-	}
-	lines := strings.Split(string(serialResult), "\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "Firmware version installed: ") {
-			version := strings.TrimSpace(strings.Replace(line, "Firmware version installed: ", "", 1))
-			semver := semver.ParseRelaxed(version)
-			return &flasher.FlashResult{
-				Programmer: (&flasher.ExecOutput{
-					Stdout: programmerOut.String(),
-					Stderr: programmerErr.String(),
-				}),
-				Version: semver.String(),
-			}
-		}
-		if strings.HasPrefix(line, "Communication with WiFi module failed!") {
-			feedback.Fatal("communication with WiFi module failed", feedback.ErrGeneric)
-		}
-	}
-	feedback.Fatal("could not find the version string to parse", feedback.ErrGeneric)
-	return nil
 }

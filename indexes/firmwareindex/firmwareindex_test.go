@@ -26,7 +26,7 @@ import (
 )
 
 func TestIndexParsing(t *testing.T) {
-	indexFile := paths.New("testdata/module_firmware_index.json")
+	indexFile := paths.New("testdata/plugin_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
@@ -38,15 +38,15 @@ func TestIndexParsing(t *testing.T) {
 }
 
 func TestGetBoard(t *testing.T) {
-	indexFile := paths.New("testdata/module_firmware_index.json")
+	indexFile := paths.New("testdata/plugin_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 
-	board := index.GetBoard("arduino:samd:mkr1000")
+	board := index.GetBoard("arduino:samd:mkrwifi1010")
 	require.NotNil(t, board)
-	require.Equal(t, board.Fqbn, "arduino:samd:mkr1000")
+	require.Equal(t, board.Fqbn, "arduino:samd:mkrwifi1010")
 
 	board = index.GetBoard("arduino:samd:nano_33_iot")
 	require.NotNil(t, board)
@@ -57,29 +57,29 @@ func TestGetBoard(t *testing.T) {
 }
 
 func TestGetLatestFirmware(t *testing.T) {
-	indexFile := paths.New("testdata/module_firmware_index.json")
+	indexFile := paths.New("testdata/plugin_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 
-	firmware := index.GetBoard("arduino:samd:mkr1000").LatestFirmware()
-	require.Equal(t, firmware.Version.String(), "19.6.1")
+	firmware := index.GetBoard("arduino:samd:mkrwifi1010").LatestFirmware()
+	require.Equal(t, firmware.Version.String(), "1.5.0")
 }
 
 func TestGetFirmware(t *testing.T) {
-	indexFile := paths.New("testdata/module_firmware_index.json")
+	indexFile := paths.New("testdata/plugin_firmware_index.json")
 	t.Logf("testing with index: %s", indexFile)
 	index, e := LoadIndexNoSign(indexFile)
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 
-	firmware := index.GetBoard("arduino:samd:mkr1000").GetFirmware("19.6.1")
-	require.Equal(t, firmware.Version.String(), "19.6.1")
+	firmware := index.GetBoard("arduino:samd:mkrwifi1010").GetFirmware("1.5.0")
+	require.Equal(t, firmware.Version.String(), "1.5.0")
 
-	firmware = index.GetBoard("arduino:samd:mkr1000").GetFirmware("19.5.2")
-	require.Equal(t, firmware.Version.String(), "19.5.2")
+	firmware = index.GetBoard("arduino:samd:mkrwifi1010").GetFirmware("1.4.8")
+	require.Equal(t, firmware.Version.String(), "1.4.8")
 
-	firmware = index.GetBoard("arduino:samd:mkr1000").GetFirmware("0.0.0")
+	firmware = index.GetBoard("arduino:samd:mkrwifi1010").GetFirmware("0.0.0")
 	require.Nil(t, firmware)
 }

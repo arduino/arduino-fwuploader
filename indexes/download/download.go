@@ -286,10 +286,8 @@ func verifyIndex(indexPath *paths.Path, URL *url.URL) error {
 	signaturePath := paths.New(fmt.Sprintf("%s.sig", indexPath))
 	if index == "package_index.json.gz" {
 		valid, err = verifyPackageIndex(indexPath, signaturePath)
-	} else if index == "module_firmware_index.json.gz" {
-		valid, err = verifyModuleFirmwareIndex(indexPath, signaturePath)
 	} else if index == "plugin_firmware_index.json.gz" {
-		valid, err = verifyModuleFirmwareIndex(indexPath, signaturePath)
+		valid, err = verifyPluginFirmwareIndex(indexPath, signaturePath)
 	} else {
 		return fmt.Errorf("index %s not supported", URL.Path)
 	}
@@ -316,9 +314,9 @@ func verifyPackageIndex(indexPath, signaturePath *paths.Path) (bool, error) {
 	return valid, nil
 }
 
-// verifyModuleFirmwareIndex verify if the signature is valid for the provided module firmware index
-func verifyModuleFirmwareIndex(indexPath, signaturePath *paths.Path) (bool, error) {
-	arduinoKeyringFile, err := globals.Keys.Open("keys/module_firmware_index_public.gpg.key")
+// verifyPluginFirmwareIndex verify if the signature is valid for the provided plugin firmware index
+func verifyPluginFirmwareIndex(indexPath, signaturePath *paths.Path) (bool, error) {
+	arduinoKeyringFile, err := globals.Keys.Open("keys/plugin_firmware_index_public.gpg.key")
 	if err != nil {
 		return false, fmt.Errorf("could not find bundled signature keys: %s", err)
 	}
