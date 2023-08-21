@@ -32,7 +32,7 @@ import (
 // required to connect to that server from the TLS handshake response.
 func ScrapeRootCertificatesFromURL(URL string) (*x509.Certificate, error) {
 	conn, err := tls.Dial("tcp", URL, &tls.Config{
-		InsecureSkipVerify: true,
+		InsecureSkipVerify: false,
 	})
 	if err != nil {
 		logrus.Error(err)
