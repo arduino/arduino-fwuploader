@@ -140,3 +140,25 @@ func TestDownloadFirmware(t *testing.T) {
 	require.NotEmpty(t, firmwarePath)
 	require.FileExists(t, firmwarePath.String())
 }
+
+func TestDownloadToolMissingFlavour(t *testing.T) {
+	toolRelease := &cores.ToolRelease{
+		Version: semver.ParseRelaxed("1.7.0-arduino3"),
+		Tool: &cores.Tool{
+			Name: "bossac",
+			Package: &cores.Package{
+				Name: "arduino",
+			},
+		},
+		Flavors: []*cores.Flavor{},
+	}
+	defer os.RemoveAll(globals.FwUploaderPath.String())
+	indexFile := paths.New("testdata/package_index.json")
+	t.Logf("testing with index: %s", indexFile)
+	index, e := packageindex.LoadIndexNoSign(indexFile)
+	require.NoError(t, e)
+	require.NotEmpty(t, index)
+	toolDir, err := DownloadTool(toolRelease)
+	require.Error(t, err)
+	require.Empty(t, toolDir)
+}
