@@ -45,6 +45,11 @@ import (
 // DownloadTool downloads and returns the path on the local filesystem of a tool
 func DownloadTool(toolRelease *cores.ToolRelease) (*paths.Path, error) {
 	resource := toolRelease.GetCompatibleFlavour()
+	if resource == nil {
+		err := fmt.Errorf("tool %s not available for this OS", toolRelease.String())
+		logrus.Error(err)
+		return nil, err
+	}
 	installDir := globals.FwUploaderPath.Join(
 		"tools",
 		toolRelease.Tool.Name,
