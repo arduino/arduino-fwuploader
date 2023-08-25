@@ -85,7 +85,7 @@ func runFlash(certificateURLs, certificatePaths []string) {
 	res, flashErr := flashCertificates(uploader, certificateURLs, certificatePaths)
 	feedback.PrintResult(res)
 	if flashErr != nil {
-		os.Exit(int(feedback.ErrGeneric))
+		feedback.Fatal(fmt.Sprintf("Error during certificates flashing: %s", flashErr), feedback.ErrGeneric)
 	}
 }
 
