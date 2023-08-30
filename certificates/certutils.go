@@ -45,15 +45,15 @@ func ScrapeRootCertificatesFromURL(URL string) (*x509.Certificate, error) {
 		return nil, err
 	}
 
-	peerCertificates := conn.ConnectionState().PeerCertificates
-	if len(peerCertificates) == 0 {
-		err = fmt.Errorf("no peer certificates found at %s", URL)
-		logrus.Error(err)
-		return nil, err
+	chains := conn.ConnectionState().VerifiedChains
+	if len(chains) == 0 {
+		return nil, fmt.Errorf("no certificates found at %s", URL)
 	}
-
-	rootCertificate := peerCertificates[len(peerCertificates)-1]
-	return rootCertificate, nil
+	rootCertificate := chains[len(chains)-1]
+	if len(rootCertificate) == 0 {
+		return nil, fmt.Errorf("no certificates found at %s", URL)
+	}
+	return rootCertificate[len(rootCertificate)-1], nil
 }
 
 // LoadCertificatesFromFile read certificates from the given file. PEM and CER formats
