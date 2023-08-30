@@ -121,11 +121,11 @@ func flashCertificates(uploader *plugin.FwUploader, certificateURLs, certificate
 	for _, URL := range certificateURLs {
 		logrus.Infof("Converting and flashing certificate from %s", URL)
 		stdout.Write([]byte(fmt.Sprintf("Converting and flashing certificate from %s\n", URL)))
-		rootCert, err := certificates.ScrapeRootCertificatesFromURL(URL)
+		rootCerts, err := certificates.ScrapeRootCertificatesFromURL(URL)
 		if err != nil {
 			return nil, err
 		}
-		allCerts = append(allCerts, rootCert)
+		allCerts = append(allCerts, rootCerts...)
 	}
 
 	f, err := certsBundle.Create()

@@ -8,7 +8,9 @@ import (
 )
 
 func TestScrapeRootCertificatesFromURL(t *testing.T) {
-	cert, err := certificates.ScrapeRootCertificatesFromURL("www.arduino.cc:443")
+	rootCerts, err := certificates.ScrapeRootCertificatesFromURL("www.arduino.cc:443")
 	require.NoError(t, err)
-	require.Equal(t, cert.Issuer, cert.Subject)
+	for _, cert := range rootCerts {
+		require.Equal(t, cert.Issuer, cert.Subject)
+	}
 }
