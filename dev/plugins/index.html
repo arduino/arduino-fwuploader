@@ -732,11 +732,8 @@ Error:<span class="w"> </span>reboot<span class="w"> </span>mode:<span class="w"
 ...
 </code></pre></div>
 <h4 id="i-flashed-the-certificates-but-i-am-unable-to-reach-the-host">I flashed the certificates, but I am unable to reach the host<a class="headerlink" href="#i-flashed-the-certificates-but-i-am-unable-to-reach-the-host" title="Permanent link">&para;</a></h4>
-<p>The <strong>whole certificate chain</strong> is needed to make it work. Using
-<a href="../commands/arduino-fwuploader_certificates_flash/#options"><code>-u</code> flags</a> (ex: <code>-u www.arduino.cc:443</code>) won’t work because
-it only downloads the root certificates. The solution is to use only the
-<a href="../commands/arduino-fwuploader_certificates_flash/#options"><code>-f</code> flag</a> and provide a pem certificate containing the
-whole chain.</p>
+<p>There was a bug in the arduino-fwuploader prior <code>2.4.1</code> which didn't pick the actual root certificate. Upgrading to the
+latest version solves the problem.</p>
 <h4 id="my-antivirus-says-that-espflash-is-a-threat">My antivirus says that <code>espflash</code> is a threat<a class="headerlink" href="#my-antivirus-says-that-espflash-is-a-threat" title="Permanent link">&para;</a></h4>
 <p>The binary is not signed <a href="https://github.com/esp-rs/espflash/issues/348">#348</a>, and some antiviruses might complain. If
 still doubtful, <a href="https://github.com/esp-rs/espflash">https://github.com/esp-rs/espflash</a> is open source, and it's possible to double-check the md5 hashes of
