@@ -30,7 +30,7 @@ import (
 
 // ScrapeRootCertificatesFromURL downloads from a webserver the root certificate
 // required to connect to that server from the TLS handshake response.
-func ScrapeRootCertificatesFromURL(URL string) (*x509.Certificate, error) {
+func ScrapeRootCertificatesFromURL(URL string) ([]*x509.Certificate, error) {
 	conn, err := tls.Dial("tcp", URL, &tls.Config{
 		InsecureSkipVerify: false,
 	})
@@ -45,15 +45,16 @@ func ScrapeRootCertificatesFromURL(URL string) (*x509.Certificate, error) {
 		return nil, err
 	}
 
-	peerCertificates := conn.ConnectionState().PeerCertificates
-	if len(peerCertificates) == 0 {
-		err = fmt.Errorf("no peer certificates found at %s", URL)
-		logrus.Error(err)
-		return nil, err
+	chains := conn.ConnectionState().VerifiedChains
+	if len(chains) == 0 {
+		return nil, fmt.Errorf("no certificates found at %s", URL)
 	}
-
-	rootCertificate := peerCertificates[len(peerCertificates)-1]
-	return rootCertificate, nil
+	rootCertificates := make([]*x509.Certificate, len(chains))
+	for i, chain := range chains {
+		// The last certificate of the chain is always the Root Certificate
+		rootCertificates[i] = chain[len(chain)-1]
+	}
+	return rootCertificates, nil
 }
 
 // LoadCertificatesFromFile read certificates from the given file. PEM and CER formats

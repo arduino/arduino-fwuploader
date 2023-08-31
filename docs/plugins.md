@@ -94,11 +94,8 @@ Error: reboot mode: upload commands sketch: setting DTR to OFF
 
 #### I flashed the certificates, but I am unable to reach the host
 
-The **whole certificate chain** is needed to make it work. Using
-[`-u` flags](commands/arduino-fwuploader_certificates_flash.md#options) (ex: `-u www.arduino.cc:443`) won’t work because
-it only downloads the root certificates. The solution is to use only the
-[`-f` flag](commands/arduino-fwuploader_certificates_flash.md#options) and provide a pem certificate containing the
-whole chain.
+There was a bug in the arduino-fwuploader prior `2.4.1` which didn't pick the actual root certificate. Upgrading to the
+latest version solves the problem.
 
 #### My antivirus says that `espflash` is a threat
 
