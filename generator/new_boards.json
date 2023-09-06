@@ -1,7 +1,7 @@
 {
   "arduino:renesas_uno:unor4wifi": {
     "moduleName": "ESP32-S3",
-    "versions": ["0.1.0", "0.2.0", "0.2.1"],
+    "versions": ["0.1.0", "0.2.0", "0.2.1", "0.3.0"],
     "name": "Arduino UNO R4 WiFi",
     "uploader_plugin": "arduino:uno-r4-wifi-fwuploader-plugin@1.0.0",
     "additional_tools": ["arduino:espflash@2.0.0", "arduino:bossac@1.9.1-arduino5"],
