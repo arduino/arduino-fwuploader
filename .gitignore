@@ -2,6 +2,7 @@
 /arduino-fwuploader*
 !/arduino-fwuploader*/
 /.vscode/
+/node_modules/
 .idea
 coverage_*.txt
 /dist

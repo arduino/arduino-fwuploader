@@ -2,12 +2,12 @@
 name: Test Integration
 
 env:
-  # See: https://github.com/actions/setup-go/tree/v2#readme
+  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
   GO_VERSION: "1.18"
-  # See: https://github.com/actions/setup-python/tree/v2#available-versions-of-python
+  # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
   PYTHON_VERSION: "3.9"
 
-# See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
 on:
   create:
   push:
@@ -38,15 +38,16 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       result: ${{ steps.determination.outputs.result }}
+    permissions: {}
     steps:
       - name: Determine if the rest of the workflow should run
         id: determination
         run: |
           RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
           # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
-          if [[ \
-            "${{ github.event_name }}" != "create" || \
-            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX \
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
           ]]; then
             # Run the other jobs.
             RESULT="true"
@@ -60,6 +61,8 @@ jobs:
   test:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
+    permissions:
+      contents: read
 
     strategy:
       matrix:
@@ -92,7 +95,7 @@ jobs:
         run: pip install poetry
 
       - name: Install Task
-        uses: arduino/setup-task@v1
+        uses: arduino/setup-task@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
