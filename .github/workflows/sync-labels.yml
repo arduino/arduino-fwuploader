@@ -1,7 +1,7 @@
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/sync-labels.md
 name: Sync Labels
 
-# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
 on:
   push:
     paths:
@@ -24,6 +24,8 @@ env:
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -55,6 +57,7 @@ jobs:
   download:
     needs: check
     runs-on: ubuntu-latest
+    permissions: {}
 
     strategy:
       matrix:
@@ -82,11 +85,14 @@ jobs:
   sync:
     needs: download
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
 
     steps:
       - name: Set environment variables
         run: |
-          # See: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
+          # See: https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
           echo "MERGED_CONFIGURATION_PATH=${{ runner.temp }}/labels.yml" >> "$GITHUB_ENV"
 
       - name: Determine whether to dry run
