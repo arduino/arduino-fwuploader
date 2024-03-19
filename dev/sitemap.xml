@@ -2,67 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/deprecated/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/installation/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/plugins/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/usage/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_certificates/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_certificates_flash/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_firmware/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_firmware_flash/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_firmware_get-version/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_firmware_list/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-fwuploader/dev/commands/arduino-fwuploader_version/</loc>
-         <lastmod>2024-03-14</lastmod>
+         <lastmod>2024-03-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
