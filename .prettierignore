@@ -11,3 +11,4 @@ indexes/testdata/package_index.json
 
 # Generated files
 /.licenses/
+node_modules/
