@@ -72,14 +72,14 @@ jobs:
         with:
           submodules: recursive
 
-      # This is required to allow jonabc/setup-licensed to install licensed via Ruby gem.
+      # This is required to allow licensee/setup-licensed to install licensed via Ruby gem.
       - name: Install Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ruby # Install latest version
 
       - name: Install licensed
-        uses: jonabc/setup-licensed@v1
+        uses: licensee/setup-licensed@v1.3.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
@@ -131,14 +131,14 @@ jobs:
         with:
           submodules: recursive
 
-      # This is required to allow jonabc/setup-licensed to install licensed via Ruby gem.
+      # This is required to allow licensee/setup-licensed to install licensed via Ruby gem.
       - name: Install Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ruby # Install latest version
 
       - name: Install licensed
-        uses: jonabc/setup-licensed@v1
+        uses: licensee/setup-licensed@v1.3.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
