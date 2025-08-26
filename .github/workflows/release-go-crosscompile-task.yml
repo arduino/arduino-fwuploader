@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -112,7 +112,7 @@ jobs:
           echo "PACKAGE_FILENAME=${{ env.PROJECT_NAME }}_${TAG}_${{ matrix.build.package-suffix }}" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -210,7 +210,7 @@ jobs:
 
     steps:
       - name: Checkout # we need package_index.template
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download artifact
         uses: actions/download-artifact@v4
