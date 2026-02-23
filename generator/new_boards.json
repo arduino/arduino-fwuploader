@@ -36,7 +36,8 @@
       "1.4.8",
       "1.5.0",
       "1.6.0",
-      "2.0.0"
+      "2.0.0",
+      "3.0.1"
     ],
     "name": "Arduino MKR WiFi 1010",
     "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
@@ -64,7 +65,8 @@
       "1.4.8",
       "1.5.0",
       "1.6.0",
-      "2.0.0"
+      "2.0.0",
+      "3.0.1"
     ],
     "name": "Arduino NANO 33 IoT",
     "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
@@ -90,7 +92,8 @@
       "1.4.8",
       "1.5.0",
       "1.6.0",
-      "2.0.0"
+      "2.0.0",
+      "3.0.1"
     ],
     "name": "Arduino Uno WiFi Rev2",
     "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
@@ -99,7 +102,7 @@
   },
   "arduino:mbed_nano:nanorp2040connect": {
     "moduleName": "NINA",
-    "versions": ["1.4.5", "1.4.6", "1.4.7", "1.4.8", "1.5.0", "1.6.0", "2.0.0"],
+    "versions": ["1.4.5", "1.4.6", "1.4.7", "1.4.8", "1.5.0", "1.6.0", "2.0.0", "3.0.1"],
     "name": "Arduino Nano RP2040 Connect",
     "uploader_plugin": "arduino:nina-fwuploader-plugin@1.0.0",
     "additional_tools": ["arduino:rp2040tools@1.0.6"],
