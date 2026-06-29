@@ -85,7 +85,7 @@ previous certificates are going to be erased. To overcome this it's required to 
 ```
 
 You can find the certificates that are preflashed on the NINA module
-[here](https://github.com/arduino/nina-fw/blob/master/data/roots.pem).
+[here](https://github.com/arduino/nina-fw/blob/master/data/cacrt_all.pem).
 
 ### Command line options
 
