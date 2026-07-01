@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Install Taskfile
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@v3
 
       - name: Install Python
         uses: actions/setup-python@v6
