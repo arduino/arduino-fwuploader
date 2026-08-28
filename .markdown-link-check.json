@@ -7,6 +7,11 @@
       }
     }
   ],
+  "ignorePatterns": [
+    {
+      "pattern": "^https://support\\.arm\\.com/documentation/ddi0419/c/Appendices/ARMv7-M-Differences/ARMv6-M-and-ARMv7-M-compatibility$"
+    }
+  ],
   "retryOn429": true,
   "retryCount": 3,
   "aliveStatusCodes": [200, 206, 429]
