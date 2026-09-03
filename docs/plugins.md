@@ -108,4 +108,4 @@ the binary and the source code. For more information, you can follow
 
 At the moment, we are always downloading the armv6 binaries. Since they are dynamically linked, most likely they are not
 going to run on armv7. More infos on the topic:
-[here](https://developer.arm.com/documentation/ddi0419/c/Appendices/ARMv7-M-Differences/ARMv6-M-and-ARMv7-M-compatibility).
+[here](https://support.arm.com/documentation/ddi0419/c/Appendices/ARMv7-M-Differences/ARMv6-M-and-ARMv7-M-compatibility).
