@@ -20,6 +20,8 @@ package download
 
 import (
 	"os"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -55,6 +57,9 @@ func TestDownloadTool(t *testing.T) {
 		Version: semver.ParseRelaxed("1.7.0-arduino3"),
 		Tool: &cores.Tool{
 			Name: "bossac",
+			Package: &cores.Package{
+				Name: "arduino",
+			},
 		},
 		Flavors: []*cores.Flavor{
 			{
@@ -120,12 +125,16 @@ func TestDownloadTool(t *testing.T) {
 	require.NoError(t, e)
 	require.NotEmpty(t, index)
 	toolDir, err := DownloadTool(toolRelease)
+	if err != nil && strings.Contains(err.Error(), "not available for this OS") {
+		t.Skipf("skipping: no tool flavor available for this platform (%s/%s)", runtime.GOOS, runtime.GOARCH)
+	}
 	require.NoError(t, err)
 	require.NotEmpty(t, toolDir)
 	require.DirExists(t, toolDir.String())
 	toolDirContent, err := toolDir.ReadDir()
 	require.NoError(t, err)
 	require.True(t, len(toolDirContent) > 0)
+
 }
 
 func TestDownloadFirmware(t *testing.T) {
