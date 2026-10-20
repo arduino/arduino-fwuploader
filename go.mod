@@ -1,6 +1,6 @@
 module github.com/arduino/arduino-fwuploader
 
-go 1.18
+go 1.24
 
 require (
 	github.com/arduino/arduino-cli v0.0.0-20230613145607-5725c0273235
@@ -32,7 +32,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
-	github.com/klauspost/compress v1.15.13 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
 	github.com/leonelquinteros/gotext v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
