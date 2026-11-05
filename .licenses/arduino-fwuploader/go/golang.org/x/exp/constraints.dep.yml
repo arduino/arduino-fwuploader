@@ -5,8 +5,7 @@ type: go
 summary: Package constraints defines a set of useful constraints to be used with type
   parameters.
 homepage: https://pkg.go.dev/golang.org/x/exp/constraints
-license: other
-review_changed_license: true
+license: bsd-3-clause
 licenses:
 - sources: exp@v0.0.0-20240719175910-8a7402abbf56/LICENSE
   text: |

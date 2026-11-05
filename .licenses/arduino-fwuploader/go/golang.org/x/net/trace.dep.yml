@@ -4,7 +4,7 @@ version: v0.39.0
 type: go
 summary: Package trace implements tracing of requests and long-lived objects.
 homepage: https://pkg.go.dev/golang.org/x/net/trace
-license: other
+license: bsd-3-clause
 licenses:
 - sources: net@v0.39.0/LICENSE
   text: |

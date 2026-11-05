@@ -4,8 +4,7 @@ version: v0.0.0-20240719175910-8a7402abbf56
 type: go
 summary: Package slices defines various functions useful with slices of any type.
 homepage: https://pkg.go.dev/golang.org/x/exp/slices
-license: other
-review_changed_license: true
+license: bsd-3-clause
 licenses:
 - sources: exp@v0.0.0-20240719175910-8a7402abbf56/LICENSE
   text: |
