@@ -1,12 +1,15 @@
 {
   "Exclude": [
+    "^\\.git[/\\\\]",
+    "^\\.licenses[/\\\\]",
+    "__pycache__[/\\\\]",
+    "node_modules[/\\\\]",
+    "^LICENSE\\.txt$",
+    "^poetry\\.lock$",
     "^indexes/download/testdata/plugin_firmware_index\\.json$",
     "^indexes/download/testdata/package_index\\.json$",
     "^indexes/testdata/package_index\\.json$",
     "^indexes/firmwareindex/testdata/plugin_firmware_index\\.json$",
-    "^LICENSE\\.txt$",
-    "^poetry\\.lock$",
-    "^\\.licenses/",
     ".+\\.cer$",
     ".+\\.elf$",
     ".+\\.key$",
