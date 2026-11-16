@@ -60,7 +60,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.15.13 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leonelquinteros/gotext v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
