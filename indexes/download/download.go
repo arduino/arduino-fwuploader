@@ -154,7 +154,7 @@ func Download(d *downloader.Downloader) error {
 	}
 	// The URL is not reachable for some reason
 	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		return fmt.Errorf(d.Resp.Status)
+		return errors.New(d.Resp.Status)
 	}
 	return nil
 }
