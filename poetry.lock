@@ -170,15 +170,14 @@ files = [
 
 [[package]]
 name = "invoke"
-version = "1.5.0"
+version = "3.0.3"
 description = "Pythonic task execution"
 optional = false
-python-versions = "*"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "invoke-1.5.0-py2-none-any.whl", hash = "sha256:da7c2d0be71be83ffd6337e078ef9643f41240024d6b2659e7b46e0b251e339f"},
-    {file = "invoke-1.5.0-py3-none-any.whl", hash = "sha256:7e44d98a7dc00c91c79bac9e3007276965d2c96884b3c22077a9f04042bd6d90"},
-    {file = "invoke-1.5.0.tar.gz", hash = "sha256:f0c560075b5fb29ba14dad44a7185514e94970d1b9d57dcd3723bec5fed92650"},
+    {file = "invoke-3.0.3-py3-none-any.whl", hash = "sha256:f11327165e5cbb89b2ad1d88d3292b5113332c43b8553b494da435d6ec6f5053"},
+    {file = "invoke-3.0.3.tar.gz", hash = "sha256:437b6a622223824380bfb4e64f612711a6b648c795f565efc8625af66fb57f0c"},
 ]
 
 [[package]]
@@ -751,4 +750,4 @@ watchmedo = ["PyYAML (>=3.10)", "argh (>=0.24.1)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.15.2"
-content-hash = "1d29e42819cea315f6f23d1ef60311788e8835cb9d24dc735fabeaf7887dcc1b"
+content-hash = "2974f3a57dbfc3c2aece11dc1e403b7cfe9761a8b066f4d316016c36feda81bb"
