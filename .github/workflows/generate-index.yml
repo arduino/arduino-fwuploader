@@ -39,7 +39,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v7
         with:
-          python-version: "3.9"
+          python-version-file: pyproject.toml
 
       - name: Install Poetry
         run: pip install poetry
