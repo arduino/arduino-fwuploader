@@ -11,3 +11,13 @@ updates:
       interval: daily
     labels:
       - "topic: infrastructure"
+
+  - package-ecosystem: pip
+    directory: /
+    assignees:
+      - per1234
+    labels:
+      - "topic: dependencies"
+      - "topic: infrastructure"
+    schedule:
+      interval: daily
