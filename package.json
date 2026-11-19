@@ -2,7 +2,7 @@
   "devDependencies": {
     "markdown-link-check": "^3.12.1",
     "markdownlint-cli": "^0.50.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.10.1"
   },
   "engines": {
     "node": "24.x"
