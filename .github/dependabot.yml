@@ -12,6 +12,16 @@ updates:
     labels:
       - "topic: infrastructure"
 
+  - package-ecosystem: npm
+    directory: /
+    assignees:
+      - per1234
+    labels:
+      - "topic: dependencies"
+      - "topic: infrastructure"
+    schedule:
+      interval: daily
+
   - package-ecosystem: pip
     directory: /
     assignees:
