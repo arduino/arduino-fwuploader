@@ -319,21 +319,6 @@ pycodestyle = ">=2.15.0,<2.16.0"
 pyflakes = ">=4.1.0,<4.2.0"
 
 [[package]]
-name = "flake8-polyfill"
-version = "1.0.2"
-description = "Polyfill package for Flake8 plugins"
-optional = false
-python-versions = "*"
-groups = ["dev"]
-files = [
-    {file = "flake8-polyfill-1.0.2.tar.gz", hash = "sha256:e44b087597f6da52ec6393a709e7108b2905317d0c0b744cdca6208e670d8eda"},
-    {file = "flake8_polyfill-1.0.2-py2.py3-none-any.whl", hash = "sha256:12be6a34ee3ab795b19ca73505e7b55826d5f6ad7230d31b18e106400169b9e9"},
-]
-
-[package.dependencies]
-flake8 = "*"
-
-[[package]]
 name = "ghp-import"
 version = "2.0.1"
 description = "Copy your docs directly to the gh-pages branch."
@@ -743,19 +728,18 @@ files = [
 
 [[package]]
 name = "pep8-naming"
-version = "0.12.1"
+version = "0.15.1"
 description = "Check PEP-8 naming conventions, plugin for flake8"
 optional = false
-python-versions = "*"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "pep8-naming-0.12.1.tar.gz", hash = "sha256:bb2455947757d162aa4cad55dba4ce029005cd1692f2899a21d51d8630ca7841"},
-    {file = "pep8_naming-0.12.1-py2.py3-none-any.whl", hash = "sha256:4a8daeaeb33cfcde779309fc0c9c0a68a3bbe2ad8a8308b763c5068f86eb9f37"},
+    {file = "pep8_naming-0.15.1-py3-none-any.whl", hash = "sha256:eb63925e7fd9e028c7f7ee7b1e413ec03d1ee5de0e627012102ee0222c273c86"},
+    {file = "pep8_naming-0.15.1.tar.gz", hash = "sha256:f6f4a499aba2deeda93c1f26ccc02f3da32b035c8b2db9696b730ef2c9639d29"},
 ]
 
 [package.dependencies]
-flake8 = ">=3.9.1"
-flake8-polyfill = ">=1.0.2,<2"
+flake8 = ">=5.0.0"
 
 [[package]]
 name = "platformdirs"
@@ -1097,4 +1081,4 @@ watchmedo = ["PyYAML (>=3.10)", "argh (>=0.24.1)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.15.2"
-content-hash = "71d534dd730380883e594ed3d7a14e462d15818e0636e259cbcb0226c1c874f0"
+content-hash = "1965235c9ecc7c397dec506712e9c5454640103ca41d1b57f223b9615caf3942"
