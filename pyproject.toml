@@ -11,7 +11,7 @@ python-dateutil = ">=2.8.1,<5.0.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^7.5.0"
-black = "^24.3"
+black = "^26.10"
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.8.1"
 mdx-truly-sane-lists = "^1.3"
