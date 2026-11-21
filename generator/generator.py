@@ -40,7 +40,7 @@ def sha2(file_path):
 
 
 def split_property_and_drop_first_level(s):
-    (k, v) = s.strip().split("=", maxsplit=1)
+    k, v = s.strip().split("=", maxsplit=1)
     k = ".".join(k.split(".", maxsplit=1)[1:])
     return (k, v)
 
