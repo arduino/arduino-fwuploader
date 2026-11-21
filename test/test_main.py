@@ -26,7 +26,7 @@ def test_version(run_command):
     assert output_list[0] == "arduino-fwuploader"
     assert output_list[1] == "Version:"
     version = output_list[2]
-    assert semver.VersionInfo.isvalid(version=version) or version == "git-snapshot" or "nightly" in version
+    assert semver.VersionInfo.is_valid(version=version) or version == "git-snapshot" or "nightly" in version
     assert output_list[3] == "Commit:"
     assert isinstance(output_list[4], str)
     assert output_list[5] == "Date:"
@@ -38,7 +38,7 @@ def test_version(run_command):
     parsed_out = json.loads(result.stdout)
     assert parsed_out.get("Application", False) == "arduino-fwuploader"
     version = parsed_out.get("VersionString", False)
-    assert semver.VersionInfo.isvalid(version=version) or "git-snapshot" in version or "nightly" in version
+    assert semver.VersionInfo.is_valid(version=version) or "git-snapshot" in version or "nightly" in version
     assert parsed_out.get("Commit", False) != ""
     assert isinstance(parsed_out.get("Commit", False), str)
     assert parsed_out.get("Date") != ""
